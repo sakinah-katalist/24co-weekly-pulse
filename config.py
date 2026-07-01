@@ -1,29 +1,17 @@
 # ─────────────────────────────────────────────
 # Gov Leads Monitor — Configuration
+# Secrets are read from environment variables.
+# Locally: create a .env file (see .env.example).
+# Streamlit Cloud: set these in App Settings → Secrets.
 # ─────────────────────────────────────────────
-# HOW TO GET YOUR NOTION TOKEN & DATABASE IDs:
-#
-#  1. Go to https://www.notion.so/my-integrations
-#  2. Click "+ New integration", name it "Gov Leads Monitor"
-#  3. Select your workspace, click Submit
-#  4. Copy the "Internal Integration Token" below
-#
-#  5. For each database:
-#     - Open the database in Notion (full page view)
-#     - Copy the URL — it looks like:
-#       https://www.notion.so/YOUR-WORKSPACE/abc123def456...?v=...
-#     - The 32-character string before the "?" is the database ID
-#     - Add dashes: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-#
-#  6. Share each database with your integration:
-#     - Open database → ··· menu → Connections → Add your integration
+import os as _os
 
-NOTION_TOKEN = "secret_PASTE_YOUR_TOKEN_HERE"
+NOTION_TOKEN = _os.environ.get("NOTION_TOKEN", "")
 
-# ── Database IDs — pre-filled from your live Notion workspace ──────────────
-MARKETING_LEADS_DB_ID = "199b1ded-82ca-8030-96fc-c3cfa0024f76"
-PAST_CLASSES_DB_ID    = "132b1ded-82ca-80ce-aac5-f48060e58c62"
-SALES_CRM_DB_ID       = "8aa1672a-ac29-4454-9acc-b32f3cda12a1"
+# ── Database IDs ──────────────────────────────────────────────────────────
+MARKETING_LEADS_DB_ID = _os.environ.get("MARKETING_LEADS_DB_ID", "199b1ded-82ca-8030-96fc-c3cfa0024f76")
+PAST_CLASSES_DB_ID    = _os.environ.get("PAST_CLASSES_DB_ID",    "132b1ded-82ca-80ce-aac5-f48060e58c62")
+SALES_CRM_DB_ID       = _os.environ.get("SALES_CRM_DB_ID",       "8aa1672a-ac29-4454-9acc-b32f3cda12a1")
 
 # ── Notion field names — mapped from your live database schemas ───────────
 LEADS_FIELDS = {
@@ -73,8 +61,8 @@ CRM_FIELDS = {
 #  3. Select app: Mail, device: Other → name it "Gov Leads Monitor"
 #  4. Copy the 16-character password (no spaces) below
 
-EMAIL_FROM     = "tengku@twenty-four.io"      # ✓
-EMAIL_PASSWORD = "hilb xbxo oght dxil"      # ← paste your Gmail App Password here
+EMAIL_FROM     = _os.environ.get("EMAIL_FROM",     "tengku@twenty-four.io")
+EMAIL_PASSWORD = _os.environ.get("EMAIL_PASSWORD", "")
 EMAIL_TO       = ["sakinah@katalist.my", "elaikha@katalist.my", "syafiq@katalist.my", "andy@katalist.my", "mubiin@katalist.my"]
 EMAIL_CC       = []
 
