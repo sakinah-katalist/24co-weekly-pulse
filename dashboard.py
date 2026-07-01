@@ -27,6 +27,41 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── Password gate ─────────────────────────────────────────────────────────────
+import os as _os
+
+def _check_password() -> bool:
+    correct = _os.environ.get("DASHBOARD_PASSWORD", "")
+    if not correct:
+        return True  # no password set — skip gate (local dev)
+    if st.session_state.get("authenticated"):
+        return True
+    st.markdown("""
+    <div style="max-width:380px;margin:80px auto 0;background:#fff;
+                border-radius:16px;padding:36px 32px;
+                box-shadow:0 4px 24px rgba(0,0,0,.10);text-align:center;">
+      <p style="font-size:28px;margin:0 0 4px;">📊</p>
+      <h2 style="color:#0D2035;font-size:20px;margin:0 0 4px;">24co Weekly Pulse</h2>
+      <p style="color:#7A8499;font-size:13px;margin:0 0 24px;">
+        Katalist Venture · Internal use only
+      </p>
+    </div>
+    """, unsafe_allow_html=True)
+    col = st.columns([1, 2, 1])[1]
+    with col:
+        pwd = st.text_input("Password", type="password", label_visibility="collapsed",
+                            placeholder="Enter password…")
+        if st.button("Login →", use_container_width=True, type="primary"):
+            if pwd == correct:
+                st.session_state["authenticated"] = True
+                st.rerun()
+            else:
+                st.error("Incorrect password. Please try again.")
+    return False
+
+if not _check_password():
+    st.stop()
+
 # ── Global styles ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
