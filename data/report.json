@@ -1,0 +1,164 @@
+{
+  "report_date": "2026-06-29T00:00:00",
+  "period_label": "22–29 Jun 2026",
+  "leads": [
+    {
+      "org_name": "KWSP | EPF",
+      "contact_name": "Yoshita Sevaganam",
+      "contact_email": "syoshita@epf.gov.my",
+      "contact_phone": "016-225 2405",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "[Training] Hot Lead",
+      "date": "2026-06-23",
+      "enquiry": "Speaker/Talk Services",
+      "area": null,
+      "notes": "Inviting Ali Reza as speaker for KFAIR26 (Knowledge Fair) organized by EPF. 200 expected attendees.",
+      "is_hot": true,
+      "tier1": null,
+      "color": "red"
+    },
+    {
+      "org_name": "Universiti Putra Malaysia",
+      "contact_name": "Radzi",
+      "contact_email": "m_rdzi@upm.edu.my",
+      "contact_phone": "03-9769 1211",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-06-27",
+      "enquiry": "Trainings/Courses Request",
+      "area": "Not Sure Yet",
+      "notes": null,
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal"
+    },
+    {
+      "org_name": "Yayasan Terengganu",
+      "contact_name": "mdlizan",
+      "contact_email": "mdlizan@yt.gov.my",
+      "contact_phone": "011-1631 1245",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-06-28",
+      "enquiry": "Collaboration Opportunity",
+      "area": "Generative AI",
+      "notes": "IT Officer from Terengganu state government agency. Wants all staff to understand and use AI in their daily work.",
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal"
+    }
+  ],
+  "sessions": [
+    {
+      "org_name": "PLANMalaysia",
+      "class_name": "Canva Essentials: A Beginner's Guide to Design",
+      "date": "2026-06-23",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1LgiUcC-c-KuISJA18f9fTrv_xqZesAgtslz2aUBYeao/edit"
+    }
+  ],
+  "crm_deals": [
+    {
+      "org_name": "MTIB - Siri 2",
+      "stage": "Paid",
+      "deal_value": 19440,
+      "close_date": "2026-06-25",
+      "train_date": "2026-06-15",
+      "course": "Gen AI Essentials: Daripada Kemahiran kepada Penyelesaian Praktikal",
+      "contact": "Hidayah",
+      "pax": 37
+    },
+    {
+      "org_name": "MSU - Canva Siri 2",
+      "stage": "Paid",
+      "deal_value": 5184,
+      "close_date": "2026-06-26",
+      "train_date": "2026-06-11",
+      "course": "Canva 1 Day",
+      "contact": "",
+      "pax": 30
+    },
+    {
+      "org_name": "MINISTRY OF HOME AFFAIRS (KEMENTERIAN DALAM NEGERI)",
+      "stage": "Almost Confirmed",
+      "deal_value": 6480,
+      "close_date": null,
+      "train_date": "2026-09-29",
+      "course": "Gen AI Talk",
+      "contact": "Puan Siti Syahida",
+      "pax": null
+    },
+    {
+      "org_name": "Kementerian Ekonomi",
+      "stage": "Almost Confirmed",
+      "deal_value": 12960,
+      "close_date": null,
+      "train_date": "2026-07-16",
+      "course": "Google Workspace & Gemini",
+      "contact": "Pn Batrisyia",
+      "pax": 55
+    },
+    {
+      "org_name": "Kementerian Luar Negeri (KLN)",
+      "stage": "Almost Confirmed",
+      "deal_value": 39322,
+      "close_date": null,
+      "train_date": "2026-07-29",
+      "course": "Gen AI",
+      "contact": "Shahrul",
+      "pax": 35
+    },
+    {
+      "org_name": "Kementerian Kesihatan Malaysia KKM",
+      "stage": "Proposal / Quotation",
+      "deal_value": 23760,
+      "close_date": null,
+      "train_date": null,
+      "course": "Google Apps Script",
+      "contact": "Puan Mei",
+      "pax": 20
+    },
+    {
+      "org_name": "KWSP | EPF",
+      "stage": "Almost Confirmed",
+      "deal_value": 6000,
+      "close_date": null,
+      "train_date": "2026-08-05",
+      "course": "Gen AI Talk (Copilot) — KFAIR26",
+      "contact": "Yoshita Sevaganam",
+      "pax": 200
+    },
+    {
+      "org_name": "FELCRA Kelantan",
+      "stage": "Almost Confirmed",
+      "deal_value": 11340,
+      "close_date": null,
+      "train_date": "2026-07-21",
+      "course": "Gen AI",
+      "contact": "Hanif",
+      "pax": 35
+    },
+    {
+      "org_name": "Politeknik Sultan Salahuddin Abdul Aziz Shah",
+      "stage": "New Lead",
+      "deal_value": 0,
+      "close_date": null,
+      "train_date": null,
+      "course": "Not confirmed yet",
+      "contact": "",
+      "pax": null
+    }
+  ],
+  "revenue_history": [
+    {"week_label": "26 May–1 Jun", "total_revenue": 0},
+    {"week_label": "2–8 Jun",      "total_revenue": 0},
+    {"week_label": "9–15 Jun",     "total_revenue": 0},
+    {"week_label": "16–22 Jun",    "total_revenue": 0},
+    {"week_label": "23–29 Jun",    "total_revenue": 24624}
+  ]
+}
