@@ -662,17 +662,17 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
             _callout("  ".join(pipe_lines), C["yellow_light"], C["yellow"], styles),
         ]))
 
-    # Full deals table — heading never separated from the table itself
-    qualifying = [d for d in crm_deals if _stage_ok(d.get("stage",""))]
-    if qualifying:
+    # Open pipeline table (non-paid) — no KeepTogether so it can flow across pages
+    open_pipe = [d for d in crm_deals
+                 if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))]
+    open_pipe = sorted(open_pipe, key=lambda x: -(x.get("deal_value") or 0))[:50]
+    if open_pipe:
         add(sp(4))
-        add(KeepTogether([
-            Paragraph("All active deals (Paid, Closed & Proposals):", styles["Highlight"]),
-            sp(2),
-            _deal_table(qualifying, styles),
-        ]))
+        add(Paragraph(f"Open pipeline — top {len(open_pipe)} deals by value:", styles["Highlight"]))
+        add(sp(2))
+        add(_deal_table(open_pipe, styles))
 
-    # Pending collection — entire block kept on one page if it fits
+    # Pending collection — header kept together, table flows freely
     if pending:
         total_out = sum(d.get("deal_value",0) or 0 for d in pending)
         add(KeepTogether([
@@ -690,9 +690,9 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
                 f"Total amount still owed: <b>RM {total_out:,.0f}</b>",
                 C["red_light"], C["red"], styles
             ),
-            sp(2),
-            _deal_table(pending, styles),
         ]))
+        add(sp(2))
+        add(_deal_table(pending, styles))
 
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
     return output_path
