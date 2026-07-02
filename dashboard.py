@@ -189,7 +189,7 @@ st.markdown("""
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def _stage_ok(s):
     t = (s or "").lower()
-    return any(k in t for k in ("paid","closed","proposal","quotation","almost"))
+    return any(k in t for k in ("paid","closed","proposal","quotation","almost","in progress","preview"))
 
 def _is_revenue(s):
     t = (s or "").lower()
@@ -881,23 +881,25 @@ with tab2:
     st.markdown("---")
     st.markdown('<p class="sec-head">Current Pipeline</p>', unsafe_allow_html=True)
     st.markdown(
-        '<p class="sec-sub">Quotes sent to clients — not yet revenue</p>',
+        '<p class="sec-sub">Open deals — not yet revenue (paid deals are in the Revenue tabs above)</p>',
         unsafe_allow_html=True
     )
 
-    if crm_filtered:
+    # Pipeline = non-paid open deals only
+    open_pipeline = [d for d in crm_filtered if not _is_revenue(d.get("stage",""))]
+
+    if open_pipeline:
         by_stage = defaultdict(lambda: {"count": 0, "total": 0.0})
-        for d in crm_filtered:
+        for d in open_pipeline:
             by_stage[d.get("stage","—")]["count"] += 1
             by_stage[d.get("stage","—")]["total"] += d.get("deal_value",0) or 0
 
-        stage_cols = st.columns(len(by_stage))
+        stage_cols = st.columns(min(len(by_stage), 4))
         for col, (stage, info) in zip(stage_cols, sorted(by_stage.items(), key=lambda x:-x[1]["total"])):
-            clr  = "green" if _is_revenue(stage) else "yellow"
-            icon = "✅" if "paid" in stage.lower() else ("📁" if "closed" in stage.lower() else "📋")
+            icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
             with col:
                 st.markdown(f"""
-                <div class="kpi-card kpi-{clr}">
+                <div class="kpi-card kpi-yellow">
                   <p class="kpi-val">RM {info['total']:,.0f}</p>
                   <p class="kpi-lbl">{icon} {stage}</p>
                   <p class="kpi-src">{info['count']} deal{'s' if info['count']!=1 else ''}</p>
@@ -906,19 +908,19 @@ with tab2:
         st.markdown("<br>", unsafe_allow_html=True)
         st.image(crm_pipeline_bar(crm_deals), use_container_width=True)
 
-        st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:12px 0 8px;">All qualifying deals</p>',
+        st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:12px 0 8px;">Open pipeline deals</p>',
                     unsafe_allow_html=True)
         rows = []
-        for d in sorted(crm_filtered, key=lambda x: -(x.get("deal_value") or 0)):
+        for d in sorted(open_pipeline, key=lambda x: -(x.get("deal_value") or 0)):
             stg  = d.get("stage","")
-            icon = "✅" if "paid" in stg.lower() else ("📁" if "closed" in stg.lower() else "📋")
+            icon = "🔥" if "almost" in stg.lower() else ("⚙️" if "progress" in stg.lower() else "📋")
             rows.append({
-                "Organisation":     _expand_org(d.get("org_name","")),
-                "Status":           f"{icon} {stg}",
-                "Value":            f"RM {d.get('deal_value',0) or 0:,.0f}",
-                "Invoice / Close":  d.get("close_date") or "Not yet",
-                "Payment Received": d.get("payment_received_date") or ("—" if _is_revenue(stg) else "n/a"),
-                "Course / Notes":   d.get("course",""),
+                "Organisation": _expand_org(d.get("org_name","")),
+                "Status":       f"{icon} {stg}",
+                "Value":        f"RM {d.get('deal_value',0) or 0:,.0f}",
+                "Training Date": d.get("train_date") or "TBC",
+                "Course":        d.get("course",""),
+                "Contact":       d.get("contact",""),
             })
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
