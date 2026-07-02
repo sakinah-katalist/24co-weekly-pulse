@@ -115,8 +115,8 @@ def _revenue_last_7_days(deals, report_date) -> float:
     cutoff = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
     today  = report_date.strftime("%Y-%m-%d")
     return sum(d.get("deal_value", 0) or 0 for d in deals
-               if d.get("close_date") and cutoff <= d["close_date"] <= today
-               and _is_revenue(d.get("stage", "")))
+               if _is_revenue(d.get("stage", ""))
+               and cutoff <= (d.get("payment_received_date") or d.get("close_date") or "") <= today)
 
 
 def _hex(c) -> str:
@@ -342,7 +342,7 @@ def _deal_table(deals: list, styles) -> Table:
             Paragraph(icon,                  styles["TableCell"]),
             Paragraph(f"RM {d['deal_value']:,.0f}" if d.get("deal_value") else "—",
                       styles["TableCell"]),
-            Paragraph(d.get("close_date") or "—", styles["TableCell"]),
+            Paragraph(d.get("payment_received_date") or d.get("close_date") or "—", styles["TableCell"]),
             Paragraph(d.get("course",""),    styles["TableCell"]),
         ])
 
@@ -631,7 +631,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         for d in sorted(paid_deals, key=lambda x: -(x.get("deal_value") or 0)):
             rev_lines.append(
                 f"• <b>{_expand_org(d['org_name'])}</b> — RM {d.get('deal_value',0):,.0f} "
-                f"({'paid ' + d['close_date'] if d.get('close_date') else 'confirmed'})"
+                f"({'received ' + (d.get('payment_received_date') or d['close_date']) if (d.get('payment_received_date') or d.get('close_date')) else 'confirmed'})"
             )
         rev_callout = _callout("  ".join(rev_lines), C["green_light"], C["green"], styles)
 

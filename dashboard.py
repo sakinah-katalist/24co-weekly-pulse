@@ -545,25 +545,31 @@ with tab2:
     def _deals_in_range(deal_list, start: str, end: str):
         out = []
         for d in _paid_deals(deal_list):
-            cd = (d.get("close_date") or "")[:10]
-            if cd and start <= cd <= end:
+            # payment_received_date is authoritative; fall back to close_date
+            rev_date = (d.get("payment_received_date") or d.get("close_date") or "")[:10]
+            if rev_date and start <= rev_date <= end:
                 out.append(d)
         return out
 
     def _rev(deal_list):
         return sum(d.get("deal_value",0) or 0 for d in deal_list)
 
+    def _rev_date(d):
+        return d.get("payment_received_date") or d.get("close_date") or ""
+
     def _deal_table(deal_list):
         rows = []
-        for d in sorted(deal_list, key=lambda x: (x.get("close_date") or ""), reverse=True):
-            stg  = d.get("stage","")
+        for d in sorted(deal_list, key=_rev_date, reverse=True):
+            stg = d.get("stage","")
             icon = "✅" if "paid" in stg.lower() else "📁"
+            prd  = d.get("payment_received_date") or "—"
             rows.append({
-                "Organisation":   _expand_org(d.get("org_name","")),
-                "Status":         f"{icon} {stg}",
-                "Value":          f"RM {d.get('deal_value',0) or 0:,.0f}",
-                "Date Paid/Closed": d.get("close_date") or "—",
-                "Course":         d.get("course",""),
+                "Organisation":      _expand_org(d.get("org_name","")),
+                "Status":            f"{icon} {stg}",
+                "Value":             f"RM {d.get('deal_value',0) or 0:,.0f}",
+                "Invoice / Close":   d.get("close_date") or "—",
+                "Payment Received":  prd,
+                "Course":            d.get("course",""),
             })
         return pd.DataFrame(rows) if rows else None
 
@@ -579,21 +585,15 @@ with tab2:
     rd       = report_date
     rd_str   = rd.strftime("%Y-%m-%d")
     cur_mon  = rd.month
-    # first day of current month
-    cur_mon_start = f"{YEAR}-{cur_mon:02d}-01"
-    # first day 3 calendar months ago
-    m3 = cur_mon - 3
-    y3 = YEAR + (m3 - 1) // 12
-    m3 = ((m3 - 1) % 12) + 1
-    three_mo_start = f"{y3}-{m3:02d}-01"
 
     d7  = (rd - timedelta(days=7)).strftime("%Y-%m-%d")
     d14 = (rd - timedelta(days=14)).strftime("%Y-%m-%d")
+    d30 = (rd - timedelta(days=30)).strftime("%Y-%m-%d")
 
     # pre-compute each period
     deals_7d  = _deals_in_range(crm_deals, d7, rd_str)
     deals_14d = _deals_in_range(crm_deals, d14, rd_str)
-    deals_3m  = _deals_in_range(crm_deals, three_mo_start, rd_str)
+    deals_30d = _deals_in_range(crm_deals, d30, rd_str)
     deals_yr  = _deals_in_range(crm_deals, YEAR_START, YEAR_END)
     # monthly
     monthly_data = {}
@@ -609,7 +609,7 @@ with tab2:
         '<p class="sec-sub">Paid & Closed government deals only — pulled from Notion Sales CRM</p>',
         unsafe_allow_html=True
     )
-    st.markdown('<span class="src-badge">📂 Notion — Sales CRM Database</span>',
+    st.markdown('<span class="src-badge">📂 Updated weekly — paste new CRM data in Claude chat to refresh</span>',
                 unsafe_allow_html=True)
 
     # ── CRM stage legend ──────────────────────────────────────────
@@ -649,11 +649,11 @@ with tab2:
     )
 
     tp1, tp2, tp3, tp4, tp5 = st.tabs([
-        "📅  Last 7 Days",
-        "📅  Last 14 Days",
-        "📅  Last 3 Months",
-        "📆  By Month (2026)",
-        "🗓️  Full Year 2026",
+        "📅  Past 7 Days",
+        "📅  Past 14 Days",
+        "📅  Past Month",
+        "📆  By Quarter",
+        "🔍  Custom Range",
     ])
 
     # ── Last 7 Days ───────────────────────────────────────────────
@@ -694,159 +694,186 @@ with tab2:
         else:
             st.info("No payments received in the last 14 days.")
 
-    # ── Last 3 Months ─────────────────────────────────────────────
+    # ── Past Month (last 30 days) ─────────────────────────────────
     with tp3:
-        rev = _rev(deals_3m)
+        rev = _rev(deals_30d)
         st.markdown(
             f'<div style="background:#F0FBF4;border-left:5px solid #27AE60;border-radius:8px;'
             f'padding:14px 20px;margin-bottom:16px;">'
-            f'<p style="margin:0;font-size:13px;color:#666;">Period: <b>{three_mo_start}</b> → <b>{rd_str}</b> (3 calendar months)</p>'
+            f'<p style="margin:0;font-size:13px;color:#666;">Period: <b>{d30}</b> → <b>{rd_str}</b> (last 30 days)</p>'
             f'<p style="margin:4px 0 0;font-size:28px;font-weight:800;color:#1A7A3C;">RM {rev:,.0f}</p>'
-            f'<p style="margin:2px 0 0;font-size:13px;color:#666;">{len(deals_3m)} deal(s) collected</p>'
+            f'<p style="margin:2px 0 0;font-size:13px;color:#666;">{len(deals_30d)} deal(s) collected</p>'
             f'</div>',
             unsafe_allow_html=True
         )
-        # Month-by-month breakdown within the 3-month window
-        months_in_range = [m for m in range(1, 13)
-                           if f"{YEAR}-{m:02d}-01" >= three_mo_start
-                           and f"{YEAR}-{m:02d}-01" <= rd_str]
-        sub_cols = st.columns(len(months_in_range)) if months_in_range else []
-        for col, m in zip(sub_cols, months_in_range):
+        if deals_30d:
+            df = _deal_table(deals_30d)
+            if df is not None:
+                st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.info("No payments received in the last 30 days.")
+
+    # ── By Quarter ────────────────────────────────────────────────
+    with tp4:
+        st.markdown(
+            f'<p style="font-size:14px;color:#666;margin-bottom:16px;">'
+            f'Calendar year <b>{YEAR}</b> — quarters run Jan 1 to Dec 31</p>',
+            unsafe_allow_html=True
+        )
+
+        qsel = st.radio(
+            "Quarter:",
+            ["Q1 — Jan to Mar", "Q2 — Apr to Jun", "Q3 — Jul to Sep", "Q4 — Oct to Dec"],
+            horizontal=True, label_visibility="collapsed",
+        )
+        q_map = {
+            "Q1 — Jan to Mar": (1,  3,  "Q1 — Jan to Mar"),
+            "Q2 — Apr to Jun": (4,  6,  "Q2 — Apr to Jun"),
+            "Q3 — Jul to Sep": (7,  9,  "Q3 — Jul to Sep"),
+            "Q4 — Oct to Dec": (10, 12, "Q4 — Oct to Dec"),
+        }
+        qstart_m, qend_m, qlabel = q_map[qsel]
+
+        qdeals = []
+        for m in range(qstart_m, qend_m + 1):
+            qdeals.extend(monthly_data[m])
+        qrev = _rev(qdeals)
+
+        qstart_str = f"{YEAR}-{qstart_m:02d}-01"
+        last_day   = 31 if qend_m in (1,3,5,7,8,10,12) else (30 if qend_m in (4,6,9,11) else 28)
+        qend_str   = f"{YEAR}-{qend_m:02d}-{last_day:02d}"
+        is_future_q = qstart_m > cur_mon
+
+        # Revenue banner
+        st.markdown(
+            f'<div style="background:#F0FBF4;border-left:5px solid #27AE60;border-radius:8px;'
+            f'padding:14px 20px;margin:12px 0 16px;">'
+            f'<p style="margin:0;font-size:13px;color:#666;">{qlabel}: <b>{qstart_str}</b> → <b>{qend_str}</b></p>'
+            f'<p style="margin:4px 0 0;font-size:28px;font-weight:800;color:#1A7A3C;">RM {qrev:,.0f}</p>'
+            f'<p style="margin:2px 0 0;font-size:13px;color:#666;">{len(qdeals)} deal(s) collected</p>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+        # Month-by-month within selected quarter
+        m_cols = st.columns(3)
+        for col, m in zip(m_cols, range(qstart_m, qend_m + 1)):
             mdeals = monthly_data[m]
             mrev   = _rev(mdeals)
+            is_fut = m > cur_mon
             clr    = "green" if mrev > 0 else "teal"
             with col:
                 st.markdown(_kpi_html(
-                    f"RM {mrev:,.0f}", MONTH_NAMES[m-1],
-                    f"{len(mdeals)} deal(s)", clr
+                    "—" if is_fut else f"RM {mrev:,.0f}",
+                    MONTH_NAMES[m - 1],
+                    "future" if is_fut else f"{len(mdeals)} deal(s)",
+                    "teal" if is_fut else clr,
                 ), unsafe_allow_html=True)
-
-        st.markdown("")
-        if deals_3m:
-            df = _deal_table(deals_3m)
-            if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
-        else:
-            st.info("No payments received in the last 3 months.")
-
-    # ── By Month ──────────────────────────────────────────────────
-    with tp4:
-        st.markdown(
-            f'<p style="font-size:14px;color:#666;margin-bottom:12px;">'
-            f'Monthly revenue for all of <b>{YEAR}</b> — calendar year Jan 1 to Dec 31</p>',
-            unsafe_allow_html=True
-        )
-
-        # Full-year monthly chart
-        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon),
-                 use_container_width=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Monthly breakdown table
-        month_rows = []
-        running = 0.0
-        for m in range(1, 13):
-            mdeals = monthly_data[m]
-            mrev   = _rev(mdeals)
-            running += mrev
-            prev_rev = _rev(monthly_data[m-1]) if m > 1 else None
-            if prev_rev is not None and prev_rev > 0:
-                chg = (mrev - prev_rev) / prev_rev * 100
-                chg_str = f"{'▲' if chg>=0 else '▼'} {abs(chg):.0f}%"
-            elif mrev > 0 and (prev_rev == 0 or prev_rev is None):
-                chg_str = "▲ New revenue"
-            else:
-                chg_str = "—"
+        if qdeals:
+            st.markdown(
+                f'<p style="font-size:15px;font-weight:700;color:#0D3349;margin-bottom:8px;">'
+                f'Paid / closed deals in {qlabel}</p>',
+                unsafe_allow_html=True
+            )
+            df = _deal_table(qdeals)
+            if df is not None:
+                st.dataframe(df, use_container_width=True, hide_index=True)
+        elif is_future_q:
+            st.info(f"{qlabel} hasn't started yet.")
+        else:
+            st.info(f"No paid / closed deals in {qlabel}.")
 
-            is_cur  = "◀ current" if m == cur_mon else ""
-            is_fut  = m > cur_mon
-            month_rows.append({
-                "Month":              MONTH_NAMES[m-1] + (" " + is_cur if is_cur else ""),
-                "Revenue Received":   f"RM {mrev:,.0f}" if not is_fut else "—  (future)",
-                "Deals":              str(len(mdeals)) if not is_fut else "—",
-                "vs Prev Month":      chg_str if not is_fut else "—",
-                "Running Total (YTD)":f"RM {running:,.0f}" if not is_fut else "—",
-            })
-
-        mdf = pd.DataFrame(month_rows)
-        st.dataframe(mdf, use_container_width=True, hide_index=True)
-
-        # Year-to-date summary
-        ytd = _rev(deals_yr)
-        best_m = max(range(1, 13), key=lambda m: _rev(monthly_data[m]))
-        best_rev = _rev(monthly_data[best_m])
-        active_months = sum(1 for m in range(1, 13) if _rev(monthly_data[m]) > 0)
+        # ── Full-year summary ─────────────────────────────────────
+        st.markdown("---")
         st.markdown(
-            f'<div style="background:#EEF8F7;border-radius:8px;padding:14px 20px;'
-            f'margin-top:12px;border:1px solid #C8E6E4;font-size:14px;">'
-            f'📊 <b>Year-to-date ({YEAR}):</b> RM {ytd:,.0f} from {len(deals_yr)} deal(s) '
-            f'across {active_months} month(s) &nbsp;·&nbsp; '
-            f'Best month: <b>{MONTH_NAMES[best_m-1]}</b> (RM {best_rev:,.0f})'
+            f'<p style="font-size:15px;font-weight:700;color:#0D3349;margin:0 0 8px;">'
+            f'Full Year {YEAR} Summary</p>',
+            unsafe_allow_html=True
+        )
+
+        q_cols = st.columns(4)
+        quarters = [(1,3,"Q1 Jan–Mar"),(4,6,"Q2 Apr–Jun"),(7,9,"Q3 Jul–Sep"),(10,12,"Q4 Oct–Dec")]
+        for col, (qs, qe, qn) in zip(q_cols, quarters):
+            qd = []
+            for m in range(qs, qe + 1):
+                qd.extend(monthly_data[m])
+            qr  = _rev(qd)
+            clr = "green" if qr > 0 else "teal"
+            with col:
+                st.markdown(_kpi_html(
+                    f"RM {qr:,.0f}", qn, f"{len(qd)} deal(s)", clr
+                ), unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), use_container_width=True)
+
+        ytd          = _rev(deals_yr)
+        months_gone  = sum(1 for m in range(1, 13) if m <= cur_mon)
+        projected    = (ytd / months_gone * 12) if months_gone else 0
+        best_m       = max(range(1, 13), key=lambda m: _rev(monthly_data[m]))
+        best_rev     = _rev(monthly_data[best_m])
+
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            st.markdown(_kpi_html(f"RM {ytd:,.0f}", f"YTD Revenue {YEAR}",
+                                  f"{len(deals_yr)} deal(s)", "green"), unsafe_allow_html=True)
+        with k2:
+            st.markdown(_kpi_html(f"RM {projected:,.0f}", "Projected Full Year",
+                                  f"based on {months_gone}-month run rate", "yellow"),
+                        unsafe_allow_html=True)
+        with k3:
+            avg = ytd / len(deals_yr) if deals_yr else 0
+            st.markdown(_kpi_html(f"RM {avg:,.0f}", "Avg Deal Value",
+                                  "per paid/closed deal", "teal"), unsafe_allow_html=True)
+        with k4:
+            st.markdown(_kpi_html(MONTH_NAMES[best_m - 1], "Best Month",
+                                  f"RM {best_rev:,.0f}", "teal"), unsafe_allow_html=True)
+
+    # ── Custom Date Range ─────────────────────────────────────────
+    with tp5:
+        st.markdown(
+            '<p style="font-size:14px;color:#666;margin-bottom:16px;">'
+            'Pick any start and end date to filter paid / closed deals by <b>Payment Received</b> date.</p>',
+            unsafe_allow_html=True
+        )
+
+        fc1, fc2 = st.columns(2)
+        with fc1:
+            from_date = st.date_input("From", value=rd - timedelta(days=30),
+                                      min_value=datetime(YEAR, 1, 1).date(),
+                                      max_value=rd.date(), key="crm_from")
+        with fc2:
+            to_date = st.date_input("To", value=rd.date(),
+                                    min_value=datetime(YEAR, 1, 1).date(),
+                                    max_value=datetime(YEAR, 12, 31).date(), key="crm_to")
+
+        from_str = from_date.strftime("%Y-%m-%d")
+        to_str   = to_date.strftime("%Y-%m-%d")
+
+        custom_deals = _deals_in_range(crm_deals, from_str, to_str)
+        custom_rev   = _rev(custom_deals)
+
+        st.markdown(
+            f'<div style="background:#F0FBF4;border-left:5px solid #27AE60;border-radius:8px;'
+            f'padding:14px 20px;margin:16px 0;">'
+            f'<p style="margin:0;font-size:13px;color:#666;">Period: <b>{from_str}</b> → <b>{to_str}</b></p>'
+            f'<p style="margin:4px 0 0;font-size:28px;font-weight:800;color:#1A7A3C;">RM {custom_rev:,.0f}</p>'
+            f'<p style="margin:2px 0 0;font-size:13px;color:#666;">{len(custom_deals)} deal(s) with payment received in this window</p>'
             f'</div>',
             unsafe_allow_html=True
         )
 
-    # ── Full Year 2026 ────────────────────────────────────────────
-    with tp5:
-        yr_rev   = _rev(deals_yr)
-        yr_deals = len(deals_yr)
-
-        # Top-line KPIs
-        k1, k2, k3, k4 = st.columns(4)
-        with k1:
-            st.markdown(_kpi_html(f"RM {yr_rev:,.0f}", "Total Revenue",
-                                  f"Jan 1 – Dec 31 {YEAR}", "green"), unsafe_allow_html=True)
-        with k2:
-            st.markdown(_kpi_html(str(yr_deals), "Paid Deals",
-                                  f"in {YEAR}", "teal"), unsafe_allow_html=True)
-        avg = yr_rev / yr_deals if yr_deals else 0
-        with k3:
-            st.markdown(_kpi_html(f"RM {avg:,.0f}", "Avg Deal Value",
-                                  "per paid/closed deal", "teal"), unsafe_allow_html=True)
-        months_gone = sum(1 for m in range(1, 13) if m <= cur_mon)
-        monthly_run_rate = yr_rev / months_gone if months_gone else 0
-        projected = monthly_run_rate * 12
-        with k4:
-            st.markdown(_kpi_html(f"RM {projected:,.0f}", "Projected Full-Year",
-                                  f"based on {months_gone}-month run rate", "yellow"),
-                        unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Chart
-        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon),
-                 use_container_width=True)
-
-        # Quarter breakdown
-        st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:16px 0 8px;">Quarter breakdown</p>',
-                    unsafe_allow_html=True)
-        q_cols = st.columns(4)
-        quarters = [(1,3,"Q1 Jan–Mar"),(4,6,"Q2 Apr–Jun"),(7,9,"Q3 Jul–Sep"),(10,12,"Q4 Oct–Dec")]
-        for col, (qstart, qend, qlbl) in zip(q_cols, quarters):
-            qdeals = []
-            for m in range(qstart, qend+1):
-                qdeals.extend(monthly_data[m])
-            qrev = _rev(qdeals)
-            is_active = any(qstart <= m <= qend for m in range(1, cur_mon+1))
-            clr = "green" if qrev > 0 else ("teal" if is_active else "teal")
-            with col:
-                st.markdown(_kpi_html(
-                    f"RM {qrev:,.0f}", qlbl,
-                    f"{len(qdeals)} deal(s)", clr
-                ), unsafe_allow_html=True)
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # All year deals table
-        if deals_yr:
-            st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin-bottom:8px;">All paid/closed deals in 2026</p>',
-                        unsafe_allow_html=True)
-            df = _deal_table(deals_yr)
+        if custom_deals:
+            df = _deal_table(custom_deals)
             if df is not None:
                 st.dataframe(df, use_container_width=True, hide_index=True)
+        elif from_str > to_str:
+            st.warning("Start date is after end date — please adjust the range.")
         else:
-            st.info(f"No paid/closed deals recorded in {YEAR} yet.")
+            st.info("No payments received in this date range.")
 
     # ════════════════════════════════════════════════════════════════
     # PIPELINE OVERVIEW (below revenue analysis)
@@ -886,11 +913,12 @@ with tab2:
             stg  = d.get("stage","")
             icon = "✅" if "paid" in stg.lower() else ("📁" if "closed" in stg.lower() else "📋")
             rows.append({
-                "Organisation":   _expand_org(d.get("org_name","")),
-                "Status":         f"{icon} {stg}",
-                "Value":          f"RM {d.get('deal_value',0) or 0:,.0f}",
-                "Date Closed":    d.get("close_date") or "Not yet",
-                "Course / Notes": d.get("course",""),
+                "Organisation":     _expand_org(d.get("org_name","")),
+                "Status":           f"{icon} {stg}",
+                "Value":            f"RM {d.get('deal_value',0) or 0:,.0f}",
+                "Invoice / Close":  d.get("close_date") or "Not yet",
+                "Payment Received": d.get("payment_received_date") or ("—" if _is_revenue(stg) else "n/a"),
+                "Course / Notes":   d.get("course",""),
             })
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 

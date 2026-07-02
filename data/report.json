@@ -68,6 +68,7 @@
       "stage": "Paid",
       "deal_value": 19440,
       "close_date": "2026-06-25",
+      "payment_received_date": "2026-06-25",
       "train_date": "2026-06-15",
       "course": "Gen AI Essentials: Daripada Kemahiran kepada Penyelesaian Praktikal",
       "contact": "Hidayah",
@@ -78,6 +79,7 @@
       "stage": "Paid",
       "deal_value": 5184,
       "close_date": "2026-06-26",
+      "payment_received_date": "2026-06-26",
       "train_date": "2026-06-11",
       "course": "Canva 1 Day",
       "contact": "",
@@ -91,7 +93,8 @@
       "train_date": "2026-09-29",
       "course": "Gen AI Talk",
       "contact": "Puan Siti Syahida",
-      "pax": null
+      "pax": null,
+      "payment_received_date": null
     },
     {
       "org_name": "Kementerian Ekonomi",
@@ -101,7 +104,8 @@
       "train_date": "2026-07-16",
       "course": "Google Workspace & Gemini",
       "contact": "Pn Batrisyia",
-      "pax": 55
+      "pax": 55,
+      "payment_received_date": null
     },
     {
       "org_name": "Kementerian Luar Negeri (KLN)",
@@ -111,7 +115,8 @@
       "train_date": "2026-07-29",
       "course": "Gen AI",
       "contact": "Shahrul",
-      "pax": 35
+      "pax": 35,
+      "payment_received_date": null
     },
     {
       "org_name": "Kementerian Kesihatan Malaysia KKM",
@@ -121,7 +126,8 @@
       "train_date": null,
       "course": "Google Apps Script",
       "contact": "Puan Mei",
-      "pax": 20
+      "pax": 20,
+      "payment_received_date": null
     },
     {
       "org_name": "KWSP | EPF",
@@ -131,7 +137,8 @@
       "train_date": "2026-08-05",
       "course": "Gen AI Talk (Copilot) — KFAIR26",
       "contact": "Yoshita Sevaganam",
-      "pax": 200
+      "pax": 200,
+      "payment_received_date": null
     },
     {
       "org_name": "FELCRA Kelantan",
@@ -141,7 +148,8 @@
       "train_date": "2026-07-21",
       "course": "Gen AI",
       "contact": "Hanif",
-      "pax": 35
+      "pax": 35,
+      "payment_received_date": null
     },
     {
       "org_name": "Politeknik Sultan Salahuddin Abdul Aziz Shah",
@@ -151,14 +159,30 @@
       "train_date": null,
       "course": "Not confirmed yet",
       "contact": "",
-      "pax": null
+      "pax": null,
+      "payment_received_date": null
     }
   ],
   "revenue_history": [
-    {"week_label": "26 May–1 Jun", "total_revenue": 0},
-    {"week_label": "2–8 Jun",      "total_revenue": 0},
-    {"week_label": "9–15 Jun",     "total_revenue": 0},
-    {"week_label": "16–22 Jun",    "total_revenue": 0},
-    {"week_label": "23–29 Jun",    "total_revenue": 24624}
+    {
+      "week_label": "26 May–1 Jun",
+      "total_revenue": 0
+    },
+    {
+      "week_label": "2–8 Jun",
+      "total_revenue": 0
+    },
+    {
+      "week_label": "9–15 Jun",
+      "total_revenue": 0
+    },
+    {
+      "week_label": "16–22 Jun",
+      "total_revenue": 0
+    },
+    {
+      "week_label": "23–29 Jun",
+      "total_revenue": 24624
+    }
   ]
 }
