@@ -17,7 +17,7 @@ from emailer import build_email_html, send_report
 from config import EMAIL_TO, EMAIL_FROM
 
 DATA_FILE  = str(Path(__file__).parent / "data" / "report.json")
-PDF_OUTPUT = str(Path.home() / "Desktop" / "24co_WeeklyPulse_dashboard.pdf")
+PDF_OUTPUT = str(Path(__file__).parent / "output" / "24co_WeeklyPulse_dashboard.pdf")
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(

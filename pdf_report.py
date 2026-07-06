@@ -419,6 +419,9 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     styles = _styles()
     full_w = (W - 2*MARGIN) / mm
 
+    from pathlib import Path as _Path
+    _Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
     doc = SimpleDocTemplate(
         output_path, pagesize=A4,
         leftMargin=MARGIN, rightMargin=MARGIN,
