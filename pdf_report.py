@@ -621,19 +621,19 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     add(PageBreak())
     add(sp(10))
 
-    # Revenue narrative — kept together with section header
-    rev_callout = _callout("No paid deals recorded yet.", C["light"], C["border"], styles)
+    # Revenue narrative — summary sentence only in callout; deal table flows freely below
+    rev_summary = "No paid deals recorded yet."
     if paid_deals:
-        rev_lines = [
+        rev_summary = (
             f"We have collected a total of <b>RM {paid_total:,.0f}</b> from "
-            f"{len(paid_deals)} fully paid government deal{'s' if len(paid_deals)!=1 else ''}.  "
-        ]
-        for d in sorted(paid_deals, key=lambda x: -(x.get("deal_value") or 0)):
-            rev_lines.append(
-                f"• <b>{_expand_org(d['org_name'])}</b> — RM {d.get('deal_value',0):,.0f} "
-                f"({'received ' + (d.get('payment_received_date') or d['close_date']) if (d.get('payment_received_date') or d.get('close_date')) else 'confirmed'})"
-            )
-        rev_callout = _callout("  ".join(rev_lines), C["green_light"], C["green"], styles)
+            f"{len(paid_deals)} fully paid government deal{'s' if len(paid_deals)!=1 else ''}."
+        )
+    rev_callout = _callout(
+        rev_summary,
+        C["green_light"] if paid_deals else C["light"],
+        C["green"]  if paid_deals else C["border"],
+        styles,
+    )
 
     add(KeepTogether([
         hr(C["yellow"]),
@@ -646,21 +646,19 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         rev_callout,
     ]))
 
-    # Pipeline narrative — kept together
+    if paid_deals:
+        add(sp(3))
+        add(_deal_table(sorted(paid_deals, key=lambda x: -(x.get("deal_value") or 0)), styles))
+
+    # Pipeline narrative — summary sentence only in callout; table flows freely below
     if pipeline_deals:
-        pipe_lines = [
+        pipe_summary = (
             f"We also have <b>RM {pipe_total:,.0f}</b> in active quotes — "
             f"{len(pipeline_deals)} deal{'s' if len(pipeline_deals)!=1 else ''} "
-            f"where we have sent a proposal and are waiting for the client's decision.  "
-        ]
-        for d in sorted(pipeline_deals, key=lambda x: -(x.get("deal_value") or 0)):
-            pipe_lines.append(
-                f"• <b>{_expand_org(d['org_name'])}</b> — RM {d.get('deal_value',0):,.0f}"
-            )
+            f"where we have sent a proposal and are waiting for the client's decision."
+        )
         add(sp(4))
-        add(KeepTogether([
-            _callout("  ".join(pipe_lines), C["yellow_light"], C["yellow"], styles),
-        ]))
+        add(_callout(pipe_summary, C["yellow_light"], C["yellow"], styles))
 
     # Open pipeline table (non-paid) — no KeepTogether so it can flow across pages
     open_pipe = [d for d in crm_deals
