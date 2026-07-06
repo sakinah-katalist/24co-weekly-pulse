@@ -195,6 +195,21 @@ def _is_revenue(s):
     t = (s or "").lower()
     return "paid" in t or "closed" in t
 
+def _is_stale_pipeline(d, report_date, weeks=5):
+    """True if deal is Almost/Proposal/Quotation and close_date is >5 weeks old."""
+    stg = (d.get("stage") or "").lower()
+    if not any(k in stg for k in ("almost", "proposal", "quotation")):
+        return False
+    cd = (d.get("close_date") or "")[:10]
+    if not cd:
+        return False
+    try:
+        deal_dt = datetime.strptime(cd, "%Y-%m-%d")
+        rd = report_date if hasattr(report_date, "strftime") else datetime.strptime(str(report_date)[:10], "%Y-%m-%d")
+        return deal_dt <= rd - timedelta(days=weeks * 7)
+    except ValueError:
+        return False
+
 def _colour_icon(item):
     if item.get("tier1"):   return "🟡"
     if item.get("is_hot"):  return "🔴"
@@ -888,13 +903,17 @@ with tab2:
     # Pipeline = non-paid open deals only
     open_pipeline = [d for d in crm_filtered if not _is_revenue(d.get("stage",""))]
 
+    # Split into active and stale (Almost/Proposal/Quotation open >5 weeks)
+    stale_deals  = [d for d in open_pipeline if _is_stale_pipeline(d, report_date)]
+    active_pipe  = [d for d in open_pipeline if not _is_stale_pipeline(d, report_date)]
+
     if open_pipeline:
         by_stage = defaultdict(lambda: {"count": 0, "total": 0.0})
-        for d in open_pipeline:
+        for d in active_pipe:
             by_stage[d.get("stage","—")]["count"] += 1
             by_stage[d.get("stage","—")]["total"] += d.get("deal_value",0) or 0
 
-        stage_cols = st.columns(min(len(by_stage), 4))
+        stage_cols = st.columns(min(max(len(by_stage), 1), 4))
         for col, (stage, info) in zip(stage_cols, sorted(by_stage.items(), key=lambda x:-x[1]["total"])):
             icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
             with col:
@@ -911,7 +930,7 @@ with tab2:
         st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:12px 0 8px;">Open pipeline deals</p>',
                     unsafe_allow_html=True)
         rows = []
-        for d in sorted(open_pipeline, key=lambda x: -(x.get("deal_value") or 0)):
+        for d in sorted(active_pipe, key=lambda x: -(x.get("deal_value") or 0)):
             stg  = d.get("stage","")
             icon = "🔥" if "almost" in stg.lower() else ("⚙️" if "progress" in stg.lower() else "📋")
             rows.append({
@@ -922,7 +941,39 @@ with tab2:
                 "Course":        d.get("course",""),
                 "Contact":       d.get("contact",""),
             })
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        if rows:
+            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+    # ── Stale / Likely Lost Deals (>5 weeks in proposal/quotation/almost) ───
+    st.markdown("---")
+    st.markdown('<p class="sec-head">🕐 Likely Lost Deals</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="sec-sub">Almost Confirmed or Proposal/Quotation deals open for more than 5 weeks — '
+        'consider these as likely lost unless actively re-engaged</p>',
+        unsafe_allow_html=True
+    )
+    if not stale_deals:
+        st.success("✅ No stale deals — all open pipeline deals are less than 5 weeks old.")
+    else:
+        stale_total = sum(d.get("deal_value",0) or 0 for d in stale_deals)
+        st.markdown(f"""
+        <div class="pending-alert">
+          <p>🕐 <b>{len(stale_deals)} deal(s) — RM {stale_total:,.0f} at risk.</b>
+          These have been sitting in the pipeline for more than 5 weeks with no movement.</p>
+        </div>""", unsafe_allow_html=True)
+        srows = []
+        for d in sorted(stale_deals, key=lambda x: -(x.get("deal_value") or 0)):
+            stg  = d.get("stage","")
+            cd   = d.get("close_date","")
+            srows.append({
+                "Organisation":  _expand_org(d.get("org_name","")),
+                "Status":        f"⚠️ {stg} (open for more than 5 weeks)",
+                "Value":         f"RM {d.get('deal_value',0) or 0:,.0f}",
+                "In pipeline since": cd or "—",
+                "Course":        d.get("course",""),
+                "Contact":       d.get("contact",""),
+            })
+        st.dataframe(pd.DataFrame(srows), use_container_width=True, hide_index=True)
 
     # ── Pending collection ────────────────────────────────────────
     st.markdown("---")

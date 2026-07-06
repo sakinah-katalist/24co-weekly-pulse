@@ -94,6 +94,22 @@ def _is_revenue(s):
     return "paid" in t or "closed" in t
 
 
+def _is_stale_pipeline(d, report_date, weeks=5):
+    """True if deal is Almost/Proposal/Quotation and close_date is >5 weeks old."""
+    stg = (d.get("stage") or "").lower()
+    if not any(k in stg for k in ("almost", "proposal", "quotation")):
+        return False
+    cd = (d.get("close_date") or "")[:10]
+    if not cd:
+        return False
+    try:
+        deal_dt = datetime.strptime(cd, "%Y-%m-%d")
+        rd = report_date if hasattr(report_date, "strftime") else datetime.strptime(str(report_date)[:10], "%Y-%m-%d")
+        return deal_dt <= rd - timedelta(days=weeks * 7)
+    except ValueError:
+        return False
+
+
 def _plain_status(status: str) -> str:
     return STATUS_PLAIN.get((status or "").lower(), status or "—")
 
@@ -347,17 +363,26 @@ def _session_card(s: dict, styles) -> Table:
 
 
 # ── Simple deal table ─────────────────────────────────────────────────────────
-def _deal_table(deals: list, styles) -> Table:
+def _deal_table(deals: list, styles, mark_stale=False, report_date=None) -> Table:
     hdr = [Paragraph(h, styles["TableHead"]) for h in
-           ["Organisation", "Status", "Amount", "Date Paid/Closed", "What we delivered"]]
-    cw  = [(W-2*MARGIN)*f for f in [0.26, 0.15, 0.14, 0.16, 0.29]]
+           ["Organisation", "Status", "Amount", "Date", "What we delivered"]]
+    cw  = [(W-2*MARGIN)*f for f in [0.26, 0.18, 0.13, 0.14, 0.29]]
     rows = []
+    red_hex = _hex(C["red"])
     for d in sorted(deals, key=lambda x: -(x.get("deal_value") or 0)):
-        stg  = d.get("stage","—")
-        icon = "✅ Paid" if "paid" in stg.lower() else ("📁 Closed" if "closed" in stg.lower() else f"📋 {stg}")
+        stg   = d.get("stage","—")
+        stale = mark_stale and report_date and _is_stale_pipeline(d, report_date)
+        if "paid" in stg.lower():
+            icon_text = "✅ Paid"
+        elif "closed" in stg.lower():
+            icon_text = "📁 Closed"
+        elif stale:
+            icon_text = f'<font color="#{red_hex}"><b>⚠ {stg} — open for more than 5 weeks</b></font>'
+        else:
+            icon_text = f"📋 {stg}"
         rows.append([
             Paragraph(_expand_org(d.get("org_name","")), styles["TableCell"]),
-            Paragraph(icon,                  styles["TableCell"]),
+            Paragraph(icon_text,             styles["TableCell"]),
             Paragraph(f"RM {d['deal_value']:,.0f}" if d.get("deal_value") else "—",
                       styles["TableCell"]),
             Paragraph(d.get("payment_received_date") or d.get("close_date") or "—", styles["TableCell"]),
@@ -744,13 +769,15 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     else:
         add(_callout(f"No payments received yet in {curr_month_name}.", C["light"], C["border"], styles))
 
-    # --- 3d: Open pipeline — past 14 days only ---
-    open_pipe = [
+    # --- 3d: Open pipeline — past 14 days only (non-stale) ---
+    all_open = [
         d for d in crm_deals
         if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))
         and d14_str <= (d.get("close_date") or "")[:10] <= rd_str
     ]
-    open_pipe = sorted(open_pipe, key=lambda x: -(x.get("deal_value") or 0))
+    open_pipe       = [d for d in all_open if not _is_stale_pipeline(d, report_date)]
+    open_pipe_stale = [d for d in all_open if _is_stale_pipeline(d, report_date)]
+    open_pipe       = sorted(open_pipe, key=lambda x: -(x.get("deal_value") or 0))
     open_pipe_total = sum(d.get("deal_value",0) or 0 for d in open_pipe)
 
     add(sp(5))
@@ -761,14 +788,46 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
             styles["SectionHead"]),
         Paragraph(
             f"RM {open_pipe_total:,.0f} in active quotes updated in the last 14 days."
-            if open_pipe else "No open pipeline deals in the last 14 days.",
+            if open_pipe else "No active pipeline deals in the last 14 days.",
             styles["SectionSub"]),
     ]))
     add(sp(2))
     if open_pipe:
         add(_deal_table(open_pipe, styles))
     else:
-        add(_callout("No open pipeline deals in the last 14 days.", C["light"], C["border"], styles))
+        add(_callout("No active pipeline deals in the last 14 days.", C["light"], C["border"], styles))
+
+    # --- 3e: Likely Lost — stale deals (>5 weeks, full year) ---
+    stale_all = [
+        d for d in crm_deals
+        if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))
+        and _is_stale_pipeline(d, report_date)
+    ]
+    stale_all   = sorted(stale_all, key=lambda x: -(x.get("deal_value") or 0))
+    stale_total = sum(d.get("deal_value",0) or 0 for d in stale_all)
+
+    add(sp(5))
+    add(KeepTogether([
+        hr(C["red"]),
+        Paragraph(
+            f"Likely Lost Deals — Open for More Than 5 Weeks  ({len(stale_all)} deal{'s' if len(stale_all)!=1 else ''})",
+            styles["WarnHead"]),
+        Paragraph(
+            "Almost Confirmed or Proposal/Quotation deals that have had no movement for over 5 weeks. "
+            "These should be re-engaged or written off.",
+            styles["SectionSub"]),
+        sp(3),
+        _callout(
+            f"<b>RM {stale_total:,.0f}</b> at risk across {len(stale_all)} stale deal{'s' if len(stale_all)!=1 else ''}."
+            if stale_all else "No stale deals this period.",
+            C["red_light"] if stale_all else C["light"],
+            C["red"]       if stale_all else C["border"],
+            styles,
+        ),
+    ]))
+    if stale_all:
+        add(sp(2))
+        add(_deal_table(stale_all, styles, mark_stale=True, report_date=report_date))
 
     # --- Awaiting Payment ---
     if pending:
