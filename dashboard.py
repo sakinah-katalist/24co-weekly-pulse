@@ -196,16 +196,22 @@ def _is_revenue(s):
     return "paid" in t or "closed" in t
 
 def _is_stale_pipeline(d, report_date, weeks=5):
-    """True if deal is Almost/Proposal/Quotation and close_date is >5 weeks old."""
+    """True if deal is Almost/Proposal/Quotation and added_date (or close_date) is >5 weeks old."""
     stg = (d.get("stage") or "").lower()
     if not any(k in stg for k in ("almost", "proposal", "quotation")):
         return False
-    cd = (d.get("close_date") or "")[:10]
+    # Use added_date (Notion "Created time") first, fall back to close_date
+    cd = (d.get("added_date") or d.get("close_date") or "")[:10]
     if not cd:
         return False
     try:
         deal_dt = datetime.strptime(cd, "%Y-%m-%d")
         rd = report_date if hasattr(report_date, "strftime") else datetime.strptime(str(report_date)[:10], "%Y-%m-%d")
+        # Must also be within the current calendar year (Jan 1 – Dec 31)
+        year_start = datetime(rd.year, 1, 1)
+        year_end   = datetime(rd.year, 12, 31)
+        if not (year_start <= deal_dt <= year_end):
+            return False
         return deal_dt <= rd - timedelta(days=weeks * 7)
     except ValueError:
         return False
