@@ -91,6 +91,8 @@ def _stage_ok(s):
 
 def _is_revenue(s):
     t = (s or "").lower()
+    if "before adam" in t:
+        return False
     return "paid" in t or "closed" in t
 
 
