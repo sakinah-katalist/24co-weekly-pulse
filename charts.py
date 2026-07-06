@@ -244,7 +244,7 @@ def revenue_line_chart(weeks: list[dict]) -> bytes:
     values = [w["total_revenue"] for w in weeks]
     n = len(labels)
 
-    fig, ax = _base_ax((5.5, 3.5))
+    fig, ax = _base_ax((5.0, 2.8))
     ax.set_facecolor("#FAFAFA")
     fig.patch.set_facecolor("#FAFAFA")
 
@@ -303,7 +303,7 @@ def revenue_line_chart(weeks: list[dict]) -> bytes:
                 color=clr, fontweight="bold",
             )
 
-    ax.set_title("Weekly Revenue Collected (Government Deals)",
+    ax.set_title("Weekly Revenue Collected",
                  fontsize=9, color=BRAND["text"], pad=12, fontweight="600")
     fig.tight_layout(pad=1.0)
     return _save(fig)

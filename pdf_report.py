@@ -172,6 +172,24 @@ def _callout(text: str, bg: object, border: object, styles, key="Narrative") -> 
     return cell
 
 
+# ── Bullet-list callout box ───────────────────────────────────────────────────
+def _callout_list(items: list, bg, border_c, styles, key="Narrative") -> Table:
+    """Coloured box with each item rendered as its own bullet line."""
+    rows = [[Paragraph(f"&#x2022;&#x2002;&#x2002;{text}", styles[key])] for text in items]
+    t = Table(rows, colWidths=[W - 2*MARGIN])
+    t.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0),(-1,-1), bg),
+        ("TOPPADDING",    (0,0),(-1,-1), 3),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 3),
+        ("LEFTPADDING",   (0,0),(-1,-1), 14),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 10),
+        ("BOX",           (0,0),(-1,-1), 0.5, border_c),
+        ("TOPPADDING",    (0,0),(0,0),   8),
+        ("BOTTOMPADDING", (0,-1),(0,-1), 8),
+    ]))
+    return t
+
+
 # ── Lead card — plain English labels ─────────────────────────────────────────
 def _lead_card(lead: dict, styles) -> Table:
     color_key = lead.get("color", "teal")
@@ -537,8 +555,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
             f"RM {sum(d.get('deal_value',0) or 0 for d in pending):,.0f} outstanding."
         )
 
-    summary_text = "  ".join(lines)
-    add(_callout(summary_text, C["teal_light"], C["teal"], styles, "Narrative"))
+    add(_callout_list(lines, C["teal_light"], C["teal"], styles))
     add(sp(6))
 
     # ── REVENUE TREND LINE CHART ──────────────────────────────────────────────
@@ -553,7 +570,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
                 "in that week. Only payments that have been fully received are counted here.",
                 styles["SectionSub"]),
             sp(2),
-            _img_from_bytes(rev_chart, full_w * 0.70),
+            _img_from_bytes(rev_chart, full_w * 0.55),
         ]))
         add(sp(3))
         # WoW table kept together with its label
@@ -565,7 +582,8 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         add(sp(6))
 
     # ── SECTION 1 — LEADS ────────────────────────────────────────────────────
-    # Section header + subtitle kept together — never orphaned at page bottom
+    add(PageBreak())
+    add(sp(10))
     counts = Counter(l.get("status") or "Unknown" for l in leads)
     total  = sum(counts.values()) if leads else 1
     status_parts = ",  ".join(
@@ -596,6 +614,8 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     add(sp(5))
 
     # ── SECTION 2 — SESSIONS ─────────────────────────────────────────────────
+    add(PageBreak())
+    add(sp(10))
     sess_summary = (
         f"We ran <b>{len(sessions)}</b> government training session"
         f"{'s' if len(sessions)!=1 else ''} this week — "
@@ -620,60 +640,137 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
 
     add(sp(5))
 
-    # ── SECTION 3 — SALES & REVENUE (always starts on a fresh page) ──────────
+    # ── SECTION 3 — SALES & REVENUE ──────────────────────────────────────────
+    import calendar as _cal
+
     add(PageBreak())
     add(sp(10))
 
-    # Revenue narrative — summary sentence only in callout; deal table flows freely below
-    rev_summary = "No paid deals recorded yet."
-    if paid_deals:
-        rev_summary = (
-            f"We have collected a total of <b>RM {paid_total:,.0f}</b> from "
-            f"{len(paid_deals)} fully paid government deal{'s' if len(paid_deals)!=1 else ''}."
-        )
-    rev_callout = _callout(
-        rev_summary,
-        C["green_light"] if paid_deals else C["light"],
-        C["green"]  if paid_deals else C["border"],
-        styles,
-    )
+    # --- Date ranges ---
+    rd_str = report_date.strftime("%Y-%m-%d")
+    d7_str = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
+    d14_str = (report_date - timedelta(days=14)).strftime("%Y-%m-%d")
 
+    curr_year  = report_date.year
+    curr_month = report_date.month
+    if curr_month == 1:
+        prev_month_num, prev_year = 12, curr_year - 1
+    else:
+        prev_month_num, prev_year = curr_month - 1, curr_year
+    prev_month_last = _cal.monthrange(prev_year, prev_month_num)[1]
+    prev_month_start = f"{prev_year}-{prev_month_num:02d}-01"
+    prev_month_end   = f"{prev_year}-{prev_month_num:02d}-{prev_month_last:02d}"
+    curr_month_start = f"{curr_year}-{curr_month:02d}-01"
+    prev_month_name  = f"{_cal.month_name[prev_month_num]} {prev_year}"
+    curr_month_name  = f"{_cal.month_name[curr_month]} {curr_year}"
+
+    def _rev_d(d):
+        return (d.get("payment_received_date") or d.get("close_date") or "")[:10]
+
+    deals_7d         = [d for d in paid_deals if _rev_d(d) and d7_str  <= _rev_d(d) <= rd_str]
+    deals_prev_month = [d for d in paid_deals if _rev_d(d) and prev_month_start <= _rev_d(d) <= prev_month_end]
+    deals_curr_month = [d for d in paid_deals if _rev_d(d) and curr_month_start <= _rev_d(d) <= rd_str]
+
+    total_7d   = sum(d.get("deal_value",0) or 0 for d in deals_7d)
+    total_prev = sum(d.get("deal_value",0) or 0 for d in deals_prev_month)
+    total_curr = sum(d.get("deal_value",0) or 0 for d in deals_curr_month)
+
+    # Section header + YTD summary
     add(KeepTogether([
         hr(C["yellow"]),
         Paragraph("Section 3  —  Sales & Revenue", styles["SectionHead"]),
         Paragraph(
-            "Source: Sales CRM Database (Notion)  ·  Only Paid and Closed deals "
-            "counted as revenue",
+            "Source: Sales CRM Database (Notion)  ·  Only Paid and Closed deals counted as revenue",
             styles["SectionSub"]),
-        sp(4),
-        rev_callout,
+        sp(3),
+        _callout(
+            f"Year to date: <b>RM {paid_total:,.0f}</b> collected from "
+            f"{len(paid_deals)} paid government deal{'s' if len(paid_deals)!=1 else ''}."
+            if paid_deals else "No paid deals recorded yet.",
+            C["green_light"] if paid_deals else C["light"],
+            C["green"]       if paid_deals else C["border"],
+            styles,
+        ),
     ]))
 
-    if paid_deals:
-        add(sp(3))
-        add(_deal_table(sorted(paid_deals, key=lambda x: -(x.get("deal_value") or 0)), styles))
+    # --- 3a: Past 7 Days ---
+    add(sp(5))
+    add(KeepTogether([
+        hr(C["teal"]),
+        Paragraph(f"Past 7 Days  ({d7_str} to {rd_str})", styles["SectionHead"]),
+        Paragraph(
+            f"RM {total_7d:,.0f} received from "
+            f"{len(deals_7d)} deal{'s' if len(deals_7d)!=1 else ''} in the last 7 days."
+            if deals_7d else "No payments received in the last 7 days.",
+            styles["SectionSub"]),
+    ]))
+    add(sp(2))
+    if deals_7d:
+        add(_deal_table(sorted(deals_7d, key=lambda x: -(x.get("deal_value") or 0)), styles))
+    else:
+        add(_callout("No payments received in the last 7 days.", C["light"], C["border"], styles))
 
-    # Pipeline narrative — summary sentence only in callout; table flows freely below
-    if pipeline_deals:
-        pipe_summary = (
-            f"We also have <b>RM {pipe_total:,.0f}</b> in active quotes — "
-            f"{len(pipeline_deals)} deal{'s' if len(pipeline_deals)!=1 else ''} "
-            f"where we have sent a proposal and are waiting for the client's decision."
-        )
-        add(sp(4))
-        add(_callout(pipe_summary, C["yellow_light"], C["yellow"], styles))
+    # --- 3b: Previous month ---
+    add(sp(5))
+    add(KeepTogether([
+        hr(C["teal"]),
+        Paragraph(prev_month_name, styles["SectionHead"]),
+        Paragraph(
+            f"RM {total_prev:,.0f} received from "
+            f"{len(deals_prev_month)} deal{'s' if len(deals_prev_month)!=1 else ''} in {prev_month_name}."
+            if deals_prev_month else f"No payments received in {prev_month_name}.",
+            styles["SectionSub"]),
+    ]))
+    add(sp(2))
+    if deals_prev_month:
+        add(_deal_table(sorted(deals_prev_month, key=lambda x: -(x.get("deal_value") or 0)), styles))
+    else:
+        add(_callout(f"No payments received in {prev_month_name}.", C["light"], C["border"], styles))
 
-    # Open pipeline table (non-paid) — no KeepTogether so it can flow across pages
-    open_pipe = [d for d in crm_deals
-                 if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))]
-    open_pipe = sorted(open_pipe, key=lambda x: -(x.get("deal_value") or 0))[:50]
+    # --- 3c: Current month ---
+    add(sp(5))
+    add(KeepTogether([
+        hr(C["teal"]),
+        Paragraph(f"{curr_month_name}  (so far)", styles["SectionHead"]),
+        Paragraph(
+            f"RM {total_curr:,.0f} received from "
+            f"{len(deals_curr_month)} deal{'s' if len(deals_curr_month)!=1 else ''} so far in {curr_month_name}."
+            if deals_curr_month else f"No payments received yet in {curr_month_name}.",
+            styles["SectionSub"]),
+    ]))
+    add(sp(2))
+    if deals_curr_month:
+        add(_deal_table(sorted(deals_curr_month, key=lambda x: -(x.get("deal_value") or 0)), styles))
+    else:
+        add(_callout(f"No payments received yet in {curr_month_name}.", C["light"], C["border"], styles))
+
+    # --- 3d: Open pipeline — past 14 days only ---
+    open_pipe = [
+        d for d in crm_deals
+        if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))
+        and d14_str <= (d.get("close_date") or "")[:10] <= rd_str
+    ]
+    open_pipe = sorted(open_pipe, key=lambda x: -(x.get("deal_value") or 0))
+    open_pipe_total = sum(d.get("deal_value",0) or 0 for d in open_pipe)
+
+    add(sp(5))
+    add(KeepTogether([
+        hr(C["yellow"]),
+        Paragraph(
+            f"Open Pipeline — Past 14 Days  ({len(open_pipe)} deal{'s' if len(open_pipe)!=1 else ''})",
+            styles["SectionHead"]),
+        Paragraph(
+            f"RM {open_pipe_total:,.0f} in active quotes updated in the last 14 days."
+            if open_pipe else "No open pipeline deals in the last 14 days.",
+            styles["SectionSub"]),
+    ]))
+    add(sp(2))
     if open_pipe:
-        add(sp(4))
-        add(Paragraph(f"Open pipeline — top {len(open_pipe)} deals by value:", styles["Highlight"]))
-        add(sp(2))
         add(_deal_table(open_pipe, styles))
+    else:
+        add(_callout("No open pipeline deals in the last 14 days.", C["light"], C["border"], styles))
 
-    # Pending collection — header kept together, table flows freely
+    # --- Awaiting Payment ---
     if pending:
         total_out = sum(d.get("deal_value",0) or 0 for d in pending)
         add(KeepTogether([
