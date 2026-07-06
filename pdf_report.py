@@ -175,7 +175,7 @@ def _callout(text: str, bg: object, border: object, styles, key="Narrative") -> 
 # ── Bullet-list callout box ───────────────────────────────────────────────────
 def _callout_list(items: list, bg, border_c, styles, key="Narrative") -> Table:
     """Coloured box with each item rendered as its own bullet line."""
-    rows = [[Paragraph(f"&#x2022;&#x2002;&#x2002;{text}", styles[key])] for text in items]
+    rows = [[Paragraph(f"•  {text}", styles[key])] for text in items]
     t = Table(rows, colWidths=[W - 2*MARGIN])
     t.setStyle(TableStyle([
         ("BACKGROUND",    (0,0),(-1,-1), bg),
