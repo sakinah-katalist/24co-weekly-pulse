@@ -5,8 +5,10 @@ Run with:  streamlit run dashboard.py
 
 import json, base64, sys
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict, Counter
+
+MYT = timezone(timedelta(hours=8))
 
 import streamlit as st
 
@@ -192,10 +194,36 @@ def _stage_ok(s):
     return any(k in t for k in ("paid","closed","proposal","quotation","almost","in progress","preview"))
 
 def _is_revenue(s):
+    """True for Paid OR Closed — used to exclude from open pipeline."""
     t = (s or "").lower()
     if "before adam" in t:
         return False
     return "paid" in t or "closed" in t
+
+def _is_paid_only(s):
+    """True for Paid only — used for all revenue KPIs and charts."""
+    t = (s or "").lower()
+    if "before adam" in t:
+        return False
+    return "paid" in t
+
+def _awaiting_payment(deals, report_date):
+    """Closed deals whose training date has passed — expecting payment."""
+    cutoff = report_date.strftime("%Y-%m-%d") if hasattr(report_date, "strftime") else str(report_date)
+    return [d for d in deals
+            if "closed" in (d.get("stage") or "").lower()
+            and "before adam" not in (d.get("stage") or "").lower()
+            and d.get("train_date") and d["train_date"] <= cutoff]
+
+def _rev7d_paid(deals, report_date):
+    """Revenue (Paid-only) received in the last 7 days."""
+    if not hasattr(report_date, "strftime"):
+        return 0.0
+    cutoff = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
+    today  = report_date.strftime("%Y-%m-%d")
+    return sum(d.get("deal_value", 0) or 0 for d in deals
+               if _is_paid_only(d.get("stage", ""))
+               and cutoff <= (d.get("payment_received_date") or d.get("close_date") or "") <= today)
 
 def _is_stale_pipeline(d, report_date, weeks=5):
     """True if deal is Almost/Proposal/Quotation and added_date (or close_date) is >5 weeks old."""
@@ -252,18 +280,18 @@ def compute_insights(leads, sessions, crm_deals, revenue, report_date):
     if new_l:
         names = ", ".join(f"<b>{_expand_org(l['org_name'])}</b>" for l in new_l)
         out.append(("teal", f"📬 <b>New leads not yet contacted</b> — {len(new_l)}: {names}"))
-    pending = _pending_collection(crm_deals, report_date)
+    pending = _awaiting_payment(crm_deals, report_date)
     if pending:
         tot = sum(d.get("deal_value",0) or 0 for d in pending)
-        out.append(("red", f"⚠️ <b>Payment outstanding</b> — {len(pending)} training(s) delivered but not yet paid · RM {tot:,.0f} owed"))
-    rev_7d = _revenue_last_7_days(crm_deals, report_date)
+        out.append(("red", f"⚠️ <b>Payment outstanding</b> — {len(pending)} Closed deal(s) awaiting payment · RM {tot:,.0f} owed"))
+    rev_7d = _rev7d_paid(crm_deals, report_date)
     if rev_7d > 0:
         out.append(("green", f"💰 <b>RM {rev_7d:,.0f} received</b> in the last 7 days"))
     else:
-        out.append(("teal", "📅 No new payments received in the last 7 days"))
-    paid = sum(d.get("deal_value",0) or 0 for d in crm_deals if _is_revenue(d.get("stage","")))
+        out.append(("teal", "📅 No new Paid deals in the last 7 days"))
+    paid = sum(d.get("deal_value",0) or 0 for d in crm_deals if _is_paid_only(d.get("stage","")))
     pipe = sum(d.get("deal_value",0) or 0 for d in crm_deals if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage","")))
-    if paid: out.append(("teal", f"✅ <b>RM {paid:,.0f} total confirmed revenue</b> (Paid & Closed deals)"))
+    if paid: out.append(("teal", f"✅ <b>RM {paid:,.0f} total confirmed revenue</b> (Paid deals only)"))
     if pipe: out.append(("yellow", f"📋 <b>RM {pipe:,.0f} in active pipeline</b> — quotes sent, waiting for client decision"))
     if revenue and len(revenue) >= 2:
         curr, prev = revenue[-1]["total_revenue"], revenue[-2]["total_revenue"]
@@ -341,19 +369,19 @@ crm_deals    = data.get("crm_deals", [])
 revenue      = data.get("revenue_history", [])
 
 crm_filtered = [d for d in crm_deals if _stage_ok(d.get("stage",""))]
-rev_7d       = _revenue_last_7_days(crm_deals, report_date)
-paid_total   = sum(d.get("deal_value",0) or 0 for d in crm_deals if _is_revenue(d.get("stage","")))
+rev_7d       = _rev7d_paid(crm_deals, report_date)
+paid_total   = sum(d.get("deal_value",0) or 0 for d in crm_deals if _is_paid_only(d.get("stage","")))
 pipe_total   = sum(d.get("deal_value",0) or 0 for d in crm_filtered if not _is_revenue(d.get("stage","")))
 tier1_count  = sum(1 for x in leads+sessions if x.get("tier1"))
 pub_sess     = sum(1 for s in sessions if _session_type(s) == "Public")
 inh_sess     = len(sessions) - pub_sess
-pending      = _pending_collection(crm_deals, report_date)
+pending      = _awaiting_payment(crm_deals, report_date)
 
 # Period strip
 st.markdown(
     f'<p style="font-size:13px;color:#666;margin:-8px 0 16px;">'
     f'📅 <b>Reporting period:</b> {period_label} &nbsp;·&nbsp; '
-    f'Last refreshed: {datetime.now().strftime("%d %b %Y, %H:%M")}</p>',
+    f'Last refreshed: {datetime.now(tz=MYT).strftime("%d %b %Y, %H:%M")} (MYT)</p>',
     unsafe_allow_html=True
 )
 
@@ -362,8 +390,8 @@ if pending:
     total_out = sum(d.get("deal_value",0) or 0 for d in pending)
     st.markdown(f"""
     <div class="pending-alert">
-      <p>⚠️ <b>Action required:</b> {len(pending)} completed training(s) still waiting for payment
-         — <b>RM {total_out:,.0f} outstanding</b>. See Sales CRM tab for details.</p>
+      <p>⚠️ <b>Action required:</b> {len(pending)} Closed deal(s) still awaiting payment
+         — <b>RM {total_out:,.0f} outstanding</b>. See Sales CRM tab → Awaiting Payment.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -377,7 +405,7 @@ kpis = [
     (c2, f"{pub_sess} Public / {inh_sess} Private", "Training Sessions", "teal", "Past Classes DB"),
     (c3, str(tier1_count),                "Tier 1 Gov Matches",   "yellow",""),
     (c4, f"RM {rev_7d:,.0f}",             "Revenue This Week",    "green", "CRM — last 7 days"),
-    (c5, f"RM {paid_total:,.0f}",         "Total Revenue (Paid)", "teal",  "CRM — all time"),
+    (c5, f"RM {paid_total:,.0f}",         "Total Revenue — Paid Only", "teal",  "CRM — Paid status only"),
     (c6, f"RM {pipe_total:,.0f}",         "Pending Pipeline",     "yellow","CRM — open quotes"),
 ]
 for col, val, lbl, clr, src in kpis:
@@ -563,7 +591,7 @@ with tab2:
                    "July","August","September","October","November","December"]
 
     def _paid_deals(deal_list):
-        return [d for d in deal_list if _is_revenue(d.get("stage",""))]
+        return [d for d in deal_list if _is_paid_only(d.get("stage",""))]
 
     def _deals_in_range(deal_list, start: str, end: str):
         out = []
@@ -904,11 +932,12 @@ with tab2:
     st.markdown("---")
     st.markdown('<p class="sec-head">Current Pipeline</p>', unsafe_allow_html=True)
     st.markdown(
-        '<p class="sec-sub">Open deals — not yet revenue (paid deals are in the Revenue tabs above)</p>',
+        f'<p class="sec-sub">Open deals for the period <b>1 Jan – 31 Dec {YEAR}</b> — '
+        f'not yet revenue (Paid deals are in the Revenue tabs above)</p>',
         unsafe_allow_html=True
     )
 
-    # Pipeline = non-paid open deals only
+    # Pipeline = non-paid/non-closed open deals only
     open_pipeline = [d for d in crm_filtered if not _is_revenue(d.get("stage",""))]
 
     # Split into active and stale (Almost/Proposal/Quotation open >5 weeks)
@@ -935,22 +964,52 @@ with tab2:
         st.markdown("<br>", unsafe_allow_html=True)
         st.image(crm_pipeline_bar(crm_deals), use_container_width=True)
 
+        # Monthly revenue bar (shows Jan–Dec on X axis)
+        st.markdown(
+            f'<p style="font-size:14px;font-weight:700;color:#0D3349;margin:16px 0 6px;">'
+            f'Monthly Revenue — {YEAR}  (Paid deals only)</p>',
+            unsafe_allow_html=True
+        )
+        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), use_container_width=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:12px 0 8px;">Open pipeline deals</p>',
                     unsafe_allow_html=True)
+
+        # ── Status filter ──────────────────────────────────────────
+        all_pipeline_stages = sorted(set(d.get("stage","") for d in active_pipe if d.get("stage","")))
+        selected_pipe_stages = st.multiselect(
+            "Filter by status:", options=all_pipeline_stages, default=all_pipeline_stages,
+            key="pipeline_stage_filter",
+        )
+        filtered_pipe = [d for d in active_pipe if d.get("stage","") in selected_pipe_stages]
+
         rows = []
-        for d in sorted(active_pipe, key=lambda x: -(x.get("deal_value") or 0)):
+        for d in sorted(filtered_pipe, key=lambda x: -(x.get("deal_value") or 0)):
             stg  = d.get("stage","")
             icon = "🔥" if "almost" in stg.lower() else ("⚙️" if "progress" in stg.lower() else "📋")
             rows.append({
                 "Organisation": _expand_org(d.get("org_name","")),
                 "Status":       f"{icon} {stg}",
-                "Value":        f"RM {d.get('deal_value',0) or 0:,.0f}",
+                "Value":        d.get("deal_value",0) or 0,
                 "Training Date": d.get("train_date") or "TBC",
                 "Course":        d.get("course",""),
                 "Contact":       d.get("contact",""),
             })
         if rows:
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            df_pipe = pd.DataFrame(rows)
+            total_pipe_val = df_pipe["Value"].sum()
+            df_pipe["Value"] = df_pipe["Value"].apply(lambda x: f"RM {x:,.0f}")
+            sum_row = pd.DataFrame([{
+                "Organisation": f"TOTAL ({len(rows)} deals)",
+                "Status": "",
+                "Value": f"RM {total_pipe_val:,.0f}",
+                "Training Date": "",
+                "Course": "",
+                "Contact": "",
+            }])
+            st.dataframe(pd.concat([df_pipe, sum_row], ignore_index=True),
+                         use_container_width=True, hide_index=True)
 
     # ── Stale / Likely Lost Deals (>5 weeks in proposal/quotation/almost) ───
     st.markdown("---")
@@ -983,20 +1042,20 @@ with tab2:
             })
         st.dataframe(pd.DataFrame(srows), use_container_width=True, hide_index=True)
 
-    # ── Pending collection ────────────────────────────────────────
+    # ── Awaiting payment (Closed deals only) ─────────────────────
     st.markdown("---")
     st.markdown('<p class="sec-head">⚠️ Awaiting Payment</p>', unsafe_allow_html=True)
     st.markdown(
-        '<p class="sec-sub">Trainings delivered but invoice not yet paid</p>',
+        '<p class="sec-sub">Deals with status <b>Closed</b> — training delivered, payment still expected</p>',
         unsafe_allow_html=True
     )
     if not pending:
-        st.success("✅ All good — every completed training has been paid for.")
+        st.success("✅ No closed deals awaiting payment.")
     else:
         total_out = sum(d.get("deal_value",0) or 0 for d in pending)
         st.markdown(f"""
         <div class="pending-alert">
-          <p>⚠️ <b>{len(pending)} deal(s) — RM {total_out:,.0f} still outstanding.</b></p>
+          <p>⚠️ <b>{len(pending)} closed deal(s) — RM {total_out:,.0f} awaiting payment.</b></p>
         </div>""", unsafe_allow_html=True)
         prows = [{"Organisation": _expand_org(d.get("org_name","")), "Status": d.get("stage",""),
                   "Amount Owed": f"RM {d.get('deal_value',0) or 0:,.0f}",

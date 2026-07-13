@@ -185,7 +185,7 @@ def tier_breakdown_bar(leads: list[dict], sessions: list[dict]) -> bytes:
 
 
 # ── CRM pipeline bar ──────────────────────────────────────────────────────────
-def crm_pipeline_bar(deals: list[dict]) -> bytes:
+def crm_pipeline_bar(deals: list[dict], year: int = 2026) -> bytes:
     """Horizontal bars — only Paid, Closed, Proposal/Quotation stages."""
     from collections import defaultdict
 
@@ -220,14 +220,24 @@ def crm_pipeline_bar(deals: list[dict]) -> bytes:
     ax.tick_params(axis="y", labelsize=8.5)
 
     x_max = max(values) if max(values) > 0 else 1
+    threshold = x_max * 0.10  # bars shorter than 10% of max → label outside
     for bar, val in zip(bars, values):
-        if val > 0:
+        if val <= 0:
+            continue
+        bar_w = bar.get_width()
+        if bar_w >= threshold:
             ax.text(x_max * 0.012, bar.get_y() + bar.get_height() / 2,
                     f"RM {val:,.0f}", va="center",
                     fontsize=7.5, color="white", fontweight="bold")
+        else:
+            ax.text(bar_w + x_max * 0.012, bar.get_y() + bar.get_height() / 2,
+                    f"RM {val:,.0f}", va="center",
+                    fontsize=7.5, color=BRAND["text"], fontweight="bold")
 
-    ax.set_title("Sales CRM — Value by Stage (Paid / Closed / Pipeline)",
-                 fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
+    ax.set_title(
+        f"Sales CRM — Value by Stage  (1 Jan – 31 Dec {year})",
+        fontsize=9, color=BRAND["text"], pad=8, fontweight="bold",
+    )
     fig.tight_layout(pad=0.6)
     return _save(fig)
 
