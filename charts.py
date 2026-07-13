@@ -185,8 +185,8 @@ def tier_breakdown_bar(leads: list[dict], sessions: list[dict]) -> bytes:
 
 
 # ── CRM pipeline bar ──────────────────────────────────────────────────────────
-def crm_pipeline_bar(deals: list[dict], year: int = 2026) -> bytes:
-    """Horizontal bars — only Paid, Closed, Proposal/Quotation stages."""
+def crm_pipeline_bar(deals: list[dict]) -> bytes:
+    """Horizontal bars — only Paid, Closed, Proposal/Quotation stages. Lifetime data."""
     from collections import defaultdict
 
     by_stage = defaultdict(float)
@@ -209,7 +209,12 @@ def crm_pipeline_bar(deals: list[dict], year: int = 2026) -> bytes:
     fig_h = max(1.8, len(stages) * 0.65)
     fig, ax = _base_ax((7.5, fig_h))
 
-    bars = ax.barh(stages, values, color=colors, edgecolor="white",
+    x_max = max(values) if max(values) > 0 else 1
+    # Enforce a minimum visible bar width (1.5% of max) so tiny values still render
+    min_display = x_max * 0.015
+    display_values = [max(v, min_display) if v > 0 else 0 for v in values]
+
+    bars = ax.barh(stages, display_values, color=colors, edgecolor="white",
                    linewidth=0.8, height=0.5)
     ax.xaxis.set_major_formatter(
         mticker.FuncFormatter(lambda x, _: f"RM {x:,.0f}")
@@ -219,12 +224,11 @@ def crm_pipeline_bar(deals: list[dict], year: int = 2026) -> bytes:
     ax.tick_params(axis="x", labelsize=7.5)
     ax.tick_params(axis="y", labelsize=8.5)
 
-    x_max = max(values) if max(values) > 0 else 1
-    threshold = x_max * 0.10  # bars shorter than 10% of max → label outside
-    for bar, val in zip(bars, values):
+    threshold = x_max * 0.12  # bars shorter than 12% of max → label to the right
+    for bar, val, dval in zip(bars, values, display_values):
         if val <= 0:
             continue
-        bar_w = bar.get_width()
+        bar_w = dval  # use displayed width to position label
         if bar_w >= threshold:
             ax.text(x_max * 0.012, bar.get_y() + bar.get_height() / 2,
                     f"RM {val:,.0f}", va="center",
@@ -235,7 +239,7 @@ def crm_pipeline_bar(deals: list[dict], year: int = 2026) -> bytes:
                     fontsize=7.5, color=BRAND["text"], fontweight="bold")
 
     ax.set_title(
-        f"Sales CRM — Value by Stage  (1 Jan – 31 Dec {year})",
+        "Sales CRM — Value by Stage  ·  Lifetime (All Deals)",
         fontsize=9, color=BRAND["text"], pad=8, fontweight="bold",
     )
     fig.tight_layout(pad=0.6)
