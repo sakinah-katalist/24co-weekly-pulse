@@ -964,9 +964,11 @@ with tab2:
         stale_overdue = [d for d in pending if _overdue_weeks(d) > 5]
         stale_overdue_amt = sum(d.get("deal_value", 0) or 0 for d in stale_overdue)
 
+        stale_deals_amt = sum(d.get("deal_value", 0) or 0 for d in stale_deals)
+
         n_pipeline_stages = len(by_stage)
-        total_kpi_cols = n_pipeline_stages + 1  # +1 for overdue card
-        stage_cols = st.columns(min(max(total_kpi_cols, 1), 4))
+        total_kpi_cols = n_pipeline_stages + 2  # +2 for overdue + likely lost cards
+        stage_cols = st.columns(min(max(total_kpi_cols, 1), 5))
 
         for col, (stage, info) in zip(stage_cols, sorted(by_stage.items(), key=lambda x:-x[1]["total"])):
             icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
@@ -985,6 +987,15 @@ with tab2:
                   <p class="kpi-val">RM {stale_overdue_amt:,.0f}</p>
                   <p class="kpi-lbl">🔴 PAYMENT OVERDUE</p>
                   <p class="kpi-src">{len(stale_overdue)} deal{'s' if len(stale_overdue)!=1 else ''} &gt;5 weeks</p>
+                </div>""", unsafe_allow_html=True)
+
+        if len(stage_cols) > n_pipeline_stages + 1:
+            with stage_cols[n_pipeline_stages + 1]:
+                st.markdown(f"""
+                <div class="kpi-card kpi-red">
+                  <p class="kpi-val">RM {stale_deals_amt:,.0f}</p>
+                  <p class="kpi-lbl">⚠️ LIKELY LOST</p>
+                  <p class="kpi-src">{len(stale_deals)} deal{'s' if len(stale_deals)!=1 else ''} &gt;5 weeks stale</p>
                 </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
