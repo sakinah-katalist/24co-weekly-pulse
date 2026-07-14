@@ -945,8 +945,12 @@ with tab2:
     active_pipe  = [d for d in open_pipeline if not _is_stale_pipeline(d, report_date)]
 
     if open_pipeline:
+        # KPI cards: only count deals added within the current calendar year
         by_stage = defaultdict(lambda: {"count": 0, "total": 0.0})
         for d in active_pipe:
+            ad = (d.get("added_date") or "")[:10]
+            if not (YEAR_START <= ad <= YEAR_END):
+                continue
             by_stage[d.get("stage","—")]["count"] += 1
             by_stage[d.get("stage","—")]["total"] += d.get("deal_value",0) or 0
 
