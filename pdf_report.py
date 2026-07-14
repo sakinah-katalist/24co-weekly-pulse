@@ -457,56 +457,21 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
 
 
     # ── 4 & 5. CHARTS ─────────────────────────────────────────────────────────
-    add(PageBreak())
-    add(_sp(10))
-
     pipeline_chart = chart_bytes.get("pipeline_bar")
     if pipeline_chart:
-        add(KeepTogether([
-            _hr(C["teal"]),
-            Paragraph("Sales CRM — Value by Stage  (Lifetime, All Deals)", styles["SectionHead"]),
-            _sp(2),
-            _img_from_bytes(pipeline_chart, full_w),
-        ]))
-        add(_sp(6))
+        add(PageBreak())
+        add(_hr(C["teal"]))
+        add(Paragraph("Sales CRM — Value by Stage  (Lifetime, All Deals)", styles["SectionHead"]))
+        add(_sp(2))
+        add(_img_from_bytes(pipeline_chart, full_w))
 
     monthly_chart = chart_bytes.get("monthly_revenue")
     if monthly_chart:
-        add(KeepTogether([
-            _hr(C["teal"]),
-            Paragraph(f"Monthly Revenue — {year}  (Paid Deals Only)", styles["SectionHead"]),
-            _sp(2),
-            _img_from_bytes(monthly_chart, full_w),
-        ]))
-        add(_sp(6))
-
-    # ── 6. AWAITING PAYMENT ───────────────────────────────────────────────────
-    add(PageBreak())
-    add(_sp(10))
-
-    add(KeepTogether([
-        _hr(C["red"]),
-        Paragraph(
-            f"Awaiting Payment — {len(pending)} Closed Deal{'s' if len(pending) != 1 else ''}",
-            styles["WarnHead"]),
-        Paragraph(
-            "All deals with Closed status — training delivered, payment not yet received.",
-            styles["SectionSub"]),
-        _sp(3),
-    ]))
-
-    if stale_pending:
-        add(_callout(
-            f"🔴 <b>{len(stale_pending)} deal{'s' if len(stale_pending) != 1 else ''} "
-            f"overdue for more than 5 weeks — RM {stale_pending_total:,.0f} — re-nudge now.</b>",
-            C["red_light"], C["red"], styles,
-        ))
-        add(_sp(3))
-
-    if pending:
-        add(_pending_table(pending, report_date, styles))
-    else:
-        add(_callout("No closed deals awaiting payment.", C["light"], C["border"], styles))
+        add(PageBreak())
+        add(_hr(C["teal"]))
+        add(Paragraph(f"Monthly Revenue — {year}  (Paid Deals Only)", styles["SectionHead"]))
+        add(_sp(2))
+        add(_img_from_bytes(monthly_chart, full_w))
 
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
     return output_path

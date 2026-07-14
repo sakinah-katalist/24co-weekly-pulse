@@ -972,12 +972,24 @@ with tab2:
 
         for col, (stage, info) in zip(stage_cols, sorted(by_stage.items(), key=lambda x:-x[1]["total"])):
             icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
+            is_prop_quot = "proposal" in stage.lower() or "quotation" in stage.lower()
+            if is_prop_quot:
+                fresh = [d for d in active_pipe
+                         if d.get("stage", "") == stage
+                         and YEAR_START <= (d.get("added_date") or "")[:10] <= YEAR_END
+                         and not _is_stale_pipeline(d, report_date)]
+                fresh_amt = sum(d.get("deal_value", 0) or 0 for d in fresh)
+                remark = (f'<p class="kpi-src" style="color:#1E9650;margin-top:4px;">'
+                          f'🟢 {len(fresh)} active &lt;5 weeks · RM {fresh_amt:,.0f}</p>')
+            else:
+                remark = ""
             with col:
                 st.markdown(f"""
                 <div class="kpi-card kpi-yellow">
                   <p class="kpi-val">RM {info['total']:,.0f}</p>
                   <p class="kpi-lbl">{icon} {stage}</p>
                   <p class="kpi-src">{info['count']} deal{'s' if info['count']!=1 else ''}</p>
+                  {remark}
                 </div>""", unsafe_allow_html=True)
 
         if len(stage_cols) > n_pipeline_stages:
