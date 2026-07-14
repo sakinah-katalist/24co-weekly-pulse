@@ -208,12 +208,10 @@ def _is_paid_only(s):
     return "paid" in t
 
 def _awaiting_payment(deals, report_date):
-    """Closed deals whose training date has passed — expecting payment."""
-    cutoff = report_date.strftime("%Y-%m-%d") if hasattr(report_date, "strftime") else str(report_date)
+    """All Closed deals — payment expected regardless of training date."""
     return [d for d in deals
             if "closed" in (d.get("stage") or "").lower()
-            and "before adam" not in (d.get("stage") or "").lower()
-            and d.get("train_date") and d["train_date"] <= cutoff]
+            and "before adam" not in (d.get("stage") or "").lower()]
 
 def _rev7d_paid(deals, report_date):
     """Revenue (Paid-only) received in the last 7 days."""
