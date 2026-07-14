@@ -980,22 +980,49 @@ with tab2:
         st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:12px 0 8px;">Open pipeline deals</p>',
                     unsafe_allow_html=True)
 
-        # ── Status filter ──────────────────────────────────────────
+        # ── Filters ────────────────────────────────────────────────
+        pf1, pf2, pf3 = st.columns([2, 1, 1])
         all_pipeline_stages = sorted(set(d.get("stage","") for d in active_pipe if d.get("stage","")))
-        selected_pipe_stages = st.multiselect(
-            "Filter by status:", options=all_pipeline_stages, default=all_pipeline_stages,
-            key="pipeline_stage_filter",
-        )
-        filtered_pipe = [d for d in active_pipe if d.get("stage","") in selected_pipe_stages]
+        with pf1:
+            selected_pipe_stages = st.multiselect(
+                "Filter by status:", options=all_pipeline_stages, default=all_pipeline_stages,
+                key="pipeline_stage_filter",
+            )
+        with pf2:
+            pipe_date_from = st.date_input(
+                "Added from:", value=datetime(YEAR, 1, 1).date(),
+                min_value=datetime(2024, 1, 1).date(),
+                max_value=rd.date(), key="pipe_from",
+            )
+        with pf3:
+            pipe_date_to = st.date_input(
+                "Added to:", value=rd.date(),
+                min_value=datetime(2024, 1, 1).date(),
+                max_value=datetime(YEAR, 12, 31).date(), key="pipe_to",
+            )
+        pipe_from_str = pipe_date_from.strftime("%Y-%m-%d")
+        pipe_to_str   = pipe_date_to.strftime("%Y-%m-%d")
+
+        def _in_date_range(d, from_str, to_str):
+            ad = (d.get("added_date") or "")[:10]
+            if not ad: return True   # no date → always show
+            return from_str <= ad <= to_str
+
+        filtered_pipe = [
+            d for d in active_pipe
+            if d.get("stage","") in selected_pipe_stages
+            and _in_date_range(d, pipe_from_str, pipe_to_str)
+        ]
 
         rows = []
         for d in sorted(filtered_pipe, key=lambda x: -(x.get("deal_value") or 0)):
             stg  = d.get("stage","")
             icon = "🔥" if "almost" in stg.lower() else ("⚙️" if "progress" in stg.lower() else "📋")
             rows.append({
-                "Organisation": _expand_org(d.get("org_name","")),
-                "Status":       f"{icon} {stg}",
-                "Value":        d.get("deal_value",0) or 0,
+                "Organisation":  _expand_org(d.get("org_name","")),
+                "Status":        f"{icon} {stg}",
+                "Value":         d.get("deal_value",0) or 0,
+                "Added":         d.get("added_date") or "—",
                 "Training Date": d.get("train_date") or "TBC",
                 "Course":        d.get("course",""),
                 "Contact":       d.get("contact",""),
@@ -1005,15 +1032,18 @@ with tab2:
             total_pipe_val = df_pipe["Value"].sum()
             df_pipe["Value"] = df_pipe["Value"].apply(lambda x: f"RM {x:,.0f}")
             sum_row = pd.DataFrame([{
-                "Organisation": f"TOTAL ({len(rows)} deals)",
-                "Status": "",
-                "Value": f"RM {total_pipe_val:,.0f}",
+                "Organisation":  f"TOTAL ({len(rows)} deals)",
+                "Status":        "",
+                "Value":         f"RM {total_pipe_val:,.0f}",
+                "Added":         "",
                 "Training Date": "",
-                "Course": "",
-                "Contact": "",
+                "Course":        "",
+                "Contact":       "",
             }])
             st.dataframe(pd.concat([df_pipe, sum_row], ignore_index=True),
                          use_container_width=True, hide_index=True)
+        else:
+            st.info("No pipeline deals match the selected filters.")
 
     # ── Stale / Likely Lost Deals (>5 weeks in proposal/quotation/almost) ───
     st.markdown("---")
@@ -1026,37 +1056,70 @@ with tab2:
     if not stale_deals:
         st.success("✅ No stale deals — all open pipeline deals are less than 5 weeks old.")
     else:
-        stale_total = sum(d.get("deal_value",0) or 0 for d in stale_deals)
+        # ── Filters ───────────────────────────────────────────────
+        sf1, sf2, sf3 = st.columns([2, 1, 1])
+        all_stale_stages = sorted(set(d.get("stage","") for d in stale_deals if d.get("stage","")))
+        with sf1:
+            selected_stale_stages = st.multiselect(
+                "Filter by status:", options=all_stale_stages, default=all_stale_stages,
+                key="stale_stage_filter",
+            )
+        with sf2:
+            stale_date_from = st.date_input(
+                "Added from:", value=datetime(YEAR, 1, 1).date(),
+                min_value=datetime(2024, 1, 1).date(),
+                max_value=rd.date(), key="stale_from",
+            )
+        with sf3:
+            stale_date_to = st.date_input(
+                "Added to:", value=rd.date(),
+                min_value=datetime(2024, 1, 1).date(),
+                max_value=datetime(YEAR, 12, 31).date(), key="stale_to",
+            )
+        stale_from_str = stale_date_from.strftime("%Y-%m-%d")
+        stale_to_str   = stale_date_to.strftime("%Y-%m-%d")
+
+        filtered_stale = [
+            d for d in stale_deals
+            if d.get("stage","") in selected_stale_stages
+            and _in_date_range(d, stale_from_str, stale_to_str)
+        ]
+
+        stale_total = sum(d.get("deal_value",0) or 0 for d in filtered_stale)
         st.markdown(f"""
         <div class="pending-alert">
-          <p>🕐 <b>{len(stale_deals)} deal(s) — RM {stale_total:,.0f} at risk.</b>
+          <p>🕐 <b>{len(filtered_stale)} deal(s) — RM {stale_total:,.0f} at risk.</b>
           These have been sitting in the pipeline for more than 5 weeks with no movement.</p>
         </div>""", unsafe_allow_html=True)
-        srows = []
-        for d in sorted(stale_deals, key=lambda x: -(x.get("deal_value") or 0)):
-            stg  = d.get("stage","")
-            cd   = d.get("added_date") or d.get("close_date","")
-            srows.append({
-                "Organisation":      _expand_org(d.get("org_name","")),
-                "Status":            f"⚠️ {stg} (open for more than 5 weeks)",
-                "Value":             d.get("deal_value",0) or 0,
-                "In pipeline since": cd or "—",
-                "Course":            d.get("course",""),
-                "Contact":           d.get("contact",""),
-            })
-        df_stale = pd.DataFrame(srows)
-        stale_sum = df_stale["Value"].sum()
-        df_stale["Value"] = df_stale["Value"].apply(lambda x: f"RM {x:,.0f}")
-        stale_sum_row = pd.DataFrame([{
-            "Organisation":      f"TOTAL ({len(srows)} deals)",
-            "Status":            "",
-            "Value":             f"RM {stale_sum:,.0f}",
-            "In pipeline since": "",
-            "Course":            "",
-            "Contact":           "",
-        }])
-        st.dataframe(pd.concat([df_stale, stale_sum_row], ignore_index=True),
-                     use_container_width=True, hide_index=True)
+
+        if filtered_stale:
+            srows = []
+            for d in sorted(filtered_stale, key=lambda x: -(x.get("deal_value") or 0)):
+                stg = d.get("stage","")
+                cd  = d.get("added_date") or d.get("close_date","")
+                srows.append({
+                    "Organisation":      _expand_org(d.get("org_name","")),
+                    "Status":            f"⚠️ {stg} (open for more than 5 weeks)",
+                    "Value":             d.get("deal_value",0) or 0,
+                    "In pipeline since": cd or "—",
+                    "Course":            d.get("course",""),
+                    "Contact":           d.get("contact",""),
+                })
+            df_stale = pd.DataFrame(srows)
+            stale_sum = df_stale["Value"].sum()
+            df_stale["Value"] = df_stale["Value"].apply(lambda x: f"RM {x:,.0f}")
+            stale_sum_row = pd.DataFrame([{
+                "Organisation":      f"TOTAL ({len(srows)} deals)",
+                "Status":            "",
+                "Value":             f"RM {stale_sum:,.0f}",
+                "In pipeline since": "",
+                "Course":            "",
+                "Contact":           "",
+            }])
+            st.dataframe(pd.concat([df_stale, stale_sum_row], ignore_index=True),
+                         use_container_width=True, hide_index=True)
+        else:
+            st.info("No stale deals match the selected filters.")
 
     # ── Awaiting payment (Closed deals only) ─────────────────────
     st.markdown("---")
