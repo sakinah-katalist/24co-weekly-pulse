@@ -8,7 +8,7 @@ import io
 import calendar as _cal
 from datetime import datetime, timedelta, timezone
 from config import ORG_FULL_NAMES
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -18,7 +18,7 @@ from reportlab.platypus import (
     Image, HRFlowable, KeepTogether, PageBreak,
 )
 
-W, H   = A4
+W, H   = landscape(A4)
 MARGIN = 18 * mm
 REPORT_TITLE = "24co Weekly Pulse"
 COMPANY      = "Katalist Venture"
@@ -303,7 +303,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     _Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     doc = SimpleDocTemplate(
-        output_path, pagesize=A4,
+        output_path, pagesize=landscape(A4),
         leftMargin=MARGIN, rightMargin=MARGIN,
         topMargin=MARGIN, bottomMargin=MARGIN,
     )
