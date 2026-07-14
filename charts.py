@@ -186,14 +186,27 @@ def tier_breakdown_bar(leads: list[dict], sessions: list[dict]) -> bytes:
 
 # ── CRM pipeline bar ──────────────────────────────────────────────────────────
 def crm_pipeline_bar(deals: list[dict]) -> bytes:
-    """Horizontal bars — only Paid, Closed, Proposal/Quotation stages. Lifetime data."""
+    """Horizontal bars — Paid (revenue) + active pipeline. Closed excluded. Lifetime data."""
     from collections import defaultdict
+
+    PAID_STAGES     = ("paid",)
+    PIPELINE_STAGES = ("proposal", "quotation", "almost", "in progress", "preview")
+
+    def _include(raw):
+        s = (raw or "").lower()
+        if "before adam" in s or "closed" in s:
+            return False
+        return any(k in s for k in PAID_STAGES + PIPELINE_STAGES)
+
+    def _is_paid_stage(raw):
+        s = (raw or "").lower()
+        return "paid" in s and "before adam" not in s
 
     by_stage = defaultdict(float)
     for d in deals:
         raw   = d.get("stage") or "Unknown"
         stage = _clean(raw)
-        if _stage_ok(raw):
+        if _include(raw):
             by_stage[stage] += d.get("deal_value", 0) or 0
 
     if not by_stage:
@@ -202,16 +215,19 @@ def crm_pipeline_bar(deals: list[dict]) -> bytes:
     stages = sorted(by_stage, key=lambda s: by_stage[s], reverse=True)
     values = [by_stage[s] for s in stages]
 
-    palette = [BRAND["teal"], BRAND["yellow"], BRAND["red"],
-               "#2980B9", "#8E44AD"]
-    colors  = (palette * ((len(stages) // len(palette)) + 1))[:len(stages)]
+    # Colour: teal for Paid (revenue), yellow for pipeline stages
+    colors = []
+    for s in stages:
+        if _is_paid_stage(s):
+            colors.append(BRAND["teal"])
+        else:
+            colors.append(BRAND["yellow"])
 
     fig_h = max(1.8, len(stages) * 0.65)
     fig, ax = _base_ax((7.5, fig_h))
 
     x_max = max(values) if max(values) > 0 else 1
-    # Enforce a minimum visible bar width (1.5% of max) so tiny values still render
-    min_display = x_max * 0.015
+    min_display = x_max * 0.015  # minimum visible bar width for tiny values
     display_values = [max(v, min_display) if v > 0 else 0 for v in values]
 
     bars = ax.barh(stages, display_values, color=colors, edgecolor="white",
@@ -224,11 +240,11 @@ def crm_pipeline_bar(deals: list[dict]) -> bytes:
     ax.tick_params(axis="x", labelsize=7.5)
     ax.tick_params(axis="y", labelsize=8.5)
 
-    threshold = x_max * 0.12  # bars shorter than 12% of max → label to the right
+    threshold = x_max * 0.12
     for bar, val, dval in zip(bars, values, display_values):
         if val <= 0:
             continue
-        bar_w = dval  # use displayed width to position label
+        bar_w = dval
         if bar_w >= threshold:
             ax.text(x_max * 0.012, bar.get_y() + bar.get_height() / 2,
                     f"RM {val:,.0f}", va="center",
@@ -238,8 +254,14 @@ def crm_pipeline_bar(deals: list[dict]) -> bytes:
                     f"RM {val:,.0f}", va="center",
                     fontsize=7.5, color=BRAND["text"], fontweight="bold")
 
+    legend_patches = [
+        mpatches.Patch(color=BRAND["teal"],   label="Paid — confirmed revenue (money received)"),
+        mpatches.Patch(color=BRAND["yellow"],  label="Active pipeline — awaiting decision"),
+    ]
+    ax.legend(handles=legend_patches, fontsize=7.5, framealpha=0, loc="lower right")
+
     ax.set_title(
-        "Sales CRM — Value by Stage  ·  Lifetime (All Deals)",
+        "Sales CRM — Value by Stage  ·  Lifetime  ·  Paid status = Revenue",
         fontsize=9, color=BRAND["text"], pad=8, fontweight="bold",
     )
     fig.tight_layout(pad=0.6)
@@ -382,9 +404,9 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
                  fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
 
     patches = [
-        mpatches.Patch(color=BRAND["yellow"], label="Current month"),
-        mpatches.Patch(color=BRAND["teal"],   label="Revenue received"),
-        mpatches.Patch(color="#DEDEDE",        label="No revenue"),
+        mpatches.Patch(color=BRAND["yellow"], label="Current month — Paid deals"),
+        mpatches.Patch(color=BRAND["teal"],   label="Paid deals (money received)"),
+        mpatches.Patch(color="#DEDEDE",        label="No Paid deals"),
     ]
     ax.legend(handles=patches, fontsize=7.5, framealpha=0, loc="upper right")
     fig.tight_layout(pad=0.6)
