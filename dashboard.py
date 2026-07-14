@@ -1031,16 +1031,28 @@ with tab2:
         srows = []
         for d in sorted(stale_deals, key=lambda x: -(x.get("deal_value") or 0)):
             stg  = d.get("stage","")
-            cd   = d.get("close_date","")
+            cd   = d.get("added_date") or d.get("close_date","")
             srows.append({
-                "Organisation":  _expand_org(d.get("org_name","")),
-                "Status":        f"⚠️ {stg} (open for more than 5 weeks)",
-                "Value":         f"RM {d.get('deal_value',0) or 0:,.0f}",
+                "Organisation":      _expand_org(d.get("org_name","")),
+                "Status":            f"⚠️ {stg} (open for more than 5 weeks)",
+                "Value":             d.get("deal_value",0) or 0,
                 "In pipeline since": cd or "—",
-                "Course":        d.get("course",""),
-                "Contact":       d.get("contact",""),
+                "Course":            d.get("course",""),
+                "Contact":           d.get("contact",""),
             })
-        st.dataframe(pd.DataFrame(srows), use_container_width=True, hide_index=True)
+        df_stale = pd.DataFrame(srows)
+        stale_sum = df_stale["Value"].sum()
+        df_stale["Value"] = df_stale["Value"].apply(lambda x: f"RM {x:,.0f}")
+        stale_sum_row = pd.DataFrame([{
+            "Organisation":      f"TOTAL ({len(srows)} deals)",
+            "Status":            "",
+            "Value":             f"RM {stale_sum:,.0f}",
+            "In pipeline since": "",
+            "Course":            "",
+            "Contact":           "",
+        }])
+        st.dataframe(pd.concat([df_stale, stale_sum_row], ignore_index=True),
+                     use_container_width=True, hide_index=True)
 
     # ── Awaiting payment (Closed deals only) ─────────────────────
     st.markdown("---")
