@@ -13,7 +13,7 @@ MYT = timezone(timedelta(hours=8))
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent))
-from charts import revenue_trend_chart, lead_status_donut, tier_breakdown_bar, crm_pipeline_bar, monthly_revenue_bar
+from charts import revenue_trend_chart, lead_status_donut, crm_pipeline_bar, monthly_revenue_bar
 from pdf_report import build_pdf, _session_type, _pending_collection, _revenue_last_7_days, _expand_org
 from emailer import build_email_html, send_report
 from config import EMAIL_TO, EMAIL_FROM
@@ -1258,12 +1258,8 @@ with tab3:
     st.markdown("---")
     st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin-bottom:12px;">Visual breakdown</p>',
                 unsafe_allow_html=True)
-    ch1, ch2 = st.columns(2, gap="large")
-    with ch1:
-        if leads:
-            st.image(lead_status_donut(leads), use_container_width=True)
-    with ch2:
-        st.image(tier_breakdown_bar(leads, sessions), use_container_width=True)
+    if leads:
+        st.image(lead_status_donut(leads), use_container_width=True)
 
     # Lead status table
     if leads:
