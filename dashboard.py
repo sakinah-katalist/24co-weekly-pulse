@@ -952,7 +952,22 @@ with tab2:
             by_stage[d.get("stage","—")]["count"] += 1
             by_stage[d.get("stage","—")]["total"] += d.get("deal_value",0) or 0
 
-        stage_cols = st.columns(min(max(len(by_stage), 1), 4))
+        def _overdue_weeks(d):
+            ref = d.get("train_date") or d.get("added_date") or ""
+            if not ref:
+                return 0
+            try:
+                return (report_date - datetime.strptime(ref[:10], "%Y-%m-%d")).days / 7
+            except Exception:
+                return 0
+
+        stale_overdue = [d for d in pending if _overdue_weeks(d) > 5]
+        stale_overdue_amt = sum(d.get("deal_value", 0) or 0 for d in stale_overdue)
+
+        n_pipeline_stages = len(by_stage)
+        total_kpi_cols = n_pipeline_stages + 1  # +1 for overdue card
+        stage_cols = st.columns(min(max(total_kpi_cols, 1), 4))
+
         for col, (stage, info) in zip(stage_cols, sorted(by_stage.items(), key=lambda x:-x[1]["total"])):
             icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
             with col:
@@ -961,6 +976,15 @@ with tab2:
                   <p class="kpi-val">RM {info['total']:,.0f}</p>
                   <p class="kpi-lbl">{icon} {stage}</p>
                   <p class="kpi-src">{info['count']} deal{'s' if info['count']!=1 else ''}</p>
+                </div>""", unsafe_allow_html=True)
+
+        if len(stage_cols) > n_pipeline_stages:
+            with stage_cols[n_pipeline_stages]:
+                st.markdown(f"""
+                <div class="kpi-card kpi-red">
+                  <p class="kpi-val">RM {stale_overdue_amt:,.0f}</p>
+                  <p class="kpi-lbl">🔴 PAYMENT OVERDUE</p>
+                  <p class="kpi-src">{len(stale_overdue)} deal{'s' if len(stale_overdue)!=1 else ''} &gt;5 weeks</p>
                 </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
