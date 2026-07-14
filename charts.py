@@ -186,27 +186,14 @@ def tier_breakdown_bar(leads: list[dict], sessions: list[dict]) -> bytes:
 
 # ── CRM pipeline bar ──────────────────────────────────────────────────────────
 def crm_pipeline_bar(deals: list[dict]) -> bytes:
-    """Horizontal bars — Paid (revenue) + active pipeline. Closed excluded. Lifetime data."""
+    """Horizontal bars — only Paid, Closed, Proposal/Quotation stages. Lifetime data."""
     from collections import defaultdict
-
-    PAID_STAGES     = ("paid",)
-    PIPELINE_STAGES = ("proposal", "quotation", "almost", "in progress", "preview")
-
-    def _include(raw):
-        s = (raw or "").lower()
-        if "before adam" in s or "closed" in s:
-            return False
-        return any(k in s for k in PAID_STAGES + PIPELINE_STAGES)
-
-    def _is_paid_stage(raw):
-        s = (raw or "").lower()
-        return "paid" in s and "before adam" not in s
 
     by_stage = defaultdict(float)
     for d in deals:
         raw   = d.get("stage") or "Unknown"
         stage = _clean(raw)
-        if _include(raw):
+        if _stage_ok(raw):
             by_stage[stage] += d.get("deal_value", 0) or 0
 
     if not by_stage:
@@ -215,13 +202,9 @@ def crm_pipeline_bar(deals: list[dict]) -> bytes:
     stages = sorted(by_stage, key=lambda s: by_stage[s], reverse=True)
     values = [by_stage[s] for s in stages]
 
-    # Colour: teal for Paid (revenue), yellow for pipeline stages
-    colors = []
-    for s in stages:
-        if _is_paid_stage(s):
-            colors.append(BRAND["teal"])
-        else:
-            colors.append(BRAND["yellow"])
+    palette = [BRAND["teal"], BRAND["yellow"], BRAND["red"],
+               "#2980B9", "#8E44AD"]
+    colors  = (palette * ((len(stages) // len(palette)) + 1))[:len(stages)]
 
     fig_h = max(1.8, len(stages) * 0.65)
     fig, ax = _base_ax((7.5, fig_h))
@@ -254,14 +237,8 @@ def crm_pipeline_bar(deals: list[dict]) -> bytes:
                     f"RM {val:,.0f}", va="center",
                     fontsize=7.5, color=BRAND["text"], fontweight="bold")
 
-    legend_patches = [
-        mpatches.Patch(color=BRAND["teal"],   label="Paid — confirmed revenue (money received)"),
-        mpatches.Patch(color=BRAND["yellow"],  label="Active pipeline — awaiting decision"),
-    ]
-    ax.legend(handles=legend_patches, fontsize=7.5, framealpha=0, loc="lower right")
-
     ax.set_title(
-        "Sales CRM — Value by Stage  ·  Lifetime  ·  Paid status = Revenue",
+        "Sales CRM — Value by Stage  ·  Lifetime (All Deals)",
         fontsize=9, color=BRAND["text"], pad=8, fontweight="bold",
     )
     fig.tight_layout(pad=0.6)
