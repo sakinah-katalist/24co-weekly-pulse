@@ -7,7 +7,6 @@ Sections: at-a-glance KPIs, revenue by period, pipeline cards,
 import io
 import calendar as _cal
 from datetime import datetime, timedelta, timezone
-from collections import defaultdict
 from config import ORG_FULL_NAMES
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -385,17 +384,6 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
                   and _is_stale_pipeline(d, report_date)]
     stale_pipe_total = sum(d.get("deal_value", 0) or 0 for d in stale_pipe)
 
-    # Pipeline by stage (current year, added_date filter)
-    YEAR_START = f"{year}-01-01"
-    YEAR_END   = f"{year}-12-31"
-    by_stage = defaultdict(lambda: {"count": 0, "total": 0.0})
-    for d in pipeline_deals:
-        ad = (d.get("added_date") or "")[:10]
-        if not (YEAR_START <= ad <= YEAR_END):
-            continue
-        by_stage[d.get("stage", "—")]["count"] += 1
-        by_stage[d.get("stage", "—")]["total"] += d.get("deal_value", 0) or 0
-
     # ── 1. THIS WEEK AT A GLANCE ──────────────────────────────────────────────
     add(KeepTogether([
         _hr(C["teal"]),
@@ -467,29 +455,6 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     add(rev_tbl)
     add(_sp(6))
 
-    # ── 3. CURRENT PIPELINE CARDS ─────────────────────────────────────────────
-    add(KeepTogether([
-        _hr(C["yellow"]),
-        Paragraph("Current Pipeline by Stage", styles["SectionHead"]),
-        Paragraph(f"Deals added in {year} · active pipeline (excluding Paid/Closed)",
-                  styles["SectionSub"]),
-        _sp(3),
-    ]))
-
-    if by_stage:
-        pipe_cards = []
-        for stage, info in sorted(by_stage.items(), key=lambda x: -x[1]["total"]):
-            icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
-            pipe_cards.append(_kpi_card(
-                f"RM {info['total']:,.0f}",
-                f"{icon} {stage.upper()}",
-                f"{info['count']} deal{'s' if info['count'] != 1 else ''}",
-                C["yellow_light"], C["dark"],
-            ))
-        add(_kpi_grid(pipe_cards, min(len(pipe_cards), 3), full_w))
-    else:
-        add(_callout("No active pipeline deals for this year.", C["light"], C["border"], styles))
-    add(_sp(6))
 
     # ── 4 & 5. CHARTS ─────────────────────────────────────────────────────────
     add(PageBreak())
