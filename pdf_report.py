@@ -1,12 +1,13 @@
 """
 24co Weekly Pulse — PDF Report
-Plain-language, narrative-first layout.
-No jargon. No complex charts. Readable by anyone.
+Sections: at-a-glance KPIs, revenue by period, pipeline cards,
+          CRM stage chart, monthly revenue chart, overdue payments.
 """
 
 import io
+import calendar as _cal
 from datetime import datetime, timedelta, timezone
-from collections import Counter, defaultdict
+from collections import defaultdict
 from config import ORG_FULL_NAMES
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -23,7 +24,6 @@ MARGIN = 18 * mm
 REPORT_TITLE = "24co Weekly Pulse"
 COMPANY      = "Katalist Venture"
 
-# ── Colours ──────────────────────────────────────────────────────────────────
 C = {
     "teal":         colors.HexColor("#1A7F7A"),
     "teal_light":   colors.HexColor("#E6F4F3"),
@@ -41,36 +41,10 @@ C = {
     "white":        colors.white,
     "header_bg":    colors.HexColor("#0D3349"),
 }
-C["gold"] = C["yellow"];  C["gold_light"] = C["yellow_light"]
-
-COLOR_MAP = {"gold": C["yellow"], "yellow": C["yellow"],
-             "red": C["red"],     "teal":   C["teal"]}
-LIGHT_MAP = {"gold": C["yellow_light"], "yellow": C["yellow_light"],
-             "red": C["red_light"],     "teal":   C["teal_light"]}
-
-# Plain-English translations for lead statuses
-STATUS_PLAIN = {
-    "[training] hot lead": "Very interested — follow up within 48 hours",
-    "[canva] hot lead":    "Very interested in Canva — follow up soon",
-    "new":                 "Just came in — not yet contacted",
-    "contacted":           "We've reached out, waiting for their reply",
-    "hot lead":            "Very interested — respond quickly",
-    "warm":                "Showing interest — nurture this lead",
-    "cold":                "Low activity — may need re-engagement",
-    "lost":                "Did not proceed — closed",
-    "won":                 "Successfully converted to a booking",
-}
-
-CRM_STAGES = ("paid", "closed", "proposal", "quotation", "almost")
+C["gold"] = C["yellow"]
 
 
 def _expand_org(name: str) -> str:
-    """
-    Expand an org name to its full form.
-    1. Exact match in ORG_FULL_NAMES.
-    2. Prefix match (longest key first) for series entries like 'MSU - Siri 11 - Ali'.
-    3. Return as-is if no match found.
-    """
     if not name:
         return name
     if name in ORG_FULL_NAMES:
@@ -84,9 +58,11 @@ def _expand_org(name: str) -> str:
     return name
 
 
-def _stage_ok(s):
+def _is_paid_only(s):
     t = (s or "").lower()
-    return any(k in t for k in CRM_STAGES)
+    if "before adam" in t:
+        return False
+    return "paid" in t
 
 
 def _is_revenue(s):
@@ -97,18 +73,15 @@ def _is_revenue(s):
 
 
 def _is_stale_pipeline(d, report_date, weeks=5):
-    """True if deal is Almost/Proposal/Quotation and added_date (or close_date) is >5 weeks old."""
     stg = (d.get("stage") or "").lower()
     if not any(k in stg for k in ("almost", "proposal", "quotation")):
         return False
-    # Use added_date (Notion "Created time") first, fall back to close_date
     cd = (d.get("added_date") or d.get("close_date") or "")[:10]
     if not cd:
         return False
     try:
         deal_dt = datetime.strptime(cd, "%Y-%m-%d")
         rd = report_date if hasattr(report_date, "strftime") else datetime.strptime(str(report_date)[:10], "%Y-%m-%d")
-        # Must also be within the current calendar year (Jan 1 – Dec 31)
         year_start = datetime(rd.year, 1, 1)
         year_end   = datetime(rd.year, 12, 31)
         if not (year_start <= deal_dt <= year_end):
@@ -118,8 +91,34 @@ def _is_stale_pipeline(d, report_date, weeks=5):
         return False
 
 
-def _plain_status(status: str) -> str:
-    return STATUS_PLAIN.get((status or "").lower(), status or "—")
+def _awaiting_payment(deals):
+    return [d for d in deals
+            if "closed" in (d.get("stage") or "").lower()
+            and "before adam" not in (d.get("stage") or "").lower()]
+
+
+def _weeks_overdue(d, report_date):
+    ref = d.get("train_date") or d.get("added_date") or ""
+    if not ref:
+        return None
+    try:
+        return (report_date - datetime.strptime(ref[:10], "%Y-%m-%d")).days / 7
+    except Exception:
+        return None
+
+
+def _rev_date(d):
+    return (d.get("payment_received_date") or d.get("close_date") or "")[:10]
+
+
+def _revenue_last_7_days(deals, report_date) -> float:
+    if not hasattr(report_date, "strftime"):
+        return 0.0
+    cutoff = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
+    today  = report_date.strftime("%Y-%m-%d")
+    return sum(d.get("deal_value", 0) or 0 for d in deals
+               if _is_revenue(d.get("stage", ""))
+               and cutoff <= (d.get("payment_received_date") or d.get("close_date") or "") <= today)
 
 
 def _session_type(s: dict) -> str:
@@ -131,16 +130,6 @@ def _pending_collection(deals, report_date) -> list:
     return [d for d in deals
             if d.get("train_date") and d["train_date"] <= cutoff
             and not _is_revenue(d.get("stage", ""))]
-
-
-def _revenue_last_7_days(deals, report_date) -> float:
-    if not hasattr(report_date, "strftime"):
-        return 0.0
-    cutoff = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
-    today  = report_date.strftime("%Y-%m-%d")
-    return sum(d.get("deal_value", 0) or 0 for d in deals
-               if _is_revenue(d.get("stage", ""))
-               and cutoff <= (d.get("payment_received_date") or d.get("close_date") or "") <= today)
 
 
 def _hex(c) -> str:
@@ -155,7 +144,6 @@ def _img_from_bytes(data: bytes, w_mm: float) -> Image:
     return img
 
 
-# ── Styles ────────────────────────────────────────────────────────────────────
 def _styles():
     base = getSampleStyleSheet()
 
@@ -169,21 +157,29 @@ def _styles():
         "SectionSub":   _s("SectionSub",    8, "Helvetica-Oblique", C["muted"]),
         "Narrative":    _s("Narrative",    9.5,"Helvetica",         C["dark"],    leading_mult=1.6),
         "NarrativeBold":_s("NarrativeBold",9.5,"Helvetica-Bold",   C["dark"],    leading_mult=1.6),
+        "KPIVal":       _s("KPIVal",       15, "Helvetica-Bold",    C["dark"],    TA_CENTER),
+        "KPILbl":       _s("KPILbl",        8, "Helvetica-Bold",    C["muted"],   TA_CENTER),
+        "KPISub":       _s("KPISub",        7, "Helvetica",         C["muted"],   TA_CENTER),
         "CardOrg":      _s("CardOrg",      10, "Helvetica-Bold",    C["dark"]),
-        "CardDesc":     _s("CardDesc",      7.5,"Helvetica-Oblique",C["mid"]),
-        "CardLabel":    _s("CardLabel",     7, "Helvetica-Bold",    C["muted"]),
-        "CardValue":    _s("CardValue",     8.5,"Helvetica",        C["dark"]),
         "TableHead":    _s("TableHead",     8, "Helvetica-Bold",    C["white"],   TA_LEFT),
         "TableCell":    _s("TableCell",     8, "Helvetica",         C["dark"]),
+        "TableCellR":   _s("TableCellR",    8, "Helvetica",         C["dark"],    TA_RIGHT),
         "SmallMuted":   _s("SmallMuted",    7, "Helvetica",         C["muted"]),
-        "Highlight":    _s("Highlight",     9, "Helvetica-Bold",    C["teal"]),
         "WarnHead":     _s("WarnHead",      9, "Helvetica-Bold",    C["red"]),
+        "Highlight":    _s("Highlight",     9, "Helvetica-Bold",    C["teal"]),
     }
 
 
-# ── Helper: coloured highlight box ───────────────────────────────────────────
-def _callout(text: str, bg: object, border: object, styles, key="Narrative") -> Table:
-    """Single-cell coloured box with text inside."""
+def _hr(c=None):
+    return HRFlowable(width="100%", thickness=0.8,
+                      color=c or C["border"], spaceAfter=3)
+
+
+def _sp(n=4):
+    return Spacer(1, n * mm)
+
+
+def _callout(text, bg, border, styles, key="Narrative"):
     cell = Table([[Paragraph(text, styles[key])]], colWidths=[W - 2*MARGIN])
     cell.setStyle(TableStyle([
         ("BACKGROUND",    (0,0),(-1,-1), bg),
@@ -196,264 +192,98 @@ def _callout(text: str, bg: object, border: object, styles, key="Narrative") -> 
     return cell
 
 
-# ── Bullet-list callout box ───────────────────────────────────────────────────
-def _callout_list(items: list, bg, border_c, styles, key="Narrative") -> Table:
-    """Coloured box with each item rendered as its own bullet line."""
-    rows = [[Paragraph(f"•  {text}", styles[key])] for text in items]
-    t = Table(rows, colWidths=[W - 2*MARGIN])
-    t.setStyle(TableStyle([
-        ("BACKGROUND",    (0,0),(-1,-1), bg),
+# ── KPI card grid ─────────────────────────────────────────────────────────────
+def _kpi_card(val_str, label, sub, bg, val_color):
+    """Single KPI card as a 1-cell Table."""
+    inner = Table([
+        [Paragraph(val_str, ParagraphStyle("_kv", fontName="Helvetica-Bold",
+                   fontSize=13, leading=16, textColor=val_color, alignment=TA_CENTER))],
+        [Paragraph(label,   ParagraphStyle("_kl", fontName="Helvetica-Bold",
+                   fontSize=7.5, leading=11, textColor=C["muted"], alignment=TA_CENTER))],
+        [Paragraph(sub,     ParagraphStyle("_ks", fontName="Helvetica",
+                   fontSize=7, leading=10, textColor=C["muted"], alignment=TA_CENTER))],
+    ], colWidths=[None])
+    inner.setStyle(TableStyle([
         ("TOPPADDING",    (0,0),(-1,-1), 3),
         ("BOTTOMPADDING", (0,0),(-1,-1), 3),
-        ("LEFTPADDING",   (0,0),(-1,-1), 14),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 10),
-        ("BOX",           (0,0),(-1,-1), 0.5, border_c),
-        ("TOPPADDING",    (0,0),(0,0),   8),
-        ("BOTTOMPADDING", (0,-1),(0,-1), 8),
-    ]))
-    return t
-
-
-# ── Lead card — plain English labels ─────────────────────────────────────────
-def _lead_card(lead: dict, styles) -> Table:
-    color_key = lead.get("color", "teal")
-    accent    = COLOR_MAP.get(color_key, C["teal"])
-    bg        = LIGHT_MAP.get(color_key, C["teal_light"])
-    tier_hex  = _hex(C["yellow"])
-    red_hex   = _hex(C["red"])
-
-    hot_tag  = f' <font color="#{red_hex}"><b>[ HOT — respond quickly ]</b></font>' \
-               if lead.get("is_hot") and not lead.get("tier1") else ""
-    tier_tag = f' <font color="#{tier_hex}"><b>[ Tier 1 — {lead["tier1"]} ]</b></font>' \
-               if lead.get("tier1") else ""
-
-    short   = lead['org_name']
-    full    = _expand_org(short)
-    # Only show the short-form in grey if it's genuinely shorter (an abbreviation)
-    name_str = (f"<b>{full}</b>  <font size='8' color='#888888'>({short})</font>"
-                if full != short and len(short) < len(full)
-                else f"<b>{full}</b>")
-    header = Paragraph(f"{name_str}{tier_tag}{hot_tag}", styles["CardOrg"])
-
-    rows = []
-    if lead.get("description"):
-        rows.append([Paragraph("About this org", styles["CardLabel"]),
-                     Paragraph(lead["description"], styles["CardDesc"])])
-
-    def row(lbl, val):
-        if not val: return None
-        return [Paragraph(lbl, styles["CardLabel"]),
-                Paragraph(str(val), styles["CardValue"])]
-
-    # Plain English labels
-    status_plain = _plain_status(lead.get("status",""))
-    for r in [
-        row("Organisation type",  lead.get("org_type")),
-        row("Contact person",     lead.get("contact_name")),
-        row("Email",              lead.get("contact_email")),
-        row("Phone",              lead.get("contact_phone")),
-        row("How they found us",  lead.get("lead_source")),
-        row("Current status",     status_plain),
-        row("Enquiry received",   lead.get("date")),
-        row("What they need",     lead.get("enquiry")),
-        row("Training topic",     lead.get("area")),
-        row("Internal notes",     lead.get("notes")),
-    ]:
-        if r: rows.append(r)
-
-    cw2 = W - 2*MARGIN - 34*mm
-    detail = Table(rows, colWidths=[26*mm, cw2])
-    detail.setStyle(TableStyle([
-        ("VALIGN",        (0,0),(-1,-1),"TOP"),
-        ("TOPPADDING",    (0,0),(-1,-1), 2),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 2),
         ("LEFTPADDING",   (0,0),(-1,-1), 0),
         ("RIGHTPADDING",  (0,0),(-1,-1), 0),
     ]))
-
-    body = Table([[header],[detail]], colWidths=[W-2*MARGIN-6*mm])
-    body.setStyle(TableStyle([
-        ("BACKGROUND", (0,0),(-1,-1), bg),
-        ("TOPPADDING", (0,0),(-1,-1), 6),
-        ("BOTTOMPADDING",(0,0),(-1,-1), 6),
-        ("LEFTPADDING", (0,0),(-1,-1), 9),
-        ("RIGHTPADDING",(0,0),(-1,-1), 9),
-    ]))
-
-    bar = Table([[""]], colWidths=[4*mm])
-    bar.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,-1),accent)]))
-
-    card = Table([[bar, body]], colWidths=[4*mm, W-2*MARGIN-4*mm])
+    card = Table([[inner]], colWidths=[None])
     card.setStyle(TableStyle([
-        ("VALIGN",        (0,0),(-1,-1),"TOP"),
-        ("TOPPADDING",    (0,0),(-1,-1), 0),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 0),
-        ("LEFTPADDING",   (0,0),(-1,-1), 0),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 0),
+        ("BACKGROUND",    (0,0),(-1,-1), bg),
+        ("TOPPADDING",    (0,0),(-1,-1), 10),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 10),
+        ("LEFTPADDING",   (0,0),(-1,-1), 8),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 8),
         ("BOX",           (0,0),(-1,-1), 0.5, C["border"]),
     ]))
     return card
 
 
-# ── Session card — plain English labels ──────────────────────────────────────
-def _session_card(s: dict, styles) -> Table:
-    color_key = s.get("color", "teal")
-    accent    = COLOR_MAP.get(color_key, C["teal"])
-    bg        = LIGHT_MAP.get(color_key, C["teal_light"])
-    tier_hex  = _hex(C["yellow"])
-    stype     = _session_type(s)
-
-    tier_tag  = f' <font color="#{tier_hex}"><b>[ Tier 1 — {s["tier1"]} ]</b></font>' \
-                if s.get("tier1") else ""
-    type_tag  = " [ Public class ]" if stype == "Public" else " [ In-house ]"
-
-    short_s  = s['org_name']
-    full_s   = _expand_org(short_s)
-    name_str_s = (f"<b>{full_s}</b>  <font size='8' color='#888888'>({short_s})</font>"
-                  if full_s != short_s and len(short_s) < len(full_s)
-                  else f"<b>{full_s}</b>")
-    header = Paragraph(f"{name_str_s}{tier_tag} <i>{type_tag}</i>",
-                       styles["CardOrg"])
-
+def _kpi_grid(cards, n_cols, full_w_mm):
+    """Lay out a list of card items in n_cols columns."""
+    col_w = (full_w_mm / n_cols) * mm
     rows = []
-    if s.get("description"):
-        rows.append([Paragraph("About this org", styles["CardLabel"]),
-                     Paragraph(s["description"], styles["CardDesc"])])
-
-    def row(lbl, val):
-        if not val: return None
-        return [Paragraph(lbl, styles["CardLabel"]),
-                Paragraph(str(val), styles["CardValue"])]
-
-    for r in [
-        row("Programme",     s.get("class_name")),
-        row("Date held",     s.get("date")),
-        row("Session type",  f"{stype} — {'Anyone can join' if stype == 'Public' else 'Booked exclusively for this organisation'}"),
-    ]:
-        if r: rows.append(r)
-
-    if not rows:
-        rows.append([Paragraph("Date", styles["CardLabel"]),
-                     Paragraph(s.get("date",""), styles["CardValue"])])
-
-    cw2 = W - 2*MARGIN - 34*mm
-    detail = Table(rows, colWidths=[26*mm, cw2])
-    detail.setStyle(TableStyle([
-        ("VALIGN",        (0,0),(-1,-1),"TOP"),
-        ("TOPPADDING",    (0,0),(-1,-1), 2),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 2),
-        ("LEFTPADDING",   (0,0),(-1,-1), 0),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 0),
-    ]))
-
-    body = Table([[header],[detail]], colWidths=[W-2*MARGIN-6*mm])
-    body.setStyle(TableStyle([
-        ("BACKGROUND", (0,0),(-1,-1), bg),
-        ("TOPPADDING", (0,0),(-1,-1), 6),
-        ("BOTTOMPADDING",(0,0),(-1,-1), 6),
-        ("LEFTPADDING", (0,0),(-1,-1), 9),
-        ("RIGHTPADDING",(0,0),(-1,-1), 9),
-    ]))
-
-    bar = Table([[""]], colWidths=[4*mm])
-    bar.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,-1),accent)]))
-
-    card = Table([[bar, body]], colWidths=[4*mm, W-2*MARGIN-4*mm])
-    card.setStyle(TableStyle([
-        ("VALIGN",        (0,0),(-1,-1),"TOP"),
-        ("TOPPADDING",    (0,0),(-1,-1), 0),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 0),
-        ("LEFTPADDING",   (0,0),(-1,-1), 0),
-        ("RIGHTPADDING",  (0,0),(-1,-1), 0),
-        ("BOX",           (0,0),(-1,-1), 0.5, C["border"]),
-    ]))
-    return card
-
-
-# ── Simple deal table ─────────────────────────────────────────────────────────
-def _deal_table(deals: list, styles, mark_stale=False, report_date=None) -> Table:
-    hdr = [Paragraph(h, styles["TableHead"]) for h in
-           ["Organisation", "Status", "Amount", "Date", "What we delivered"]]
-    cw  = [(W-2*MARGIN)*f for f in [0.26, 0.18, 0.13, 0.14, 0.29]]
-    rows = []
-    red_hex = _hex(C["red"])
-    for d in sorted(deals, key=lambda x: -(x.get("deal_value") or 0)):
-        stg   = d.get("stage","—")
-        stale = mark_stale and report_date and _is_stale_pipeline(d, report_date)
-        if "paid" in stg.lower():
-            icon_text = "✅ Paid"
-        elif "closed" in stg.lower():
-            icon_text = "📁 Closed"
-        elif stale:
-            icon_text = f'<font color="#{red_hex}"><b>⚠ {stg} — open for more than 5 weeks</b></font>'
-        else:
-            icon_text = f"📋 {stg}"
-        rows.append([
-            Paragraph(_expand_org(d.get("org_name","")), styles["TableCell"]),
-            Paragraph(icon_text,             styles["TableCell"]),
-            Paragraph(f"RM {d['deal_value']:,.0f}" if d.get("deal_value") else "—",
-                      styles["TableCell"]),
-            Paragraph(d.get("payment_received_date") or d.get("close_date") or "—", styles["TableCell"]),
-            Paragraph(d.get("course",""),    styles["TableCell"]),
-        ])
-
-    if not rows:
-        return Paragraph("No deals to show.", styles["SmallMuted"])
-
-    t = Table([hdr]+rows, colWidths=cw, repeatRows=1)
+    for i in range(0, len(cards), n_cols):
+        row = cards[i:i+n_cols]
+        while len(row) < n_cols:
+            row.append(Spacer(1, 1))
+        rows.append(row)
+    t = Table(rows, colWidths=[col_w] * n_cols)
     t.setStyle(TableStyle([
-        ("BACKGROUND",    (0,0),(-1,0),  C["header_bg"]),
-        ("FONTNAME",      (0,0),(-1,0),  "Helvetica-Bold"),
-        ("FONTSIZE",      (0,0),(-1,-1), 8),
-        ("ROWBACKGROUNDS",(0,1),(-1,-1), [C["white"], C["light"]]),
-        ("GRID",          (0,0),(-1,-1), 0.35, C["border"]),
-        ("TOPPADDING",    (0,0),(-1,-1), 4),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 4),
-        ("LEFTPADDING",   (0,0),(-1,-1), 5),
         ("VALIGN",        (0,0),(-1,-1), "TOP"),
+        ("LEFTPADDING",   (0,0),(-1,-1), 3),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 3),
+        ("TOPPADDING",    (0,0),(-1,-1), 3),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 3),
     ]))
     return t
 
 
-# ── Week-on-week table ────────────────────────────────────────────────────────
-def _wow_table(revenue_history: list, styles) -> Table:
+# ── Awaiting payment table ────────────────────────────────────────────────────
+def _pending_table(deals, report_date, styles):
     hdr = [Paragraph(h, styles["TableHead"]) for h in
-           ["Week", "Revenue Collected", "Compared to Previous Week"]]
-    cw  = [(W-2*MARGIN)*f for f in [0.22, 0.28, 0.50]]
+           ["Organisation", "Collection Status", "Amount Owed", "Training Date", "Contact"]]
+    cw = [(W - 2*MARGIN) * f for f in [0.32, 0.26, 0.15, 0.14, 0.13]]
+    red_hex = _hex(C["red"])
+
     rows = []
-    for i, w in enumerate(revenue_history):
-        curr = w["total_revenue"]
-        if i > 0:
-            prev = revenue_history[i-1]["total_revenue"]
-            diff = curr - prev
-            if prev > 0:
-                pct   = diff / prev * 100
-                arrow = "▲" if diff >= 0 else "▼"
-                clr   = "#27AE60" if diff >= 0 else "#C0392B"
-                delta = Paragraph(
-                    f'<font color="{clr}"><b>{arrow} RM {abs(diff):,.0f} ({abs(pct):.0f}%)</b></font>',
-                    styles["TableCell"])
-            elif diff > 0:
-                delta = Paragraph('<font color="#27AE60"><b>▲ New revenue this week</b></font>',
-                                  styles["TableCell"])
-            else:
-                delta = Paragraph("— No change", styles["TableCell"])
+    for d in sorted(deals, key=lambda x: -(x.get("deal_value") or 0)):
+        w = _weeks_overdue(d, report_date)
+        if w is not None and w > 5:
+            status = f'<font color="#{red_hex}"><b>🔴 {int(w)}w overdue — re-nudge</b></font>'
+        elif w is not None:
+            status = f"🟡 {int(w)}w since training" if w > 0 else "🟡 Training upcoming"
         else:
-            delta = Paragraph("—", styles["TableCell"])
+            status = "⚪ No training date"
 
         rows.append([
-            Paragraph(w["week_label"], styles["TableCell"]),
-            Paragraph(f"RM {curr:,.0f}", styles["TableCell"]),
-            delta,
+            Paragraph(_expand_org(d.get("org_name", "")), styles["TableCell"]),
+            Paragraph(status,                              styles["TableCell"]),
+            Paragraph(f"RM {d['deal_value']:,.0f}" if d.get("deal_value") else "—",
+                      styles["TableCellR"]),
+            Paragraph(d.get("train_date") or "—",         styles["TableCell"]),
+            Paragraph(d.get("contact", "") or "—",        styles["TableCell"]),
         ])
 
-    t = Table([hdr]+rows, colWidths=cw)
+    total_amt = sum(d.get("deal_value", 0) or 0 for d in deals)
+    rows.append([
+        Paragraph(f"<b>TOTAL ({len(deals)} deals)</b>", styles["TableCell"]),
+        Paragraph("", styles["TableCell"]),
+        Paragraph(f"<b>RM {total_amt:,.0f}</b>",        styles["TableCellR"]),
+        Paragraph("", styles["TableCell"]),
+        Paragraph("", styles["TableCell"]),
+    ])
+
+    t = Table([hdr] + rows, colWidths=cw, repeatRows=1)
     t.setStyle(TableStyle([
         ("BACKGROUND",    (0,0),(-1,0),  C["header_bg"]),
         ("FONTNAME",      (0,0),(-1,0),  "Helvetica-Bold"),
         ("FONTSIZE",      (0,0),(-1,-1), 8),
         ("ROWBACKGROUNDS",(0,1),(-1,-2), [C["white"], C["light"]]),
-        ("BACKGROUND",    (0,-1),(-1,-1),C["yellow_light"]),
+        ("BACKGROUND",    (0,-1),(-1,-1), C["yellow_light"]),
+        ("FONTNAME",      (0,-1),(-1,-1), "Helvetica-Bold"),
         ("GRID",          (0,0),(-1,-1), 0.35, C["border"]),
         ("TOPPADDING",    (0,0),(-1,-1), 4),
         ("BOTTOMPADDING", (0,0),(-1,-1), 4),
@@ -481,383 +311,237 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
 
     def on_page(canvas, doc):
         canvas.saveState()
-        # Header strip
         canvas.setFillColor(C["header_bg"])
-        canvas.rect(0, H-20*mm, W, 20*mm, fill=1, stroke=0)
+        canvas.rect(0, H - 20*mm, W, 20*mm, fill=1, stroke=0)
         canvas.setFillColor(C["white"])
         canvas.setFont("Helvetica-Bold", 11)
-        canvas.drawString(MARGIN, H-12*mm, REPORT_TITLE)
+        canvas.drawString(MARGIN, H - 12*mm, REPORT_TITLE)
         canvas.setFont("Helvetica", 7)
-        canvas.drawRightString(W-MARGIN, H-11*mm,
+        canvas.drawRightString(W - MARGIN, H - 11*mm,
                                f"{COMPANY}  ·  {report_date.strftime('%d %b %Y')}")
-        canvas.drawRightString(W-MARGIN, H-16*mm, f"Period: {period_label}")
-        # Footer
+        canvas.drawRightString(W - MARGIN, H - 16*mm, f"Period: {period_label}")
         canvas.setFillColor(C["muted"])
         canvas.setFont("Helvetica", 6.5)
-        canvas.drawCentredString(W/2, 9*mm,
+        canvas.drawCentredString(W / 2, 9*mm,
             f"Generated {datetime.now(timezone.utc).strftime('%d %b %Y %H:%M UTC')}"
             f"  ·  Page {doc.page}  ·  Confidential — Katalist Venture")
         canvas.restoreState()
 
-    story  = []
-    add    = story.append
-    sp     = lambda n=4: Spacer(1, n*mm)
-    hr     = lambda c=C["border"]: HRFlowable(width="100%", thickness=0.8,
-                                              color=c, spaceAfter=3)
+    story = []
+    add   = story.append
+    add(_sp(10))
 
-    add(sp(10))
+    # ── Pre-compute values ────────────────────────────────────────────────────
+    rd_str   = report_date.strftime("%Y-%m-%d")
+    d7_str   = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
+    d14_str  = (report_date - timedelta(days=14)).strftime("%Y-%m-%d")
+    year     = report_date.year
+    month    = report_date.month
 
-    # ── COLOUR KEY — plain English ────────────────────────────────────────────
-    key_rows = [[
-        Paragraph(f'<font color="#{_hex(C["yellow"])}"><b>■  Yellow stripe</b></font>  — '
-                  f'Top-level Malaysian federal ministry (e.g. Finance, Defence, Education)',
-                  styles["SmallMuted"]),
-    ],[
-        Paragraph(f'<font color="#{_hex(C["red"])}"><b>■  Red stripe</b></font>  — '
-                  f'Hot lead — expressed strong interest, needs a fast response',
-                  styles["SmallMuted"]),
-    ],[
-        Paragraph(f'<font color="#{_hex(C["teal"])}"><b>■  Teal stripe</b></font>  — '
-                  f'Government agency, GLC, statutory body, or GovTech vendor',
-                  styles["SmallMuted"]),
-    ]]
-    key_tbl = Table(key_rows, colWidths=[W-2*MARGIN])
-    key_tbl.setStyle(TableStyle([
-        ("BACKGROUND",    (0,0),(-1,-1), C["light"]),
-        ("TOPPADDING",    (0,0),(-1,-1), 3),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 3),
-        ("LEFTPADDING",   (0,0),(-1,-1), 8),
-        ("BOX",           (0,0),(-1,-1), 0.5, C["border"]),
-    ]))
-    add(key_tbl)
-    add(sp(5))
+    paid_deals     = [d for d in crm_deals if _is_paid_only(d.get("stage", ""))]
+    pipeline_deals = [d for d in crm_deals
+                      if not _is_revenue(d.get("stage", ""))
+                      and any(k in (d.get("stage") or "").lower()
+                              for k in ("almost", "proposal", "quotation", "progress"))]
+    paid_total     = sum(d.get("deal_value", 0) or 0 for d in paid_deals)
+    pipe_total     = sum(d.get("deal_value", 0) or 0 for d in pipeline_deals)
 
-    # ── WEEK AT A GLANCE — plain text summary ────────────────────────────────
-    paid_deals     = [d for d in crm_deals if _is_revenue(d.get("stage",""))]
-    pipeline_deals = [d for d in crm_deals if _stage_ok(d.get("stage",""))
-                      and not _is_revenue(d.get("stage",""))]
-    paid_total     = sum(d.get("deal_value",0) or 0 for d in paid_deals)
-    pipe_total     = sum(d.get("deal_value",0) or 0 for d in pipeline_deals)
-    rev_7d         = _revenue_last_7_days(crm_deals, report_date)
-    tier1_count    = sum(1 for x in leads+sessions if x.get("tier1"))
-    pub_sess       = sum(1 for s in sessions if _session_type(s) == "Public")
-    inh_sess       = len(sessions) - pub_sess
-    pending        = _pending_collection(crm_deals, report_date)
+    # Revenue by period (paid only)
+    def _period_rev(deals, from_str, to_str):
+        return [(d, d.get("deal_value", 0) or 0) for d in deals
+                if _rev_date(d) and from_str <= _rev_date(d) <= to_str]
 
-    hot_names  = [_expand_org(l["org_name"]) for l in leads if l.get("is_hot")]
-    new_names  = [_expand_org(l["org_name"]) for l in leads if (l.get("status") or "").lower() == "new"]
+    rev_7d_deals  = _period_rev(paid_deals, d7_str,  rd_str)
+    rev_14d_deals = _period_rev(paid_deals, d14_str, rd_str)
 
-    # Build the narrative paragraph
-    lines = []
-    lines.append(
-        f"This week ({period_label}), we received <b>{len(leads)}</b> government "
-        f"{'enquiry' if len(leads)==1 else 'enquiries'} and delivered "
-        f"<b>{len(sessions)}</b> training session{'s' if len(sessions)!=1 else ''} "
-        f"for government organisations."
-    )
-    if hot_names:
-        lines.append(
-            f"<b>{', '.join(hot_names)}</b> "
-            f"{'is' if len(hot_names)==1 else 'are'} a hot lead — "
-            f"{'they need' if len(hot_names)==1 else 'they need'} a response as soon as possible."
-        )
-    if tier1_count:
-        lines.append(
-            f"We have <b>{tier1_count}</b> match{'es' if tier1_count!=1 else ''} "
-            f"with top-level federal ministries this week — these are our highest-priority accounts."
-        )
-    if rev_7d > 0:
-        lines.append(f"<b>RM {rev_7d:,.0f}</b> was collected in the last 7 days.")
-    else:
-        lines.append("No new payments were collected in the last 7 days.")
-    if paid_total:
-        lines.append(
-            f"In total, we have collected <b>RM {paid_total:,.0f}</b> from "
-            f"{len(paid_deals)} paid government deal{'s' if len(paid_deals)!=1 else ''} this year."
-        )
-    if pipe_total:
-        lines.append(
-            f"We also have <b>RM {pipe_total:,.0f}</b> in active quotes sent to clients "
-            f"({len(pipeline_deals)} deal{'s' if len(pipeline_deals)!=1 else ''}) — "
-            f"waiting for their decision."
-        )
-    if pending:
-        lines.append(
-            f"⚠ <b>{len(pending)} training{'s' if len(pending)!=1 else ''} already delivered "
-            f"but payment not yet received</b> — "
-            f"RM {sum(d.get('deal_value',0) or 0 for d in pending):,.0f} outstanding."
-        )
+    curr_m_start  = f"{year}-{month:02d}-01"
+    rev_cm_deals  = _period_rev(paid_deals, curr_m_start, rd_str)
 
-    add(_callout_list(lines, C["teal_light"], C["teal"], styles))
-    add(sp(6))
+    def _qrange(q):
+        starts = {1: f"{year}-01-01", 2: f"{year}-04-01",
+                  3: f"{year}-07-01", 4: f"{year}-10-01"}
+        ends   = {1: f"{year}-03-31", 2: f"{year}-06-30",
+                  3: f"{year}-09-30", 4: f"{year}-12-31"}
+        return starts[q], ends[q]
 
-    # ── REVENUE TREND LINE CHART ──────────────────────────────────────────────
-    # Keep heading + sub + chart together; table gets its own KeepTogether
-    rev_chart = chart_bytes.get("revenue_line") or chart_bytes.get("revenue")
-    if rev_chart and revenue_history:
-        add(KeepTogether([
-            hr(C["teal"]),
-            Paragraph("Revenue Collected — Week by Week", styles["SectionHead"]),
-            Paragraph(
-                "Each dot shows how much money was collected from government training deals "
-                "in that week. Only payments that have been fully received are counted here.",
-                styles["SectionSub"]),
-            sp(2),
-            _img_from_bytes(rev_chart, full_w * 0.55),
-        ]))
-        add(sp(3))
-        # WoW table kept together with its label
-        add(KeepTogether([
-            Paragraph("Week-by-week comparison:", styles["SmallMuted"]),
-            sp(1),
-            _wow_table(revenue_history, styles),
-        ]))
-        add(sp(6))
+    q_deals = {}
+    for q in (1, 2, 3, 4):
+        qs, qe = _qrange(q)
+        q_deals[q] = _period_rev(paid_deals, qs, qe)
 
-    # ── SECTION 1 — LEADS ────────────────────────────────────────────────────
-    add(PageBreak())
-    add(sp(10))
-    counts = Counter(l.get("status") or "Unknown" for l in leads)
-    total  = sum(counts.values()) if leads else 1
-    status_parts = ",  ".join(
-        f"{_plain_status(s)}: <b>{n}</b> ({n*100//total}%)"
-        for s, n in sorted(counts.items(), key=lambda x: -x[1])
-    ) if leads else ""
+    total_7d  = sum(v for _, v in rev_7d_deals)
+    total_14d = sum(v for _, v in rev_14d_deals)
+    total_cm  = sum(v for _, v in rev_cm_deals)
 
+    # Awaiting payment (all Closed deals)
+    pending      = _awaiting_payment(crm_deals)
+    pending_total = sum(d.get("deal_value", 0) or 0 for d in pending)
+    stale_pending = [d for d in pending if (_weeks_overdue(d, report_date) or 0) > 5]
+    stale_pending_total = sum(d.get("deal_value", 0) or 0 for d in stale_pending)
+
+    # Likely lost
+    stale_pipe = [d for d in crm_deals
+                  if not _is_revenue(d.get("stage", ""))
+                  and _is_stale_pipeline(d, report_date)]
+    stale_pipe_total = sum(d.get("deal_value", 0) or 0 for d in stale_pipe)
+
+    # Pipeline by stage (current year, added_date filter)
+    YEAR_START = f"{year}-01-01"
+    YEAR_END   = f"{year}-12-31"
+    by_stage = defaultdict(lambda: {"count": 0, "total": 0.0})
+    for d in pipeline_deals:
+        ad = (d.get("added_date") or "")[:10]
+        if not (YEAR_START <= ad <= YEAR_END):
+            continue
+        by_stage[d.get("stage", "—")]["count"] += 1
+        by_stage[d.get("stage", "—")]["total"] += d.get("deal_value", 0) or 0
+
+    # ── 1. THIS WEEK AT A GLANCE ──────────────────────────────────────────────
     add(KeepTogether([
-        hr(C["teal"]),
-        Paragraph(
-            f"Section 1  —  Government Enquiries This Week  ({len(leads)})",
-            styles["SectionHead"]),
-        Paragraph("Source: Marketing Leads Database (Notion)", styles["SectionSub"]),
-        sp(3),
-        _callout(
-            f"Status summary this week — {status_parts}" if leads
-            else "No government enquiries were received this week.",
-            C["light"], C["border"], styles, "SmallMuted"
-        ),
-    ]))
-    add(sp(3))
-
-    if leads:
-        for lead in sorted(leads, key=lambda l: (
-                0 if l.get("tier1") else 1, 0 if l.get("is_hot") else 1)):
-            add(KeepTogether([_lead_card(lead, styles), sp(3)]))
-
-    add(sp(5))
-
-    # ── SECTION 2 — SESSIONS ─────────────────────────────────────────────────
-    add(PageBreak())
-    add(sp(10))
-    sess_summary = (
-        f"We ran <b>{len(sessions)}</b> government training session"
-        f"{'s' if len(sessions)!=1 else ''} this week — "
-        f"<b>{inh_sess}</b> in-house (private, booked for one organisation) "
-        f"and <b>{pub_sess}</b> public (open to all participants)."
-    ) if sessions else "No training sessions were recorded this week."
-
-    add(KeepTogether([
-        hr(C["teal"]),
-        Paragraph(
-            f"Section 2  —  Training Sessions This Week  ({len(sessions)})",
-            styles["SectionHead"]),
-        Paragraph("Source: Past Classes Database (Notion)", styles["SectionSub"]),
-        sp(3),
-        _callout(sess_summary, C["light"], C["border"], styles),
-    ]))
-    add(sp(3))
-
-    if sessions:
-        for s in sorted(sessions, key=lambda s: (0 if s.get("tier1") else 1)):
-            add(KeepTogether([_session_card(s, styles), sp(3)]))
-
-    add(sp(5))
-
-    # ── SECTION 3 — SALES & REVENUE ──────────────────────────────────────────
-    import calendar as _cal
-
-    add(PageBreak())
-    add(sp(10))
-
-    # --- Date ranges ---
-    rd_str = report_date.strftime("%Y-%m-%d")
-    d7_str = (report_date - timedelta(days=7)).strftime("%Y-%m-%d")
-    d14_str = (report_date - timedelta(days=14)).strftime("%Y-%m-%d")
-
-    curr_year  = report_date.year
-    curr_month = report_date.month
-    if curr_month == 1:
-        prev_month_num, prev_year = 12, curr_year - 1
-    else:
-        prev_month_num, prev_year = curr_month - 1, curr_year
-    prev_month_last = _cal.monthrange(prev_year, prev_month_num)[1]
-    prev_month_start = f"{prev_year}-{prev_month_num:02d}-01"
-    prev_month_end   = f"{prev_year}-{prev_month_num:02d}-{prev_month_last:02d}"
-    curr_month_start = f"{curr_year}-{curr_month:02d}-01"
-    prev_month_name  = f"{_cal.month_name[prev_month_num]} {prev_year}"
-    curr_month_name  = f"{_cal.month_name[curr_month]} {curr_year}"
-
-    def _rev_d(d):
-        return (d.get("payment_received_date") or d.get("close_date") or "")[:10]
-
-    deals_7d         = [d for d in paid_deals if _rev_d(d) and d7_str  <= _rev_d(d) <= rd_str]
-    deals_prev_month = [d for d in paid_deals if _rev_d(d) and prev_month_start <= _rev_d(d) <= prev_month_end]
-    deals_curr_month = [d for d in paid_deals if _rev_d(d) and curr_month_start <= _rev_d(d) <= rd_str]
-
-    total_7d   = sum(d.get("deal_value",0) or 0 for d in deals_7d)
-    total_prev = sum(d.get("deal_value",0) or 0 for d in deals_prev_month)
-    total_curr = sum(d.get("deal_value",0) or 0 for d in deals_curr_month)
-
-    # Section header + YTD summary
-    add(KeepTogether([
-        hr(C["yellow"]),
-        Paragraph("Section 3  —  Sales & Revenue", styles["SectionHead"]),
-        Paragraph(
-            "Source: Sales CRM Database (Notion)  ·  Only Paid and Closed deals counted as revenue",
-            styles["SectionSub"]),
-        sp(3),
-        _callout(
-            f"Year to date: <b>RM {paid_total:,.0f}</b> collected from "
-            f"{len(paid_deals)} paid government deal{'s' if len(paid_deals)!=1 else ''}."
-            if paid_deals else "No paid deals recorded yet.",
-            C["green_light"] if paid_deals else C["light"],
-            C["green"]       if paid_deals else C["border"],
-            styles,
-        ),
+        _hr(C["teal"]),
+        Paragraph("This Week at a Glance", styles["SectionHead"]),
+        Paragraph(period_label, styles["SectionSub"]),
+        _sp(3),
     ]))
 
-    # --- 3a: Past 7 Days ---
-    add(sp(5))
-    add(KeepTogether([
-        hr(C["teal"]),
-        Paragraph(f"Past 7 Days  ({d7_str} to {rd_str})", styles["SectionHead"]),
-        Paragraph(
-            f"RM {total_7d:,.0f} received from "
-            f"{len(deals_7d)} deal{'s' if len(deals_7d)!=1 else ''} in the last 7 days."
-            if deals_7d else "No payments received in the last 7 days.",
-            styles["SectionSub"]),
-    ]))
-    add(sp(2))
-    if deals_7d:
-        add(_deal_table(sorted(deals_7d, key=lambda x: -(x.get("deal_value") or 0)), styles))
-    else:
-        add(_callout("No payments received in the last 7 days.", C["light"], C["border"], styles))
-
-    # --- 3b: Previous month ---
-    add(sp(5))
-    add(KeepTogether([
-        hr(C["teal"]),
-        Paragraph(prev_month_name, styles["SectionHead"]),
-        Paragraph(
-            f"RM {total_prev:,.0f} received from "
-            f"{len(deals_prev_month)} deal{'s' if len(deals_prev_month)!=1 else ''} in {prev_month_name}."
-            if deals_prev_month else f"No payments received in {prev_month_name}.",
-            styles["SectionSub"]),
-    ]))
-    add(sp(2))
-    if deals_prev_month:
-        add(_deal_table(sorted(deals_prev_month, key=lambda x: -(x.get("deal_value") or 0)), styles))
-    else:
-        add(_callout(f"No payments received in {prev_month_name}.", C["light"], C["border"], styles))
-
-    # --- 3c: Current month ---
-    add(sp(5))
-    add(KeepTogether([
-        hr(C["teal"]),
-        Paragraph(f"{curr_month_name}  (so far)", styles["SectionHead"]),
-        Paragraph(
-            f"RM {total_curr:,.0f} received from "
-            f"{len(deals_curr_month)} deal{'s' if len(deals_curr_month)!=1 else ''} so far in {curr_month_name}."
-            if deals_curr_month else f"No payments received yet in {curr_month_name}.",
-            styles["SectionSub"]),
-    ]))
-    add(sp(2))
-    if deals_curr_month:
-        add(_deal_table(sorted(deals_curr_month, key=lambda x: -(x.get("deal_value") or 0)), styles))
-    else:
-        add(_callout(f"No payments received yet in {curr_month_name}.", C["light"], C["border"], styles))
-
-    # --- 3d: Open pipeline — past 14 days only (non-stale) ---
-    all_open = [
-        d for d in crm_deals
-        if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))
-        and d14_str <= (d.get("close_date") or "")[:10] <= rd_str
+    glance_cards = [
+        _kpi_card(f"RM {total_7d:,.0f}",   "REVENUE THIS WEEK",     "Past 7 days (Paid)",    C["teal_light"],   C["teal"]),
+        _kpi_card(f"RM {paid_total:,.0f}",  "YTD REVENUE",           f"All of {year} (Paid)", C["green_light"],  C["green"]),
+        _kpi_card(f"RM {pipe_total:,.0f}",  "ACTIVE PIPELINE",       f"{len(pipeline_deals)} deals",   C["yellow_light"], C["yellow"]),
+        _kpi_card(f"RM {pending_total:,.0f}", "AWAITING PAYMENT",    f"{len(pending)} Closed deals",   C["red_light"],    C["red"]),
+        _kpi_card(f"RM {stale_pending_total:,.0f}", "OVERDUE >5 WKS", f"{len(stale_pending)} deals — re-nudge", C["red_light"], C["red"]),
+        _kpi_card(f"RM {stale_pipe_total:,.0f}", "LIKELY LOST",      f"{len(stale_pipe)} stale deals", C["yellow_light"], C["dark"]),
     ]
-    open_pipe       = [d for d in all_open if not _is_stale_pipeline(d, report_date)]
-    open_pipe_stale = [d for d in all_open if _is_stale_pipeline(d, report_date)]
-    open_pipe       = sorted(open_pipe, key=lambda x: -(x.get("deal_value") or 0))
-    open_pipe_total = sum(d.get("deal_value",0) or 0 for d in open_pipe)
+    add(_kpi_grid(glance_cards, 3, full_w))
+    add(_sp(6))
 
-    add(sp(5))
+    # ── 2. REVENUE BREAKDOWN BY PERIOD ───────────────────────────────────────
     add(KeepTogether([
-        hr(C["yellow"]),
-        Paragraph(
-            f"Open Pipeline — Past 14 Days  ({len(open_pipe)} deal{'s' if len(open_pipe)!=1 else ''})",
-            styles["SectionHead"]),
-        Paragraph(
-            f"RM {open_pipe_total:,.0f} in active quotes updated in the last 14 days."
-            if open_pipe else "No active pipeline deals in the last 14 days.",
-            styles["SectionSub"]),
+        _hr(C["yellow"]),
+        Paragraph("Revenue Breakdown by Period", styles["SectionHead"]),
+        Paragraph(f"Paid deals only · {year}", styles["SectionSub"]),
+        _sp(3),
     ]))
-    add(sp(2))
-    if open_pipe:
-        add(_deal_table(open_pipe, styles))
-    else:
-        add(_callout("No active pipeline deals in the last 14 days.", C["light"], C["border"], styles))
 
-    # --- 3e: Likely Lost — stale deals (>5 weeks, full year) ---
-    stale_all = [
-        d for d in crm_deals
-        if _stage_ok(d.get("stage","")) and not _is_revenue(d.get("stage",""))
-        and _is_stale_pipeline(d, report_date)
+    rev_hdr = [Paragraph(h, styles["TableHead"])
+               for h in ["Period", "Deals", "Revenue (Paid)"]]
+    rev_cw  = [(W - 2*MARGIN) * f for f in [0.50, 0.15, 0.35]]
+
+    q_names = {1: "Q1 (Jan – Mar)", 2: "Q2 (Apr – Jun)",
+                3: "Q3 (Jul – Sep)", 4: "Q4 (Oct – Dec)"}
+    curr_m_name = f"{_cal.month_name[month]} {year}"
+
+    rev_rows = [
+        [Paragraph("Past 7 days",      styles["TableCell"]),
+         Paragraph(str(len(rev_7d_deals)),  styles["TableCell"]),
+         Paragraph(f"RM {total_7d:,.0f}",  styles["TableCellR"])],
+        [Paragraph("Past 14 days",     styles["TableCell"]),
+         Paragraph(str(len(rev_14d_deals)), styles["TableCell"]),
+         Paragraph(f"RM {total_14d:,.0f}", styles["TableCellR"])],
+        [Paragraph(f"{curr_m_name} (so far)", styles["TableCell"]),
+         Paragraph(str(len(rev_cm_deals)), styles["TableCell"]),
+         Paragraph(f"RM {total_cm:,.0f}", styles["TableCellR"])],
     ]
-    stale_all   = sorted(stale_all, key=lambda x: -(x.get("deal_value") or 0))
-    stale_total = sum(d.get("deal_value",0) or 0 for d in stale_all)
+    for q in (1, 2, 3, 4):
+        qd = q_deals[q]
+        qt = sum(v for _, v in qd)
+        rev_rows.append([
+            Paragraph(f"{q_names[q]} {year}", styles["TableCell"]),
+            Paragraph(str(len(qd)),           styles["TableCell"]),
+            Paragraph(f"RM {qt:,.0f}",        styles["TableCellR"]),
+        ])
 
-    add(sp(5))
+    rev_tbl = Table([rev_hdr] + rev_rows, colWidths=rev_cw, repeatRows=1)
+    rev_tbl.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0),(-1,0),  C["header_bg"]),
+        ("FONTSIZE",      (0,0),(-1,-1), 8),
+        ("ROWBACKGROUNDS",(0,1),(-1,-1), [C["white"], C["light"]]),
+        ("GRID",          (0,0),(-1,-1), 0.35, C["border"]),
+        ("TOPPADDING",    (0,0),(-1,-1), 5),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 5),
+        ("LEFTPADDING",   (0,0),(-1,-1), 6),
+        ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
+        # Highlight current quarter row
+        ("BACKGROUND",    (0, 3 + month // 4 + 1), (-1, 3 + month // 4 + 1), C["yellow_light"]),
+    ]))
+    add(rev_tbl)
+    add(_sp(6))
+
+    # ── 3. CURRENT PIPELINE CARDS ─────────────────────────────────────────────
     add(KeepTogether([
-        hr(C["red"]),
+        _hr(C["yellow"]),
+        Paragraph("Current Pipeline by Stage", styles["SectionHead"]),
+        Paragraph(f"Deals added in {year} · active pipeline (excluding Paid/Closed)",
+                  styles["SectionSub"]),
+        _sp(3),
+    ]))
+
+    if by_stage:
+        pipe_cards = []
+        for stage, info in sorted(by_stage.items(), key=lambda x: -x[1]["total"]):
+            icon = "🔥" if "almost" in stage.lower() else ("⚙️" if "progress" in stage.lower() else "📋")
+            pipe_cards.append(_kpi_card(
+                f"RM {info['total']:,.0f}",
+                f"{icon} {stage.upper()}",
+                f"{info['count']} deal{'s' if info['count'] != 1 else ''}",
+                C["yellow_light"], C["dark"],
+            ))
+        add(_kpi_grid(pipe_cards, min(len(pipe_cards), 3), full_w))
+    else:
+        add(_callout("No active pipeline deals for this year.", C["light"], C["border"], styles))
+    add(_sp(6))
+
+    # ── 4 & 5. CHARTS ─────────────────────────────────────────────────────────
+    add(PageBreak())
+    add(_sp(10))
+
+    pipeline_chart = chart_bytes.get("pipeline_bar")
+    if pipeline_chart:
+        add(KeepTogether([
+            _hr(C["teal"]),
+            Paragraph("Sales CRM — Value by Stage  (Lifetime, All Deals)", styles["SectionHead"]),
+            _sp(2),
+            _img_from_bytes(pipeline_chart, full_w),
+        ]))
+        add(_sp(6))
+
+    monthly_chart = chart_bytes.get("monthly_revenue")
+    if monthly_chart:
+        add(KeepTogether([
+            _hr(C["teal"]),
+            Paragraph(f"Monthly Revenue — {year}  (Paid Deals Only)", styles["SectionHead"]),
+            _sp(2),
+            _img_from_bytes(monthly_chart, full_w),
+        ]))
+        add(_sp(6))
+
+    # ── 6. AWAITING PAYMENT ───────────────────────────────────────────────────
+    add(PageBreak())
+    add(_sp(10))
+
+    add(KeepTogether([
+        _hr(C["red"]),
         Paragraph(
-            f"Likely Lost Deals — Open for More Than 5 Weeks  ({len(stale_all)} deal{'s' if len(stale_all)!=1 else ''})",
+            f"Awaiting Payment — {len(pending)} Closed Deal{'s' if len(pending) != 1 else ''}",
             styles["WarnHead"]),
         Paragraph(
-            "Almost Confirmed or Proposal/Quotation deals that have had no movement for over 5 weeks. "
-            "These should be re-engaged or written off.",
+            "All deals with Closed status — training delivered, payment not yet received.",
             styles["SectionSub"]),
-        sp(3),
-        _callout(
-            f"<b>RM {stale_total:,.0f}</b> at risk across {len(stale_all)} stale deal{'s' if len(stale_all)!=1 else ''}."
-            if stale_all else "No stale deals this period.",
-            C["red_light"] if stale_all else C["light"],
-            C["red"]       if stale_all else C["border"],
-            styles,
-        ),
+        _sp(3),
     ]))
-    if stale_all:
-        add(sp(2))
-        add(_deal_table(stale_all, styles, mark_stale=True, report_date=report_date))
 
-    # --- Awaiting Payment ---
+    if stale_pending:
+        add(_callout(
+            f"🔴 <b>{len(stale_pending)} deal{'s' if len(stale_pending) != 1 else ''} "
+            f"overdue for more than 5 weeks — RM {stale_pending_total:,.0f} — re-nudge now.</b>",
+            C["red_light"], C["red"], styles,
+        ))
+        add(_sp(3))
+
     if pending:
-        total_out = sum(d.get("deal_value",0) or 0 for d in pending)
-        add(KeepTogether([
-            sp(5),
-            hr(C["red"]),
-            Paragraph(
-                f"⚠  Awaiting Payment — {len(pending)} deal(s) outstanding",
-                styles["WarnHead"]),
-            Paragraph(
-                "These trainings have already been delivered to the client, "
-                "but we have not yet received payment. Follow up to collect.",
-                styles["SectionSub"]),
-            sp(3),
-            _callout(
-                f"Total amount still owed: <b>RM {total_out:,.0f}</b>",
-                C["red_light"], C["red"], styles
-            ),
-        ]))
-        add(sp(2))
-        add(_deal_table(pending, styles))
+        add(_pending_table(pending, report_date, styles))
+    else:
+        add(_callout("No closed deals awaiting payment.", C["light"], C["border"], styles))
 
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
     return output_path

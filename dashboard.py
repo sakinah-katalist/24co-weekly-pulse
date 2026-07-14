@@ -13,7 +13,7 @@ MYT = timezone(timedelta(hours=8))
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent))
-from charts import revenue_trend_chart, crm_pipeline_bar, monthly_revenue_bar
+from charts import crm_pipeline_bar, monthly_revenue_bar
 from pdf_report import build_pdf, _session_type, _pending_collection, _revenue_last_7_days, _expand_org
 from emailer import build_email_html, send_report
 from config import EMAIL_TO, EMAIL_FROM
@@ -1315,9 +1315,10 @@ with tab4:
 
     if gen_pdf or st.button("⚙️ Build PDF Report", key="build_tab"):
         with st.spinner("Building your PDF report..."):
-            from charts import revenue_line_chart as _rlc
             cbs = {
-                "revenue_line": _rlc(revenue) if revenue else None,
+                "pipeline_bar":    crm_pipeline_bar(crm_deals),
+                "monthly_revenue": monthly_revenue_bar(crm_deals, year=YEAR,
+                                                        current_month=report_date.month),
             }
             build_pdf(leads=leads, sessions=sessions, crm_deals=crm_deals,
                       revenue_history=revenue, report_date=report_date,
