@@ -1137,10 +1137,21 @@ with tab2:
           <p>⚠️ <b>{len(pending)} closed deal(s) — RM {total_out:,.0f} awaiting payment.</b></p>
         </div>""", unsafe_allow_html=True)
         prows = [{"Organisation": _expand_org(d.get("org_name","")), "Status": d.get("stage",""),
-                  "Amount Owed": f"RM {d.get('deal_value',0) or 0:,.0f}",
+                  "Amount Owed": d.get("deal_value",0) or 0,
                   "Training Date": d.get("train_date","—"), "Contact": d.get("contact","")}
-                 for d in pending]
-        st.dataframe(pd.DataFrame(prows), use_container_width=True, hide_index=True)
+                 for d in sorted(pending, key=lambda x: -(x.get("deal_value") or 0))]
+        df_pending = pd.DataFrame(prows)
+        pending_sum = df_pending["Amount Owed"].sum()
+        df_pending["Amount Owed"] = df_pending["Amount Owed"].apply(lambda x: f"RM {x:,.0f}")
+        pending_sum_row = pd.DataFrame([{
+            "Organisation": f"TOTAL ({len(prows)} deals)",
+            "Status": "",
+            "Amount Owed": f"RM {pending_sum:,.0f}",
+            "Training Date": "",
+            "Contact": "",
+        }])
+        st.dataframe(pd.concat([df_pending, pending_sum_row], ignore_index=True),
+                     use_container_width=True, hide_index=True)
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
