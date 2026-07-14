@@ -1151,35 +1151,58 @@ with tab2:
           </p>
         </div>""", unsafe_allow_html=True)
 
+        # ── Collection Status filter ───────────────────────────────
+        STATUS_OVERDUE  = "🔴 Overdue (>5 weeks) — re-nudge"
+        STATUS_RECENT   = "🟡 Recent (within 5 weeks)"
+        STATUS_NO_DATE  = "⚪ No training date"
+
+        selected_coll = st.multiselect(
+            "Filter by Collection Status:",
+            options=[STATUS_OVERDUE, STATUS_RECENT, STATUS_NO_DATE],
+            default=[STATUS_OVERDUE, STATUS_RECENT, STATUS_NO_DATE],
+            key="pending_status_filter",
+        )
+
         prows = []
         for d in sorted(pending, key=lambda x: -(x.get("deal_value") or 0)):
             w = _weeks_since(d)
             if w is not None and w > 5:
-                nudge = f"🔴 {int(w)}w overdue — re-nudge"
-            elif w is not None and w > 0:
-                nudge = f"🟡 {int(w)}w since training"
+                bucket = STATUS_OVERDUE
+                nudge  = f"🔴 {int(w)}w overdue — re-nudge"
+            elif w is not None:
+                bucket = STATUS_RECENT
+                nudge  = f"🟡 {int(w)}w since training" if w > 0 else "🟡 Training upcoming"
             else:
-                nudge = "⚪ No training date"
+                bucket = STATUS_NO_DATE
+                nudge  = "⚪ No training date"
+
+            if bucket not in selected_coll:
+                continue
+
             prows.append({
-                "Organisation":  _expand_org(d.get("org_name","")),
+                "Organisation":      _expand_org(d.get("org_name","")),
                 "Collection Status": nudge,
-                "Amount Owed":   d.get("deal_value",0) or 0,
-                "Training Date": d.get("train_date") or "—",
-                "Contact":       d.get("contact",""),
+                "Amount Owed":       d.get("deal_value",0) or 0,
+                "Training Date":     d.get("train_date") or "—",
+                "Contact":           d.get("contact",""),
             })
 
-        df_pending   = pd.DataFrame(prows)
-        pending_sum  = df_pending["Amount Owed"].sum()
-        df_pending["Amount Owed"] = df_pending["Amount Owed"].apply(lambda x: f"RM {x:,.0f}")
-        pending_sum_row = pd.DataFrame([{
-            "Organisation":      f"TOTAL ({len(prows)} deals)",
-            "Collection Status": f"🔴 {len(stale_pending)} overdue",
-            "Amount Owed":       f"RM {pending_sum:,.0f}",
-            "Training Date":     "",
-            "Contact":           "",
-        }])
-        st.dataframe(pd.concat([df_pending, pending_sum_row], ignore_index=True),
-                     use_container_width=True, hide_index=True)
+        if prows:
+            df_pending  = pd.DataFrame(prows)
+            pending_sum = df_pending["Amount Owed"].sum()
+            overdue_in_view = sum(1 for r in prows if r["Collection Status"].startswith("🔴"))
+            df_pending["Amount Owed"] = df_pending["Amount Owed"].apply(lambda x: f"RM {x:,.0f}")
+            pending_sum_row = pd.DataFrame([{
+                "Organisation":      f"TOTAL ({len(prows)} deals)",
+                "Collection Status": f"🔴 {overdue_in_view} overdue" if overdue_in_view else "",
+                "Amount Owed":       f"RM {pending_sum:,.0f}",
+                "Training Date":     "",
+                "Contact":           "",
+            }])
+            st.dataframe(pd.concat([df_pending, pending_sum_row], ignore_index=True),
+                         use_container_width=True, hide_index=True)
+        else:
+            st.info("No deals match the selected filter.")
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
