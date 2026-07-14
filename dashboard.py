@@ -982,7 +982,7 @@ with tab2:
                 remark = (f'<p class="kpi-src" style="color:#1E9650;margin-top:4px;">'
                           f'🟢 {len(fresh)} active &lt;5 weeks · RM {fresh_amt:,.0f}</p>')
             else:
-                remark = ""
+                remark = '<p class="kpi-src" style="margin-top:4px;">&nbsp;</p>'
             with col:
                 st.markdown(f"""
                 <div class="kpi-card kpi-yellow">
@@ -999,6 +999,7 @@ with tab2:
                   <p class="kpi-val">RM {stale_overdue_amt:,.0f}</p>
                   <p class="kpi-lbl">🔴 PAYMENT OVERDUE</p>
                   <p class="kpi-src">{len(stale_overdue)} deal{'s' if len(stale_overdue)!=1 else ''} &gt;5 weeks</p>
+                  <p class="kpi-src" style="margin-top:4px;">&nbsp;</p>
                 </div>""", unsafe_allow_html=True)
 
         if len(stage_cols) > n_pipeline_stages + 1:
@@ -1008,6 +1009,7 @@ with tab2:
                   <p class="kpi-val">RM {stale_deals_amt:,.0f}</p>
                   <p class="kpi-lbl">⚠️ LIKELY LOST</p>
                   <p class="kpi-src">{len(stale_deals)} deal{'s' if len(stale_deals)!=1 else ''} &gt;5 weeks stale</p>
+                  <p class="kpi-src" style="margin-top:4px;">&nbsp;</p>
                 </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
