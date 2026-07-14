@@ -337,9 +337,9 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
     monthly = [0.0] * 12
     for d in deals:
         s = (d.get("stage") or "").lower()
-        if "paid" not in s and "closed" not in s:
+        if "paid" not in s or "before adam" in s:  # Paid status only
             continue
-        cd = d.get("close_date") or ""
+        cd = d.get("payment_received_date") or d.get("close_date") or ""
         if not cd:
             continue
         try:
@@ -378,7 +378,7 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
     ax.yaxis.grid(True, color=BRAND["grid"], linestyle="--", linewidth=0.6)
     ax.xaxis.grid(False)
     ax.set_axisbelow(True)
-    ax.set_title(f"Monthly Revenue — {year}  (Paid & Closed Gov Deals)",
+    ax.set_title(f"Monthly Revenue — {year}  (Paid deals only)",
                  fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
 
     patches = [
