@@ -137,8 +137,19 @@ def _hex(c) -> str:
     return raw.upper().zfill(6)
 
 
-def _img_from_bytes(data: bytes, w_mm: float) -> Image:
-    img = Image(io.BytesIO(data), width=w_mm * mm)
+def _img_from_bytes(data: bytes, w_mm: float, max_h_mm: float = 130) -> Image:
+    # Preserve aspect ratio explicitly — reportlab keeps the PNG's natural
+    # pixel height when only width is given, which distorts the image and
+    # can overflow the page (creating blank/orphan pages).
+    from reportlab.lib.utils import ImageReader
+    iw, ih = ImageReader(io.BytesIO(data)).getSize()
+    w = w_mm * mm
+    h = w * ih / iw
+    max_h = max_h_mm * mm
+    if h > max_h:
+        w = w * max_h / h
+        h = max_h
+    img = Image(io.BytesIO(data), width=w, height=h)
     img.hAlign = "CENTER"
     return img
 
@@ -302,10 +313,12 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     from pathlib import Path as _Path
     _Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
+    # Top margin must clear the 20mm header strip drawn by on_page,
+    # otherwise the first flowable on each page hides behind it.
     doc = SimpleDocTemplate(
         output_path, pagesize=landscape(A4),
         leftMargin=MARGIN, rightMargin=MARGIN,
-        topMargin=MARGIN, bottomMargin=MARGIN,
+        topMargin=28 * mm, bottomMargin=MARGIN,
     )
 
     def on_page(canvas, doc):
@@ -328,7 +341,6 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
 
     story = []
     add   = story.append
-    add(_sp(10))
 
     # ── Pre-compute values ────────────────────────────────────────────────────
     rd_str   = report_date.strftime("%Y-%m-%d")
@@ -453,10 +465,10 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         ("BACKGROUND",    (0, 3 + month // 4 + 1), (-1, 3 + month // 4 + 1), C["yellow_light"]),
     ]))
     add(rev_tbl)
-    add(_sp(6))
-
 
     # ── 4 & 5. CHARTS ─────────────────────────────────────────────────────────
+    # NOTE: never add a Spacer as the last flowable before a PageBreak —
+    # if the page is already full it spills onto its own blank page.
     pipeline_chart = chart_bytes.get("pipeline_bar")
     if pipeline_chart:
         add(PageBreak())
