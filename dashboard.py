@@ -53,7 +53,7 @@ def _check_password() -> bool:
     with col:
         pwd = st.text_input("Password", type="password", label_visibility="collapsed",
                             placeholder="Enter password…")
-        if st.button("Login →", use_container_width=True, type="primary"):
+        if st.button("Login →", width="stretch", type="primary"):
             if pwd == correct:
                 st.session_state["authenticated"] = True
                 st.rerun()
@@ -329,11 +329,11 @@ with st.sidebar:
       Ask Claude to fetch the latest Notion data, then click <b>Refresh</b> below.
     </div>
     """, unsafe_allow_html=True)
-    if st.button("🔄 Refresh Data", use_container_width=True):
+    if st.button("🔄 Refresh Data", width="stretch"):
         st.cache_data.clear(); st.rerun()
 
     st.markdown("### 📄 Report")
-    gen_pdf = st.button("⚙️ Build PDF Report", use_container_width=True)
+    gen_pdf = st.button("⚙️ Build PDF Report", width="stretch")
 
     st.markdown("### 📧 Email")
     all_recip = list(dict.fromkeys(EMAIL_TO + [
@@ -344,7 +344,7 @@ with st.sidebar:
     custom = st.text_input("Add recipient:", placeholder="email@example.com")
     if custom and custom not in selected:
         selected.append(custom)
-    send_now = st.button("📤 Send Report", use_container_width=True,
+    send_now = st.button("📤 Send Report", width="stretch",
                          type="primary", disabled=not selected)
     st.caption(f"From: {EMAIL_FROM}")
     st.markdown("---")
@@ -720,7 +720,7 @@ with tab2:
         if deals_7d:
             df = _deal_table(deals_7d)
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
         else:
             st.info("No payments received in the last 7 days.")
 
@@ -739,7 +739,7 @@ with tab2:
         if deals_14d:
             df = _deal_table(deals_14d)
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
         else:
             st.info("No payments received in the last 14 days.")
 
@@ -758,7 +758,7 @@ with tab2:
         if deals_30d:
             df = _deal_table(deals_30d)
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
         else:
             st.info("No payments received in the last 30 days.")
 
@@ -829,7 +829,7 @@ with tab2:
             )
             df = _deal_table(qdeals)
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
         elif is_future_q:
             st.info(f"{qlabel} hasn't started yet.")
         else:
@@ -857,7 +857,7 @@ with tab2:
                 ), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), use_container_width=True)
+        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), width="stretch")
 
         ytd          = _rev(deals_yr)
         months_gone  = sum(1 for m in range(1, 13) if m <= cur_mon)
@@ -918,7 +918,7 @@ with tab2:
         if custom_deals:
             df = _deal_table(custom_deals)
             if df is not None:
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                st.dataframe(df, width="stretch", hide_index=True)
         elif from_str > to_str:
             st.warning("Start date is after end date — please adjust the range.")
         else:
@@ -1013,7 +1013,7 @@ with tab2:
                 </div>""", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.image(crm_pipeline_bar(crm_deals), use_container_width=True)
+        st.image(crm_pipeline_bar(crm_deals), width="stretch")
 
         # Monthly revenue bar (shows Jan–Dec on X axis)
         st.markdown(
@@ -1021,7 +1021,7 @@ with tab2:
             f'Monthly Revenue — {YEAR}  (Paid deals only)</p>',
             unsafe_allow_html=True
         )
-        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), use_container_width=True)
+        st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), width="stretch")
 
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown('<p style="font-size:15px;font-weight:700;color:#0D3349;margin:12px 0 8px;">Open pipeline deals</p>',
@@ -1088,7 +1088,7 @@ with tab2:
                 "Contact":       "",
             }])
             st.dataframe(pd.concat([df_pipe, sum_row], ignore_index=True),
-                         use_container_width=True, hide_index=True)
+                         width="stretch", hide_index=True)
         else:
             st.info("No pipeline deals match the selected filters.")
 
@@ -1164,7 +1164,7 @@ with tab2:
                 "Contact":           "",
             }])
             st.dataframe(pd.concat([df_stale, stale_sum_row], ignore_index=True),
-                         use_container_width=True, hide_index=True)
+                         width="stretch", hide_index=True)
         else:
             st.info("No stale deals match the selected filters.")
 
@@ -1249,7 +1249,7 @@ with tab2:
                 "Contact":           "",
             }])
             st.dataframe(pd.concat([df_pending, pending_sum_row], ignore_index=True),
-                         use_container_width=True, hide_index=True)
+                         width="stretch", hide_index=True)
         else:
             st.info("No deals match the selected filter.")
 
@@ -1285,7 +1285,7 @@ with tab3:
         srows  = [{"Status": s, "Count": n, "Share": f"{n/total*100:.0f}%"}
                   for s, n in sorted(counts.items(), key=lambda x: -x[1])]
         srows.append({"Status": "Total", "Count": total, "Share": "100%"})
-        st.dataframe(pd.DataFrame(srows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(srows), width="stretch", hide_index=True)
 
     # Follow-up table
     followup = [l for l in leads if (l.get("status") or "").lower() in
@@ -1303,7 +1303,7 @@ with tab3:
                   "Training Area": l.get("area",""),
                   }
                  for l in sorted(followup, key=lambda x: (0 if x.get("is_hot") else 1))]
-        st.dataframe(pd.DataFrame(frows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(frows), width="stretch", hide_index=True)
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
