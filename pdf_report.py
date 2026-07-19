@@ -335,7 +335,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         canvas.setFillColor(C["muted"])
         canvas.setFont("Helvetica", 6.5)
         canvas.drawCentredString(W / 2, 9*mm,
-            f"Generated {datetime.now(timezone.utc).strftime('%d %b %Y %H:%M UTC')}"
+            f"Generated {datetime.now(timezone(timedelta(hours=8))).strftime('%d %b %Y %H:%M MYT')}"
             f"  ·  Page {doc.page}  ·  Confidential — Katalist Venture")
         canvas.restoreState()
 

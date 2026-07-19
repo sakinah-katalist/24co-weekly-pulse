@@ -1320,10 +1320,10 @@ with tab4:
     s1, s2 = st.columns([2, 3])
     with s1:
         if pdf_path.exists():
-            mtime = datetime.fromtimestamp(pdf_path.stat().st_mtime)
-            age   = int((datetime.now() - mtime).total_seconds() // 60)
+            mtime = datetime.fromtimestamp(pdf_path.stat().st_mtime, tz=MYT)
+            age   = int((datetime.now(tz=MYT) - mtime).total_seconds() // 60)
             st.success(f"✅ PDF ready — {pdf_path.stat().st_size // 1024} KB")
-            st.caption(f"Built: {mtime.strftime('%d %b %Y, %H:%M')} ({age} min ago)")
+            st.caption(f"Built: {mtime.strftime('%d %b %Y, %H:%M')} MYT ({age} min ago)")
         else:
             st.warning("No PDF yet — click Build below.")
 
