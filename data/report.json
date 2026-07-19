@@ -16,7 +16,8 @@
       "notes": "Inviting Ali Reza as speaker for KFAIR26 (Knowledge Fair) organized by EPF. 200 expected attendees.",
       "is_hot": true,
       "tier1": null,
-      "color": "red"
+      "color": "red",
+      "description": "Kumpulan Wang Simpanan Pekerja (Employees Provident Fund) — federal statutory body under the Ministry of Finance, est. 1951. Manages compulsory retirement savings for Malaysia's private-sector workforce: 16+ million members and assets exceeding RM1.2 trillion, making it one of the world's oldest and largest pension funds. Large HQ workforce in KL with substantial L&D budgets — a speaker/talk engagement could open the door to recurring staff-training programmes."
     },
     {
       "org_name": "Universiti Putra Malaysia",
@@ -32,7 +33,8 @@
       "notes": null,
       "is_hot": false,
       "tier1": null,
-      "color": "teal"
+      "color": "teal",
+      "description": "Top-tier public research university in Serdang, Selangor — ranked 2nd best in Malaysia and ~#138 in the QS World University Rankings (top 25 in Asia). Around 24,000 students and 3,300+ permanent staff across 16 faculties. Universities of this size run continuous professional-development programmes for academic and admin staff — strong potential for repeat course bookings."
     },
     {
       "org_name": "Yayasan Terengganu",
@@ -48,7 +50,8 @@
       "notes": "IT Officer from Terengganu state government agency. Wants all staff to understand and use AI in their daily work.",
       "is_hot": false,
       "tier1": null,
-      "color": "teal"
+      "color": "teal",
+      "description": "Statutory body of the Terengganu State Government focused on human-capital and educational development for Terengganu citizens. Runs the SPC excellence scholarship (RM23 million allocated in a recent year) plus education and skills-training loan schemes. A digital-skills collaboration aligns directly with their core mandate — potential gateway to state-level programmes."
     }
   ],
   "sessions": [
@@ -59,7 +62,8 @@
       "tier1": null,
       "color": "teal",
       "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1LgiUcC-c-KuISJA18f9fTrv_xqZesAgtslz2aUBYeao/edit"
+      "feedback": "https://docs.google.com/spreadsheets/d/1LgiUcC-c-KuISJA18f9fTrv_xqZesAgtslz2aUBYeao/edit",
+      "description": "Jabatan Perancangan Bandar dan Desa — the federal town and country planning department under the Ministry of Housing and Local Government (KPKT), headquartered in Putrajaya. Custodian of the National Physical Plan; advises on all major urban development nationwide, with state offices across Malaysia. Successful Canva session here is a reference point for other KPKT agencies and state planning offices."
     }
   ],
   "crm_deals": [
