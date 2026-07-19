@@ -407,10 +407,10 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     glance_cards = [
         _kpi_card(f"RM {total_7d:,.0f}",   "REVENUE THIS WEEK",     "Past 7 days (Paid)",    C["teal_light"],   C["teal"]),
         _kpi_card(f"RM {paid_total:,.0f}",  "YTD REVENUE",           f"All of {year} (Paid)", C["green_light"],  C["green"]),
-        _kpi_card(f"RM {pipe_total:,.0f}",  "ACTIVE PIPELINE",       f"{len(pipeline_deals)} deals",   C["yellow_light"], C["yellow"]),
-        _kpi_card(f"RM {pending_total:,.0f}", "AWAITING PAYMENT",    f"{len(pending)} Closed deals",   C["red_light"],    C["red"]),
+        _kpi_card(f"RM {pipe_total:,.0f}",  "ACTIVE PIPELINE",       f"{len(pipeline_deals)} deals · lifetime active pipeline",   C["yellow_light"], C["yellow"]),
+        _kpi_card(f"RM {pending_total:,.0f}", "AWAITING PAYMENT (LIFETIME)", f"{len(pending)} Closed deals",   C["red_light"],    C["red"]),
         _kpi_card(f"RM {stale_pending_total:,.0f}", "OVERDUE >5 WKS", f"{len(stale_pending)} deals — re-nudge", C["red_light"], C["red"]),
-        _kpi_card(f"RM {stale_pipe_total:,.0f}", "LIKELY LOST",      f"{len(stale_pipe)} stale deals", C["yellow_light"], C["dark"]),
+        _kpi_card(f"RM {stale_pipe_total:,.0f}", "LIKELY LOST",      f"{len(stale_pipe)} stale deals · lifetime deals", C["yellow_light"], C["dark"]),
     ]
     add(_kpi_grid(glance_cards, 3, full_w))
     add(_sp(6))
