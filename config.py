@@ -77,6 +77,12 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 14–20 July 2026 leads ──
+    "UniKL MITEC, Johor":     "Universiti Kuala Lumpur — Malaysian Institute of Industrial Technology (UniKL MITEC), Johor",
+    "Akademi Sains Malaysia": "Akademi Sains Malaysia (Academy of Sciences Malaysia — ASM)",
+    "WISDEC MTIB":            "WISDEC — Wood Industry Skills Development Centre (Malaysian Timber Industry Board)",
+    "MUIP":                   "Majlis Ugama Islam dan Adat Resam Melayu Pahang (MUIP)",
+    "Kementerian Dalam Negeri": "Kementerian Dalam Negeri (Ministry of Home Affairs — KDN)",
     # ── Kementerian Kesihatan Malaysia (MOH — Tier 1) ──
     "KKM":                    "Kementerian Kesihatan Malaysia (Ministry of Health)",
     "KKM BPM":                "Kementerian Kesihatan Malaysia — Bahagian Pengurusan Maklumat",
