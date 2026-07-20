@@ -1,11 +1,12 @@
-# Pinned to the exact stack verified working locally on 15 Jul 2026.
-# Unpinned versions caused a segfault on Streamlit Cloud (bad combo of
-# freshly-released wheels in the pandas/pyarrow/matplotlib native stack).
-streamlit==1.57.0
-pandas==3.0.3
-numpy==2.4.6
-matplotlib==3.10.9
-pillow==12.2.0
-pyarrow==24.0.0
-reportlab==4.5.1
+# Bounded ranges: let pip pick versions compatible with the deploy
+# environment's Python, while capping majors to avoid untested
+# freshly-released wheels (an uncapped install segfaulted on
+# Streamlit Cloud on 15 Jul 2026).
+streamlit>=1.44,<2
+pandas>=2.2,<3.1
+numpy>=1.26,<3
+matplotlib>=3.8,<3.11
+pillow>=10,<13
+pyarrow>=17,<25
+reportlab>=4.2,<5
 notion-client>=2.2.1
