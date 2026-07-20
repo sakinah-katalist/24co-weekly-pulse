@@ -354,7 +354,9 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
                       if not _is_revenue(d.get("stage", ""))
                       and any(k in (d.get("stage") or "").lower()
                               for k in ("almost", "proposal", "quotation", "progress"))]
-    paid_total     = sum(d.get("deal_value", 0) or 0 for d in paid_deals)
+    # YTD = Paid deals with money received in the report year only
+    paid_total     = sum(d.get("deal_value", 0) or 0 for d in paid_deals
+                         if _rev_date(d).startswith(str(year)))
     pipe_total     = sum(d.get("deal_value", 0) or 0 for d in pipeline_deals)
 
     # Revenue by period (paid only)
