@@ -483,7 +483,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     if monthly_chart:
         add(PageBreak())
         add(_hr(C["teal"]))
-        add(Paragraph(f"Monthly Revenue — {year}  (Paid Deals Only)", styles["SectionHead"]))
+        add(Paragraph(f"Monthly Revenue — {year}  (Paid Deals Added in {year})", styles["SectionHead"]))
         add(_sp(2))
         add(_img_from_bytes(monthly_chart, full_w))
 

@@ -327,7 +327,8 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
                         current_month: int | None = None) -> bytes:
     """
     12-bar chart — one bar per month of `year`.
-    Only counts Paid / Closed deals (close_date in that month).
+    Paid deals created (added) in `year`, bucketed by creation month —
+    same definition as the YTD Revenue card, so the totals reconcile.
     Current month bar is highlighted yellow.
     """
     MONTHS = ["Jan","Feb","Mar","Apr","May","Jun",
@@ -338,11 +339,9 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
         s = (d.get("stage") or "").lower()
         if "paid" not in s or "before adam" in s:  # Paid status only
             continue
-        cd = d.get("payment_received_date") or d.get("close_date") or ""
-        if not cd:
-            continue
+        ad = d.get("added_date") or ""
         try:
-            dt = datetime.strptime(cd[:10], "%Y-%m-%d")
+            dt = datetime.strptime(ad[:10], "%Y-%m-%d")
             if dt.year == year:
                 monthly[dt.month - 1] += d.get("deal_value", 0) or 0
         except ValueError:
@@ -377,12 +376,12 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
     ax.yaxis.grid(True, color=BRAND["grid"], linestyle="--", linewidth=0.6)
     ax.xaxis.grid(False)
     ax.set_axisbelow(True)
-    ax.set_title(f"Monthly Revenue — {year}  (Paid deals only)",
+    ax.set_title(f"Monthly Revenue — {year}  (Paid deals added in {year})",
                  fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
 
     patches = [
         mpatches.Patch(color=BRAND["yellow"], label="Current month — Paid deals"),
-        mpatches.Patch(color=BRAND["teal"],   label="Paid deals (money received)"),
+        mpatches.Patch(color=BRAND["teal"],   label=f"Paid deals (added in {year})"),
         mpatches.Patch(color="#DEDEDE",        label="No Paid deals"),
     ]
     ax.legend(handles=patches, fontsize=7.5, framealpha=0, loc="upper right")

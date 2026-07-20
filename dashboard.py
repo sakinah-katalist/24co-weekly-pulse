@@ -1022,7 +1022,7 @@ with tab2:
         # Monthly revenue bar (shows Jan–Dec on X axis)
         st.markdown(
             f'<p style="font-size:14px;font-weight:700;color:#0D3349;margin:16px 0 6px;">'
-            f'Monthly Revenue — {YEAR}  (Paid deals only)</p>',
+            f'Monthly Revenue — {YEAR}  (Paid deals added in {YEAR})</p>',
             unsafe_allow_html=True
         )
         st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), width="stretch")
