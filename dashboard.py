@@ -863,24 +863,37 @@ with tab2:
         st.markdown("<br>", unsafe_allow_html=True)
         st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), width="stretch")
 
-        ytd          = _rev(deals_yr)
+        # YTD / best month use the same definition as the glance card and
+        # monthly chart: status Paid, deal created (added) in the report year
+        paid_yr = [d for d in crm_deals
+                   if _is_paid_only(d.get("stage", ""))
+                   and (d.get("added_date") or "").startswith(str(YEAR))]
+        ytd = sum(d.get("deal_value", 0) or 0 for d in paid_yr)
+
+        paid_monthly = {m: 0.0 for m in range(1, 13)}
+        for d in paid_yr:
+            try:
+                paid_monthly[int(d["added_date"][5:7])] += d.get("deal_value", 0) or 0
+            except (ValueError, KeyError):
+                pass
+
         months_gone  = sum(1 for m in range(1, 13) if m <= cur_mon)
         projected    = (ytd / months_gone * 12) if months_gone else 0
-        best_m       = max(range(1, 13), key=lambda m: _rev(monthly_data[m]))
-        best_rev     = _rev(monthly_data[best_m])
+        best_m       = max(range(1, 13), key=lambda m: paid_monthly[m])
+        best_rev     = paid_monthly[best_m]
 
         k1, k2, k3, k4 = st.columns(4)
         with k1:
             st.markdown(_kpi_html(f"RM {ytd:,.0f}", f"YTD Revenue {YEAR}",
-                                  f"{len(deals_yr)} deal(s)", "green"), unsafe_allow_html=True)
+                                  f"{len(paid_yr)} Paid deal(s) added in {YEAR}", "green"), unsafe_allow_html=True)
         with k2:
             st.markdown(_kpi_html(f"RM {projected:,.0f}", "Projected Full Year",
                                   f"based on {months_gone}-month run rate", "yellow"),
                         unsafe_allow_html=True)
         with k3:
-            avg = ytd / len(deals_yr) if deals_yr else 0
+            avg = ytd / len(paid_yr) if paid_yr else 0
             st.markdown(_kpi_html(f"RM {avg:,.0f}", "Avg Deal Value",
-                                  "per paid/closed deal", "teal"), unsafe_allow_html=True)
+                                  f"per Paid deal added in {YEAR}", "teal"), unsafe_allow_html=True)
         with k4:
             st.markdown(_kpi_html(MONTH_NAMES[best_m - 1], "Best Month",
                                   f"RM {best_rev:,.0f}", "teal"), unsafe_allow_html=True)
