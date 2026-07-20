@@ -354,9 +354,8 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
                       if not _is_revenue(d.get("stage", ""))
                       and any(k in (d.get("stage") or "").lower()
                               for k in ("almost", "proposal", "quotation", "progress"))]
-    # YTD = Paid deals with money received in the report year only
-    paid_total     = sum(d.get("deal_value", 0) or 0 for d in paid_deals
-                         if _rev_date(d).startswith(str(year)))
+    # YTD = invoiced amount of every Paid deal; Money Received date deliberately ignored
+    paid_total     = sum(d.get("deal_value", 0) or 0 for d in paid_deals)
     pipe_total     = sum(d.get("deal_value", 0) or 0 for d in pipeline_deals)
 
     # Revenue by period (paid only)
@@ -408,7 +407,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
 
     glance_cards = [
         _kpi_card(f"RM {total_7d:,.0f}",   "REVENUE THIS WEEK",     "Past 7 days (Paid)",    C["teal_light"],   C["teal"]),
-        _kpi_card(f"RM {paid_total:,.0f}",  "YTD REVENUE",           f"All of {year} (Paid)", C["green_light"],  C["green"]),
+        _kpi_card(f"RM {paid_total:,.0f}",  "YTD REVENUE",           "All Paid deals (invoiced)", C["green_light"],  C["green"]),
         _kpi_card(f"RM {pipe_total:,.0f}",  "ACTIVE PIPELINE",       f"{len(pipeline_deals)} deals · lifetime active pipeline",   C["yellow_light"], C["yellow"]),
         _kpi_card(f"RM {pending_total:,.0f}", "AWAITING PAYMENT (LIFETIME)", f"{len(pending)} Closed deals",   C["red_light"],    C["red"]),
         _kpi_card(f"RM {stale_pending_total:,.0f}", "OVERDUE >5 WKS", f"{len(stale_pending)} deals — re-nudge", C["red_light"], C["red"]),

@@ -368,10 +368,8 @@ revenue      = data.get("revenue_history", [])
 
 crm_filtered = [d for d in crm_deals if _stage_ok(d.get("stage",""))]
 rev_7d       = _rev7d_paid(crm_deals, report_date)
-_ytd_year    = report_date.strftime("%Y") if hasattr(report_date, "strftime") else "2026"
-paid_total   = sum(d.get("deal_value",0) or 0 for d in crm_deals
-                   if _is_paid_only(d.get("stage",""))
-                   and (d.get("payment_received_date") or d.get("close_date") or "").startswith(_ytd_year))
+# YTD = invoiced amount of every Paid deal; Money Received date deliberately ignored
+paid_total   = sum(d.get("deal_value",0) or 0 for d in crm_deals if _is_paid_only(d.get("stage","")))
 pipe_total   = sum(d.get("deal_value",0) or 0 for d in crm_filtered if not _is_revenue(d.get("stage","")))
 tier1_count  = sum(1 for x in leads+sessions if x.get("tier1"))
 pub_sess     = sum(1 for s in sessions if _session_type(s) == "Public")
@@ -406,7 +404,7 @@ kpis = [
     (c2, f"{pub_sess} Public / {inh_sess} Private", "Training Sessions", "teal", "Past Classes DB"),
     (c3, str(tier1_count),                "Tier 1 Gov Matches",   "yellow",""),
     (c4, f"RM {rev_7d:,.0f}",             "Revenue This Week",    "green", "CRM — last 7 days"),
-    (c5, f"RM {paid_total:,.0f}",         "YTD Revenue — Paid Only", "teal",  "CRM — Paid, received in 2026"),
+    (c5, f"RM {paid_total:,.0f}",         "YTD Revenue — Paid Only", "teal",  "CRM — all Paid deals (invoiced)"),
     (c6, f"RM {pipe_total:,.0f}",         "Pending Pipeline",     "yellow","CRM — open quotes"),
 ]
 for col, val, lbl, clr, src in kpis:
