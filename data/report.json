@@ -88,7 +88,48 @@
       "description": "Kementerian Dalam Negeri (Ministry of Home Affairs, KDN) — Tier 1 federal ministry responsible for public security and order, overseeing the Royal Malaysia Police (PDRM), Immigration Department, National Registration Department, RELA and the National Anti-Drug Agency. One of the largest ministries in government by workforce. The enquiry is a procurement eligibility check — answering it well positions us for official government purchase orders from a top-priority ministry."
     }
   ],
-  "sessions": [],
+  "sessions": [
+    {
+      "org_name": "UniKL RCMP",
+      "class_name": "Gen AI Essentials: From Skills to Solutions",
+      "date": "2026-07-13 → 2026-07-14",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "",
+      "description": "Universiti Kuala Lumpur — Royal College of Medicine Perak, in Greentown, Ipoh. UniKL is wholly owned by MARA (federal statutory agency), and RCMP is its medical campus: medicine, pharmacy and health sciences, registered with the Malaysian Medical Council with MOH agreements giving access to government hospitals in Perak and beyond. A repeat client — two further Closed deals (RM 20,952 each) sit in Awaiting Payment, so relationship health matters here."
+    },
+    {
+      "org_name": "Ekonomi",
+      "class_name": "Gen AI Essentials: Skills for the AI-Powered Workplace",
+      "date": "2026-07-13 → 2026-07-14",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1fGV5qP3uFIgJb4rFpTnSadiQ-W4LDiG2inprO7y3sXM/edit",
+      "description": "Kementerian Ekonomi Malaysia (Ministry of Economy) — the federal ministry for economic planning, statistics and socioeconomic policy, working alongside MOF and the Economic Planning Unit on national development plans. Ran two back-to-back AI programmes with us in a single week — a deep engagement that pairs with the two RM 23,000 Closed deals in the CRM. Strong candidate for a ministry-wide rollout."
+    },
+    {
+      "org_name": "Ekonomi",
+      "class_name": "AI, Automation & Critical Thinking Programme",
+      "date": "2026-07-15 → 2026-07-16",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1xnnjd_QARrEcc3_nNB8ao_E0CfOA2MO8tSsoVEsW1Cw/edit",
+      "description": "Kementerian Ekonomi Malaysia (Ministry of Economy) — second programme of the week for this federal ministry (see the Gen AI Essentials session on 13–14 July). Two multi-day courses in five days signals serious investment in AI upskilling across their divisions."
+    },
+    {
+      "org_name": "MSU | 13th Series",
+      "class_name": "The AI-Resilient Educator",
+      "date": "2026-07-20",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/11cO8PYHZdYI51w_1kAO3pzQ0Y5h1oJwaiHa7Lc9IbA8/edit",
+      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). This is the 13th series of the AI-Resilient Educator programme with them — a long-running recurring engagement, with matching series deals tracked in the CRM."
+    }
+  ],
   "crm_deals": [
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",

@@ -77,6 +77,9 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 14–20 July 2026 sessions ──
+    "Ekonomi":                "Kementerian Ekonomi Malaysia (Ministry of Economy)",
+    "UniKL RCMP":             "Universiti Kuala Lumpur — Royal College of Medicine Perak (UniKL RCMP)",
     # ── Week of 14–20 July 2026 leads ──
     "UniKL MITEC, Johor":     "Universiti Kuala Lumpur — Malaysian Institute of Industrial Technology (UniKL MITEC), Johor",
     "Akademi Sains Malaysia": "Akademi Sains Malaysia (Academy of Sciences Malaysia — ASM)",
