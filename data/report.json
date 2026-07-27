@@ -1,135 +1,8 @@
 {
-  "report_date": "2026-07-20",
-  "period_label": "Week of 14–20 July 2026",
-  "leads": [
-    {
-      "org_name": "UniKL MITEC, Johor",
-      "contact_name": "Amira (Senior HR Executive)",
-      "contact_email": "amira.aliah@unikl.edu.my",
-      "contact_phone": "0177576909",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "[Training] Hot Lead",
-      "date": "2026-07-14",
-      "enquiry": "Trainings/Courses Request",
-      "area": "Generative AI & Automation",
-      "notes": "Inviting us to conduct an AI training programme at their campus, tentatively September 2026. Requested Ali Reza as preferred trainer. Asked for proposed outline, duration and quotation.",
-      "is_hot": true,
-      "tier1": null,
-      "color": "red",
-      "description": "Universiti Kuala Lumpur — Malaysian Institute of Industrial Technology, in Masai, Johor (near Johor Bahru and the Singapore checkpoint). UniKL is a private university wholly owned by MARA, a federal statutory agency — so effectively government-linked. The MITEC campus (capacity ~3,000 students) specialises in industrial technology: quality engineering, process instrumentation and logistics. A confirmed September AI programme with a named-trainer request signals strong buying intent."
-    },
-    {
-      "org_name": "Akademi Sains Malaysia",
-      "contact_name": "Zarith (Executive)",
-      "contact_email": "zarithsofia@akademisains.gov.my",
-      "contact_phone": "0173428400",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "No Answer/Respond",
-      "date": "2026-07-14",
-      "enquiry": "Trainings/Courses Request",
-      "area": "Other/Customised Course",
-      "notes": "Wants to explore strategic AI Competency Development for Policy Excellence training.",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "The Academy of Sciences Malaysia (ASM) — statutory body under the Ministry of Science, Technology and Innovation (MOSTI), established by an Act of Parliament in 1994. Malaysia's highest scientific advisory body and national think-tank, with ~450 Fellows across eight disciplines; produces national blueprints and policy roadmaps. An 'AI competency for policy excellence' course here would put us in front of Malaysia's science-policy elite — high prestige value. Worth a follow-up despite no answer yet."
-    },
-    {
-      "org_name": "WISDEC MTIB",
-      "contact_name": "Ummi Ainul Hafizah (Senior Assistant Director)",
-      "contact_email": "ummiainul@mtib.gov.my",
-      "contact_phone": "0172785464",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "Contacted",
-      "date": "2026-07-14",
-      "enquiry": "Trainings/Courses Request",
-      "area": "Designing with Canva",
-      "notes": "Wants to join Generative AI & Automation (23 July 2026) and Designing with Canva (30 July 2026) for 5 pax. Requested quotation for both courses and venue details. Will pay via LPO (local purchase order).",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "Wood Industry Skills Development Centre (WISDEC) in Banting, Selangor — the training arm of the Malaysian Timber Industry Board (MTIB), a federal statutory body. Established 1995 to upskill the value-added wood-processing sector; runs short courses, competency-based training and the Malaysia Skills Competition. They already train regularly and pay by government LPO — a near-term, low-friction booking for two of our public courses this month."
-    },
-    {
-      "org_name": "MUIP",
-      "contact_name": "Nazihah (Pegawai Tadbir)",
-      "contact_email": "nazihah@muip.gov.my",
-      "contact_phone": "0145122245",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "[Training] Hot Lead",
-      "date": "2026-07-16",
-      "enquiry": "Trainings/Courses Request",
-      "area": "Cybersecurity Awareness",
-      "notes": "Would like to invite Ali Reza as speaker (Cybersecurity Awareness).",
-      "is_hot": true,
-      "tier1": null,
-      "color": "red",
-      "description": "Majlis Ugama Islam dan Adat Resam Melayu Pahang — the Pahang state Islamic religious council, founded 1926, headquartered in Pekan with branches across the state. A statutory council under the Pahang State Constitution that manages zakat, wakaf, Islamic education and scholarships. A speaker invitation for cybersecurity awareness is a door-opener into Pahang state religious agencies and their staff-development programmes."
-    },
-    {
-      "org_name": "Kementerian Dalam Negeri",
-      "contact_name": "Hana (Auditor)",
-      "contact_email": "hanani.nor20@gmail.com",
-      "contact_phone": "",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-07-17",
-      "enquiry": "Enquiries/Questions",
-      "area": null,
-      "notes": "Asked (in Malay) whether we deliver training to government: registered with Kementerian Kewangan (MOF), SSM, tax-compliant, and able to accept payment via government purchase order (pesanan kerajaan). This is a procurement-readiness check — respond with our MOF registration details.",
-      "is_hot": false,
-      "tier1": "KDN",
-      "color": "gold",
-      "description": "Kementerian Dalam Negeri (Ministry of Home Affairs, KDN) — Tier 1 federal ministry responsible for public security and order, overseeing the Royal Malaysia Police (PDRM), Immigration Department, National Registration Department, RELA and the National Anti-Drug Agency. One of the largest ministries in government by workforce. The enquiry is a procurement eligibility check — answering it well positions us for official government purchase orders from a top-priority ministry."
-    }
-  ],
-  "sessions": [
-    {
-      "org_name": "UniKL RCMP",
-      "class_name": "Gen AI Essentials: From Skills to Solutions",
-      "date": "2026-07-13 → 2026-07-14",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "",
-      "description": "Universiti Kuala Lumpur — Royal College of Medicine Perak, in Greentown, Ipoh. UniKL is wholly owned by MARA (federal statutory agency), and RCMP is its medical campus: medicine, pharmacy and health sciences, registered with the Malaysian Medical Council with MOH agreements giving access to government hospitals in Perak and beyond. A repeat client — two further Closed deals (RM 20,952 each) sit in Awaiting Payment, so relationship health matters here."
-    },
-    {
-      "org_name": "Ekonomi",
-      "class_name": "Gen AI Essentials: Skills for the AI-Powered Workplace",
-      "date": "2026-07-13 → 2026-07-14",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1fGV5qP3uFIgJb4rFpTnSadiQ-W4LDiG2inprO7y3sXM/edit",
-      "description": "Kementerian Ekonomi Malaysia (Ministry of Economy) — the federal ministry for economic planning, statistics and socioeconomic policy, working alongside MOF and the Economic Planning Unit on national development plans. Ran two back-to-back AI programmes with us in a single week — a deep engagement that pairs with the two RM 23,000 Closed deals in the CRM. Strong candidate for a ministry-wide rollout."
-    },
-    {
-      "org_name": "Ekonomi",
-      "class_name": "AI, Automation & Critical Thinking Programme",
-      "date": "2026-07-15 → 2026-07-16",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1xnnjd_QARrEcc3_nNB8ao_E0CfOA2MO8tSsoVEsW1Cw/edit",
-      "description": "Kementerian Ekonomi Malaysia (Ministry of Economy) — second programme of the week for this federal ministry (see the Gen AI Essentials session on 13–14 July). Two multi-day courses in five days signals serious investment in AI upskilling across their divisions."
-    },
-    {
-      "org_name": "MSU | 13th Series",
-      "class_name": "The AI-Resilient Educator",
-      "date": "2026-07-20",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/11cO8PYHZdYI51w_1kAO3pzQ0Y5h1oJwaiHa7Lc9IbA8/edit",
-      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). This is the 13th series of the AI-Resilient Educator programme with them — a long-running recurring engagement, with matching series deals tracked in the CRM."
-    }
-  ],
+  "report_date": "2026-07-27",
+  "period_label": "Week of 21–27 July 2026",
+  "leads": [],
+  "sessions": [],
   "crm_deals": [
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",
@@ -2816,7 +2689,7 @@
       "course": "Gen ai 2hour",
       "contact": "Puan Fazlina",
       "pax": 0,
-      "train_date": "2026-06-18",
+      "train_date": "2026-06-19",
       "added_date": "2026-02-09"
     },
     {
@@ -3422,7 +3295,7 @@
     {
       "org_name": "RelyOn",
       "stage": "Paid",
-      "deal_value": 6480.0,
+      "deal_value": 6220.8,
       "close_date": "2026-06-25",
       "payment_received_date": "2026-06-25",
       "course": "Gen AI Online",
@@ -3937,7 +3810,7 @@
     },
     {
       "org_name": "ALLO TECHNOLOGY SDN BHD",
-      "stage": "Closed",
+      "stage": "Almost Confirmed",
       "deal_value": 19440.0,
       "close_date": "",
       "payment_received_date": "",
@@ -4021,10 +3894,10 @@
     },
     {
       "org_name": "Instep x MAHB Ipoh",
-      "stage": "Closed",
+      "stage": "Paid",
       "deal_value": 4100.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "close_date": "2026-07-21",
+      "payment_received_date": "2026-07-21",
       "course": "Enhancing Your productivity with Google Workspace",
       "contact": "",
       "pax": 0,
@@ -4092,7 +3965,7 @@
       "added_date": "2026-06-23"
     },
     {
-      "org_name": "KWSP | EPF",
+      "org_name": "KWSP | EPF | KFair",
       "stage": "Closed",
       "deal_value": 6000.0,
       "close_date": "",
@@ -4203,8 +4076,8 @@
       "org_name": "MSU - Canva Siri 3",
       "stage": "Closed",
       "deal_value": 5184.0,
-      "close_date": "2026-06-26",
-      "payment_received_date": "2026-06-26",
+      "close_date": "",
+      "payment_received_date": "",
       "course": "Canva 1 day",
       "contact": "",
       "pax": 30,
@@ -4255,6 +4128,18 @@
       "payment_received_date": "",
       "course": "copilot",
       "contact": "Nizam",
+      "pax": 0,
+      "train_date": "",
+      "added_date": "2026-07-08"
+    },
+    {
+      "org_name": "MARDI",
+      "stage": "In progress",
+      "deal_value": 0.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "gen AI",
+      "contact": "Dr Hajidah Hassan",
       "pax": 0,
       "train_date": "",
       "added_date": "2026-07-08"
@@ -4332,16 +4217,52 @@
       "added_date": "2026-07-14"
     },
     {
-      "org_name": "Ekuinas",
+      "org_name": "YUSHIRO MALAYSIA SDN BHD / QA",
       "stage": "Proposal / Quotation",
+      "deal_value": 19440.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Generative AI & Automation",
+      "contact": "Shazwana",
+      "pax": 35,
+      "train_date": "",
+      "added_date": "2026-07-14"
+    },
+    {
+      "org_name": "UniKL MITEC, Johor",
+      "stage": "Proposal / Quotation",
+      "deal_value": 21600.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Generative AI & Automation",
+      "contact": "Amira Aliah",
+      "pax": 0,
+      "train_date": "",
+      "added_date": "2026-07-14"
+    },
+    {
+      "org_name": "Ekuinas",
+      "stage": "Almost Confirmed",
       "deal_value": 19440.0,
       "close_date": "",
       "payment_received_date": "",
       "course": "Gen AI for SME",
       "contact": "Aishah",
+      "pax": 20,
+      "train_date": "2026-09-30",
+      "added_date": "2026-07-15"
+    },
+    {
+      "org_name": "(MUIP) Majlis Ugama Islam dan Adat Resam Melayu Pahang",
+      "stage": "In progress",
+      "deal_value": 0.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Cybersecurity Awareness",
+      "contact": "Pn Nazihah",
       "pax": 0,
       "train_date": "",
-      "added_date": "2026-07-15"
+      "added_date": "2026-07-17"
     },
     {
       "org_name": "Kementerian Ekonomi -  Fahim Siri 3",
@@ -4426,6 +4347,114 @@
       "pax": 0,
       "train_date": "2026-07-22",
       "added_date": "2026-07-19"
+    },
+    {
+      "org_name": "UniKL RCMP",
+      "stage": "Almost Confirmed",
+      "deal_value": 20952.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen Ai (session 3)",
+      "contact": "Khodijah",
+      "pax": 35,
+      "train_date": "2026-09-07",
+      "added_date": "2026-07-20"
+    },
+    {
+      "org_name": "UniKL RCMP",
+      "stage": "Almost Confirmed",
+      "deal_value": 20952.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen Ai (session 4)",
+      "contact": "Khodijah",
+      "pax": 35,
+      "train_date": "2026-09-21",
+      "added_date": "2026-07-20"
+    },
+    {
+      "org_name": "UniKL RCMP",
+      "stage": "Almost Confirmed",
+      "deal_value": 20952.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen Ai (session 5)",
+      "contact": "Khodijah",
+      "pax": 35,
+      "train_date": "2026-10-12",
+      "added_date": "2026-07-20"
+    },
+    {
+      "org_name": "UniKL RCMP",
+      "stage": "Almost Confirmed",
+      "deal_value": 5500.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "GWS",
+      "contact": "Khodijah",
+      "pax": 35,
+      "train_date": "2026-10-14",
+      "added_date": "2026-07-20"
+    },
+    {
+      "org_name": "(LTH HQ) Tabung Haji",
+      "stage": "Proposal / Quotation",
+      "deal_value": 18000.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen Ai",
+      "contact": "Puan Nurul",
+      "pax": 35,
+      "train_date": "",
+      "added_date": "2026-07-21"
+    },
+    {
+      "org_name": "kementerian dalam negeri",
+      "stage": "In progress",
+      "deal_value": 0.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "",
+      "contact": "mailto:hanani.nor20@gmail.com",
+      "pax": 0,
+      "train_date": "",
+      "added_date": "2026-07-22"
+    },
+    {
+      "org_name": "Persatuan Jururawat Malaysia , Cawangan Muar Johor (PJMM)",
+      "stage": "Proposal / Quotation",
+      "deal_value": 10000.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen AI",
+      "contact": "Matron Iza",
+      "pax": 35,
+      "train_date": "",
+      "added_date": "2026-07-22"
+    },
+    {
+      "org_name": "Chong Hwa Independent High School",
+      "stage": "Proposal / Quotation",
+      "deal_value": 10800.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Canva",
+      "contact": "CHIN CHEE CHIA",
+      "pax": 35,
+      "train_date": "",
+      "added_date": "2026-07-22"
+    },
+    {
+      "org_name": "VENTURETECH SDN BHD",
+      "stage": "Almost Confirmed",
+      "deal_value": 11000.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen AI",
+      "contact": "Miss Imanina",
+      "pax": 20,
+      "train_date": "2026-09-28",
+      "added_date": "2026-07-23"
     }
   ],
   "revenue_history": [
@@ -4451,11 +4480,11 @@
     },
     {
       "week_label": "Jun 2026",
-      "total_revenue": 245276
+      "total_revenue": 245017
     },
     {
       "week_label": "Jul 2026",
-      "total_revenue": 61042
+      "total_revenue": 65142
     }
   ]
 }
