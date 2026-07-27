@@ -77,6 +77,21 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 21–27 July 2026 ──
+    # Exact entry needed so prefix-matching on "Kementerian Dalam Negeri"
+    # doesn't mangle the division suffix.
+    "Kementerian Dalam Negeri (KDN) — Bahagian Kawalan dan Penguatkuasaan":
+        "Kementerian Dalam Negeri (Ministry of Home Affairs) — Bahagian Kawalan dan Penguatkuasaan",
+    "Teraju Bumiputera Corporation": "TERAJU — Unit Peneraju Agenda Bumiputera (Prime Minister's Department)",
+    "Perbadanan PR1MA Malaysia": "Perbadanan PR1MA Malaysia (1Malaysia People's Housing Programme)",
+    "Malaysia Rail Link Sdn Bhd": "Malaysia Rail Link Sdn Bhd (MRL — East Coast Rail Link, MOF-owned)",
+    "Malaysian Institute of Accountants": "Malaysian Institute of Accountants (MIA)",
+    "Universiti Malaysia Kelantan": "Universiti Malaysia Kelantan (UMK)",
+    "Takaful Malaysia":       "Syarikat Takaful Malaysia Keluarga Berhad",
+    "FELCRA":                 "FELCRA Berhad (Federal Land Consolidation and Rehabilitation Authority)",
+    "Cyberview":              "Cyberview Sdn Bhd (Cyberjaya Tech Hub Enabler — MOF-owned)",
+    "Terengganu Incorporated": "Terengganu Incorporated Sdn Bhd (Terengganu State investment arm)",
+    "MSU | 14th Series":      "Management and Science University (MSU) — 14th Series",
     # ── Week of 14–20 July 2026 sessions ──
     "Ekonomi":                "Kementerian Ekonomi Malaysia (Ministry of Economy)",
     "UniKL RCMP":             "Universiti Kuala Lumpur — Royal College of Medicine Perak (UniKL RCMP)",
