@@ -604,6 +604,16 @@ with tab2:
                 out.append(d)
         return out
 
+    def _deals_added_in_range(deal_list, start: str, end: str):
+        """Paid deals by CREATION date — the basis for YTD, quarterly and
+        monthly views, so they all reconcile with the YTD Revenue card."""
+        out = []
+        for d in _paid_deals(deal_list):
+            ad = (d.get("added_date") or "")[:10]
+            if ad and start <= ad <= end:
+                out.append(d)
+        return out
+
     def _rev(deal_list):
         return sum(d.get("deal_value",0) or 0 for d in deal_list)
 
@@ -647,14 +657,15 @@ with tab2:
     deals_7d  = _deals_in_range(crm_deals, d7, rd_str)
     deals_14d = _deals_in_range(crm_deals, d14, rd_str)
     deals_30d = _deals_in_range(crm_deals, d30, rd_str)
-    deals_yr  = _deals_in_range(crm_deals, YEAR_START, YEAR_END)
-    # monthly
+    # Monthly / quarterly buckets use CREATION date so the quarter cards
+    # sum exactly to the YTD Revenue card (the 7/14/30-day tabs above stay
+    # on payment date — they answer "what money came in recently").
     monthly_data = {}
     for m in range(1, 13):
         ms = f"{YEAR}-{m:02d}-01"
         me_day = 31 if m in (1,3,5,7,8,10,12) else (30 if m in (4,6,9,11) else 28)
         me = f"{YEAR}-{m:02d}-{me_day:02d}"
-        monthly_data[m] = _deals_in_range(crm_deals, ms, me)
+        monthly_data[m] = _deals_added_in_range(crm_deals, ms, me)
 
     # ── page header ───────────────────────────────────────────────
     st.markdown('<p class="sec-head">Sales CRM — Revenue Analysis</p>', unsafe_allow_html=True)
@@ -770,7 +781,9 @@ with tab2:
     with tp4:
         st.markdown(
             f'<p style="font-size:14px;color:#666;margin-bottom:16px;">'
-            f'Calendar year <b>{YEAR}</b> — quarters run Jan 1 to Dec 31</p>',
+            f'Calendar year <b>{YEAR}</b> — quarters run Jan 1 to Dec 31 · '
+            f'Paid deals grouped by the month they were <b>created</b>, '
+            f'so the quarters add up to YTD Revenue</p>',
             unsafe_allow_html=True
         )
 
@@ -803,7 +816,7 @@ with tab2:
             f'padding:14px 20px;margin:12px 0 16px;">'
             f'<p style="margin:0;font-size:13px;color:#666;">{qlabel}: <b>{qstart_str}</b> → <b>{qend_str}</b></p>'
             f'<p style="margin:4px 0 0;font-size:28px;font-weight:800;color:#1A7A3C;">RM {qrev:,.0f}</p>'
-            f'<p style="margin:2px 0 0;font-size:13px;color:#666;">{len(qdeals)} deal(s) collected</p>'
+            f'<p style="margin:2px 0 0;font-size:13px;color:#666;">{len(qdeals)} Paid deal(s) created in this quarter</p>'
             f'</div>',
             unsafe_allow_html=True
         )

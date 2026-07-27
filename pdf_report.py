@@ -359,10 +359,18 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
                          if (d.get("added_date") or "").startswith(str(year)))
     pipe_total     = sum(d.get("deal_value", 0) or 0 for d in pipeline_deals)
 
-    # Revenue by period (paid only)
+    # Two lenses, deliberately:
+    #  · recent windows (7/14 days, current month) = money RECEIVED, so they
+    #    answer "what came in lately"
+    #  · quarters = deal CREATION date, so Q1..Q4 sum to the YTD card
     def _period_rev(deals, from_str, to_str):
         return [(d, d.get("deal_value", 0) or 0) for d in deals
                 if _rev_date(d) and from_str <= _rev_date(d) <= to_str]
+
+    def _period_added(deals, from_str, to_str):
+        return [(d, d.get("deal_value", 0) or 0) for d in deals
+                if (d.get("added_date") or "")
+                and from_str <= (d.get("added_date") or "")[:10] <= to_str]
 
     rev_7d_deals  = _period_rev(paid_deals, d7_str,  rd_str)
     rev_14d_deals = _period_rev(paid_deals, d14_str, rd_str)
@@ -380,7 +388,7 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     q_deals = {}
     for q in (1, 2, 3, 4):
         qs, qe = _qrange(q)
-        q_deals[q] = _period_rev(paid_deals, qs, qe)
+        q_deals[q] = _period_added(paid_deals, qs, qe)
 
     total_7d  = sum(v for _, v in rev_7d_deals)
     total_14d = sum(v for _, v in rev_14d_deals)
@@ -421,7 +429,10 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     add(KeepTogether([
         _hr(C["yellow"]),
         Paragraph("Revenue Breakdown by Period", styles["SectionHead"]),
-        Paragraph(f"Paid deals only · {year}", styles["SectionSub"]),
+        Paragraph(
+            f"Paid deals only · {year}. Recent windows show money received; "
+            f"quarters group deals by creation date, so Q1–Q4 add up to YTD Revenue.",
+            styles["SectionSub"]),
         _sp(3),
     ]))
 
@@ -434,24 +445,31 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
     curr_m_name = f"{_cal.month_name[month]} {year}"
 
     rev_rows = [
-        [Paragraph("Past 7 days",      styles["TableCell"]),
+        [Paragraph("Past 7 days  <i>(received)</i>",  styles["TableCell"]),
          Paragraph(str(len(rev_7d_deals)),  styles["TableCell"]),
          Paragraph(f"RM {total_7d:,.0f}",  styles["TableCellR"])],
-        [Paragraph("Past 14 days",     styles["TableCell"]),
+        [Paragraph("Past 14 days  <i>(received)</i>", styles["TableCell"]),
          Paragraph(str(len(rev_14d_deals)), styles["TableCell"]),
          Paragraph(f"RM {total_14d:,.0f}", styles["TableCellR"])],
-        [Paragraph(f"{curr_m_name} (so far)", styles["TableCell"]),
+        [Paragraph(f"{curr_m_name} (so far)  <i>(received)</i>", styles["TableCell"]),
          Paragraph(str(len(rev_cm_deals)), styles["TableCell"]),
          Paragraph(f"RM {total_cm:,.0f}", styles["TableCellR"])],
     ]
+    q_total = 0.0
     for q in (1, 2, 3, 4):
         qd = q_deals[q]
         qt = sum(v for _, v in qd)
+        q_total += qt
         rev_rows.append([
-            Paragraph(f"{q_names[q]} {year}", styles["TableCell"]),
+            Paragraph(f"{q_names[q]} {year}  <i>(created)</i>", styles["TableCell"]),
             Paragraph(str(len(qd)),           styles["TableCell"]),
             Paragraph(f"RM {qt:,.0f}",        styles["TableCellR"]),
         ])
+    rev_rows.append([
+        Paragraph("<b>Q1–Q4 total = YTD Revenue</b>", styles["TableCell"]),
+        Paragraph(f"<b>{sum(len(q_deals[q]) for q in (1,2,3,4))}</b>", styles["TableCell"]),
+        Paragraph(f"<b>RM {q_total:,.0f}</b>", styles["TableCellR"]),
+    ])
 
     rev_tbl = Table([rev_hdr] + rev_rows, colWidths=rev_cw, repeatRows=1)
     rev_tbl.setStyle(TableStyle([
@@ -459,12 +477,18 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         ("FONTSIZE",      (0,0),(-1,-1), 8),
         ("ROWBACKGROUNDS",(0,1),(-1,-1), [C["white"], C["light"]]),
         ("GRID",          (0,0),(-1,-1), 0.35, C["border"]),
-        ("TOPPADDING",    (0,0),(-1,-1), 5),
-        ("BOTTOMPADDING", (0,0),(-1,-1), 5),
+        # Kept tight: the table plus the glance cards must fit on page 1,
+        # otherwise a stray row spills onto a near-empty page of its own.
+        ("TOPPADDING",    (0,0),(-1,-1), 2.5),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 2.5),
         ("LEFTPADDING",   (0,0),(-1,-1), 6),
         ("VALIGN",        (0,0),(-1,-1), "MIDDLE"),
-        # Highlight current quarter row
-        ("BACKGROUND",    (0, 3 + month // 4 + 1), (-1, 3 + month // 4 + 1), C["yellow_light"]),
+        # Highlight the current quarter. Row layout: 0 header, 1-3 recent
+        # windows, 4-7 = Q1..Q4, 8 total — so quarter q sits on row 3+q.
+        ("BACKGROUND",    (0, 3 + (month - 1) // 3 + 1), (-1, 3 + (month - 1) // 3 + 1), C["yellow_light"]),
+        # Q1-Q4 total row
+        ("BACKGROUND",    (0,-1),(-1,-1), C["green_light"]),
+        ("LINEABOVE",     (0,-1),(-1,-1), 0.8, C["green"]),
     ]))
     add(rev_tbl)
 
