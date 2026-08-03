@@ -78,6 +78,10 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
     # ── Week of 28 July – 3 August 2026 ──
+    "Ministry of Digital":    "Kementerian Digital (Ministry of Digital)",
+    "Kelab Pegawai Wanita TUDM": "Kelab Pegawai Wanita TUDM (Royal Malaysian Air Force — Women Officers' Club)",
+    "MPOC":                   "Malaysian Palm Oil Council (MPOC)",
+    "Sauber (for Pasukan Polis Udara)": "Sauber — for Pasukan Polis Udara (PDRM Air Operations Force)",
     "MSU 3.0 | Lecturers":    "Management and Science University (MSU) 3.0 — Lecturers Cohort",
     "KLN | Sesi 1":           "Kementerian Luar Negeri Malaysia (Ministry of Foreign Affairs) — Sesi 1",
     "ICU JPM":                "Unit Penyelarasan Pelaksanaan, Jabatan Perdana Menteri (ICU JPM)",
