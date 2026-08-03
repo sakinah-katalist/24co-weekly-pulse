@@ -2553,14 +2553,14 @@
     },
     {
       "org_name": "(Perpena) Persatuan Penolong Akauntan Jabatan Akauntan Negara",
-      "stage": "Closed",
+      "stage": "Proposal / Quotation",
       "deal_value": 8640.0,
       "close_date": "",
       "payment_received_date": "",
       "course": "cyber security talk",
       "contact": "Puan Zal",
       "pax": 0,
-      "train_date": "2026-07-28",
+      "train_date": "",
       "added_date": "2026-01-19"
     },
     {
@@ -2936,7 +2936,7 @@
       "added_date": "2026-02-16"
     },
     {
-      "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",
+      "org_name": "Jabatan Akauntan Negara Malaysia (JANM) @ Hub",
       "stage": "Closed",
       "deal_value": 16200.0,
       "close_date": "",
@@ -3561,7 +3561,7 @@
     },
     {
       "org_name": "Cycle & carriage (CCB)",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 3780.0,
       "close_date": "",
       "payment_received_date": "",
@@ -3584,7 +3584,7 @@
       "added_date": "2026-04-13"
     },
     {
-      "org_name": "UniKL RCMP",
+      "org_name": "UniKL RCMP - Ipoh",
       "stage": "Closed",
       "deal_value": 20952.0,
       "close_date": "",
@@ -3776,7 +3776,7 @@
       "added_date": "2026-04-29"
     },
     {
-      "org_name": "UniKL RCMP",
+      "org_name": "UniKL RCMP - Ipoh",
       "stage": "Closed",
       "deal_value": 20952.0,
       "close_date": "",
@@ -3800,7 +3800,7 @@
       "added_date": "2026-04-30"
     },
     {
-      "org_name": "E-Idaman",
+      "org_name": "E-Idaman @ Alor Setar",
       "stage": "Closed",
       "deal_value": 21000.0,
       "close_date": "",
@@ -3964,15 +3964,15 @@
       "course": "Gen AI 2 day 2nd sesh",
       "contact": "Serifah",
       "pax": 35,
-      "train_date": "2026-08-06",
+      "train_date": "",
       "added_date": "2026-06-04"
     },
     {
       "org_name": "FELCRA Kelantan",
-      "stage": "Closed",
-      "deal_value": 11340.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "stage": "Paid",
+      "deal_value": 10080.0,
+      "close_date": "2026-07-31",
+      "payment_received_date": "2026-07-31",
       "course": "Gen AI",
       "contact": "Hanif",
       "pax": 35,
@@ -4136,9 +4136,9 @@
       "added_date": "2026-06-24"
     },
     {
-      "org_name": "Kementerian Luar Negeri (KLN)",
+      "org_name": "Kementerian Luar Negeri (KLN) - Zenith",
       "stage": "Closed",
-      "deal_value": 39322.8,
+      "deal_value": 45619.2,
       "close_date": "",
       "payment_received_date": "",
       "course": "Gen AI",
@@ -4221,10 +4221,10 @@
     },
     {
       "org_name": "MSU - Canva Siri 3",
-      "stage": "Closed",
+      "stage": "Paid",
       "deal_value": 5184.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "close_date": "2026-07-28",
+      "payment_received_date": "2026-07-28",
       "course": "Canva 1 day",
       "contact": "",
       "pax": 30,
@@ -4292,7 +4292,7 @@
       "added_date": "2026-07-08"
     },
     {
-      "org_name": "Kementerian Ekonomi - Ali",
+      "org_name": "Kementerian Ekonomi - Ali @ Hub",
       "stage": "Closed",
       "deal_value": 23000.0,
       "close_date": "",
@@ -4304,7 +4304,7 @@
       "added_date": "2026-07-08"
     },
     {
-      "org_name": "Kementerian Ekonomi -  Fahim",
+      "org_name": "Kementerian Ekonomi -  Fahim @ Hub",
       "stage": "Closed",
       "deal_value": 23000.0,
       "close_date": "",
@@ -4412,7 +4412,7 @@
       "added_date": "2026-07-17"
     },
     {
-      "org_name": "Kementerian Ekonomi -  Fahim Siri 3",
+      "org_name": "Kementerian Ekonomi -  Fahim Siri 3 @ Hub",
       "stage": "Closed",
       "deal_value": 15000.0,
       "close_date": "",
@@ -4472,7 +4472,7 @@
       "added_date": "2026-07-17"
     },
     {
-      "org_name": "MSU - Siri 17 - Fahim",
+      "org_name": "MSU - Siri 16 - Fahim",
       "stage": "Closed",
       "deal_value": 5184.0,
       "close_date": "",
@@ -4485,10 +4485,10 @@
     },
     {
       "org_name": "Terengganu Incorporated Sdn Bhd",
-      "stage": "Closed",
-      "deal_value": 4000.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "stage": "Paid",
+      "deal_value": 4320.0,
+      "close_date": "2026-07-27",
+      "payment_received_date": "2026-07-27",
       "course": "[Online] Introduction to AI and its Potential in the Workplace",
       "contact": "",
       "pax": 0,
@@ -4602,6 +4602,54 @@
       "pax": 20,
       "train_date": "2026-09-28",
       "added_date": "2026-07-23"
+    },
+    {
+      "org_name": "Cybernetics International College of Technology (CICT)",
+      "stage": "Almost Confirmed",
+      "deal_value": 10800.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Canva",
+      "contact": "Pn Ira",
+      "pax": 35,
+      "train_date": "2026-08-17",
+      "added_date": "2026-07-28"
+    },
+    {
+      "org_name": "MPOGCF Malaysian Palm Oil Green Conservation Foundation",
+      "stage": "Proposal / Quotation",
+      "deal_value": 20831.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "gen ai",
+      "contact": "Aina Najwa",
+      "pax": 19,
+      "train_date": "",
+      "added_date": "2026-07-28"
+    },
+    {
+      "org_name": "MSU - Siri 1 - Ali",
+      "stage": "Closed",
+      "deal_value": 7776.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "The AI-Resilient Educator",
+      "contact": "",
+      "pax": 0,
+      "train_date": "2026-08-26",
+      "added_date": "2026-07-28"
+    },
+    {
+      "org_name": "UTM",
+      "stage": "Proposal / Quotation",
+      "deal_value": 15215.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "GWS for lect",
+      "contact": "En Hasni",
+      "pax": 35,
+      "train_date": "",
+      "added_date": "2026-07-29"
     }
   ],
   "revenue_history": [
@@ -4631,7 +4679,11 @@
     },
     {
       "week_label": "Jul 2026",
-      "total_revenue": 65142
+      "total_revenue": 84726
+    },
+    {
+      "week_label": "Aug 2026",
+      "total_revenue": 0
     }
   ]
 }
