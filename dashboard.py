@@ -1452,12 +1452,29 @@ with tab4:
                 "monthly_revenue": monthly_revenue_bar(crm_deals, year=YEAR,
                                                         current_month=report_date.month),
             }
-            build_pdf(leads=leads, sessions=sessions, crm_deals=crm_deals,
+            kw = dict(leads=leads, sessions=sessions, crm_deals=crm_deals,
                       revenue_history=revenue, report_date=report_date,
-                      period_label=period_label, chart_bytes=cbs, output_path=PDF_OUTPUT,
-                      canva_deals=data.get("canva_deals", []))
-        st.success(f"✅ PDF built — {Path(PDF_OUTPUT).stat().st_size // 1024} KB")
-        st.rerun()
+                      period_label=period_label, chart_bytes=cbs,
+                      output_path=PDF_OUTPUT)
+            built = False
+            try:
+                build_pdf(canva_deals=data.get("canva_deals", []), **kw)
+                built = True
+            except TypeError:
+                # Streamlit Cloud re-runs this script on each interaction but
+                # keeps imported modules cached, so a freshly-deployed
+                # dashboard.py can briefly meet an older pdf_report.py that
+                # has no canva_deals parameter. Fall back rather than take the
+                # whole app down; a reboot picks up the new module.
+                build_pdf(**kw)
+                built = True
+                st.info("PDF built without the Canva section — the app is running "
+                        "a cached older module. Reboot the app to include it.")
+            except Exception as e:
+                st.error(f"Could not build the PDF: {e}")
+        if built:
+            st.success(f"✅ PDF built — {Path(PDF_OUTPUT).stat().st_size // 1024} KB")
+            st.rerun()
 
     if pdf_path.exists():
         with open(PDF_OUTPUT, "rb") as f:
