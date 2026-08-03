@@ -1336,6 +1336,7 @@ with tab5:
         else:
             crows = [{
                 "Company Name":      _expand_org(d["company"]),
+                "Date Created":      d.get("created_date") or "—",
                 "Status":            d.get("status","—"),
                 "Invoice Amount":    d["invoiced"],
                 "Gross Profit":      d["gross_profit"],
@@ -1354,6 +1355,7 @@ with tab5:
 
             total_row = pd.DataFrame([{
                 "Company Name":    f"TOTAL ({len(crows)} deals)",
+                "Date Created":    "",
                 "Status":          "",
                 "Invoice Amount":  f"RM {totals['Invoice Amount']:,.2f}",
                 "Gross Profit":    f"RM {totals['Gross Profit']:,.2f}",
