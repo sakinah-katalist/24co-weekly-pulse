@@ -1454,7 +1454,8 @@ with tab4:
             }
             build_pdf(leads=leads, sessions=sessions, crm_deals=crm_deals,
                       revenue_history=revenue, report_date=report_date,
-                      period_label=period_label, chart_bytes=cbs, output_path=PDF_OUTPUT)
+                      period_label=period_label, chart_bytes=cbs, output_path=PDF_OUTPUT,
+                      canva_deals=data.get("canva_deals", []))
         st.success(f"✅ PDF built — {Path(PDF_OUTPUT).stat().st_size // 1024} KB")
         st.rerun()
 

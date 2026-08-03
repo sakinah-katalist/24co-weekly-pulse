@@ -303,9 +303,62 @@ def _pending_table(deals, report_date, styles):
     return t
 
 
+# ── Canva licence table (Paid deals only) ─────────────────────────────────────
+def _canva_table(deals, styles):
+    hdr = [Paragraph(h, styles["TableHead"]) for h in
+           ["Company", "Date Created", "Invoice Amount", "Gross Profit",
+            "To Pay Canva", "Licenses", "Years"]]
+    cw = [(W - 2*MARGIN) * f for f in [0.30, 0.11, 0.15, 0.14, 0.15, 0.08, 0.07]]
+
+    rows = []
+    for d in sorted(deals, key=lambda x: -(x.get("invoiced") or 0)):
+        rows.append([
+            Paragraph(_expand_org(d.get("company", "")),      styles["TableCell"]),
+            Paragraph(d.get("created_date") or "—",           styles["TableCell"]),
+            Paragraph(f"RM {d.get('invoiced', 0):,.2f}",      styles["TableCellR"]),
+            Paragraph(f"RM {d.get('gross_profit', 0):,.2f}"
+                      if d.get("gross_profit") else "—",      styles["TableCellR"]),
+            Paragraph(f"RM {d.get('to_pay_canva', 0):,.2f}",  styles["TableCellR"]),
+            Paragraph(f"{d.get('licenses', 0):,}"
+                      if d.get("licenses") else "—",          styles["TableCellR"]),
+            Paragraph(str(d.get("years") or "—"),             styles["TableCellR"]),
+        ])
+
+    t_inv = sum(d.get("invoiced", 0) or 0 for d in deals)
+    t_gp  = sum(d.get("gross_profit", 0) or 0 for d in deals)
+    t_pay = sum(d.get("to_pay_canva", 0) or 0 for d in deals)
+    t_lic = sum(d.get("licenses", 0) or 0 for d in deals)
+    rows.append([
+        Paragraph(f"<b>TOTAL ({len(deals)} deals)</b>", styles["TableCell"]),
+        Paragraph("", styles["TableCell"]),
+        Paragraph(f"<b>RM {t_inv:,.2f}</b>", styles["TableCellR"]),
+        Paragraph(f"<b>RM {t_gp:,.2f}</b>",  styles["TableCellR"]),
+        Paragraph(f"<b>RM {t_pay:,.2f}</b>", styles["TableCellR"]),
+        Paragraph(f"<b>{t_lic:,}</b>",       styles["TableCellR"]),
+        Paragraph("", styles["TableCellR"]),
+    ])
+
+    t = Table([hdr] + rows, colWidths=cw, repeatRows=1)
+    t.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0),(-1,0),  C["header_bg"]),
+        ("FONTNAME",      (0,0),(-1,0),  "Helvetica-Bold"),
+        ("FONTSIZE",      (0,0),(-1,-1), 8),
+        ("ROWBACKGROUNDS",(0,1),(-1,-2), [C["white"], C["light"]]),
+        ("BACKGROUND",    (0,-1),(-1,-1), C["green_light"]),
+        ("LINEABOVE",     (0,-1),(-1,-1), 0.8, C["green"]),
+        ("GRID",          (0,0),(-1,-1), 0.35, C["border"]),
+        ("TOPPADDING",    (0,0),(-1,-1), 4),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 4),
+        ("LEFTPADDING",   (0,0),(-1,-1), 5),
+        ("VALIGN",        (0,0),(-1,-1), "TOP"),
+    ]))
+    return t
+
+
 # ── Main builder ──────────────────────────────────────────────────────────────
 def build_pdf(leads, sessions, crm_deals, revenue_history,
-              report_date, period_label, chart_bytes, output_path):
+              report_date, period_label, chart_bytes, output_path,
+              canva_deals=None):
 
     styles = _styles()
     full_w = (W - 2*MARGIN) / mm
@@ -511,6 +564,32 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         add(Paragraph("*For Canva, GenAI, and Google Workspace training", styles["SectionSub"]))
         add(_sp(2))
         add(_img_from_bytes(monthly_chart, full_w))
+
+    # ── 6. CANVA LICENCE SALES (PAID ONLY) ───────────────────────────────────
+    canva_paid = [d for d in (canva_deals or [])
+                  if (d.get("status") or "").lower() == "paid"]
+    if canva_paid:
+        c_inv = sum(d.get("invoiced", 0) or 0 for d in canva_paid)
+        c_gp  = sum(d.get("gross_profit", 0) or 0 for d in canva_paid)
+        c_lic = sum(d.get("licenses", 0) or 0 for d in canva_paid)
+        margin = (c_gp / c_inv * 100) if c_inv else 0
+
+        add(PageBreak())
+        add(_hr(C["teal"]))
+        add(Paragraph("Canva Licence Sales — Paid Deals", styles["SectionHead"]))
+        add(Paragraph(
+            "Canva licence resales only (separate from training revenue). "
+            "Gross Profit is our margin after paying Canva for the licences.",
+            styles["SectionSub"]))
+        add(_sp(3))
+        add(_callout(
+            f"<b>{len(canva_paid)} paid deal{'s' if len(canva_paid) != 1 else ''}</b> · "
+            f"invoiced <b>RM {c_inv:,.0f}</b> · "
+            f"gross profit <b>RM {c_gp:,.0f}</b> ({margin:.1f}% margin) · "
+            f"<b>{c_lic:,}</b> licences sold",
+            C["green_light"], C["green"], styles))
+        add(_sp(3))
+        add(_canva_table(canva_paid, styles))
 
     doc.build(story, onFirstPage=on_page, onLaterPages=on_page)
     return output_path
