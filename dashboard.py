@@ -1047,8 +1047,10 @@ with tab2:
 
         # Monthly revenue bar (shows Jan–Dec on X axis)
         st.markdown(
-            f'<p style="font-size:14px;font-weight:700;color:#0D3349;margin:16px 0 6px;">'
-            f'Monthly Revenue — {YEAR}  (Paid deals added in {YEAR})</p>',
+            f'<p style="font-size:14px;font-weight:700;color:#0D3349;margin:16px 0 2px;">'
+            f'Monthly Revenue — {YEAR}  (Paid deals added in {YEAR})</p>'
+            f'<p style="font-size:12px;color:#7A8499;font-style:italic;margin:0 0 6px;">'
+            f'*For Canva, GenAI, and Google Workspace training</p>',
             unsafe_allow_html=True
         )
         st.image(monthly_revenue_bar(crm_deals, YEAR, cur_mon), width="stretch")

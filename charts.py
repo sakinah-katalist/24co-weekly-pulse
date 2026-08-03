@@ -376,7 +376,10 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
     ax.yaxis.grid(True, color=BRAND["grid"], linestyle="--", linewidth=0.6)
     ax.xaxis.grid(False)
     ax.set_axisbelow(True)
-    ax.set_title(f"Monthly Revenue — {year}  (Paid deals added in {year})",
+    # Single Text artist with both lines — titles are always included in the
+    # tight bbox on every matplotlib version (see the xlabel note below).
+    ax.set_title(f"Monthly Revenue — {year}  (Paid deals added in {year})\n"
+                 f"*For Canva, GenAI, and Google Workspace training",
                  fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
 
     patches = [
