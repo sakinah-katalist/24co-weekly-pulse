@@ -426,9 +426,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ═══════════════════════════════════════════════════════════════════
 # TABS
 # ═══════════════════════════════════════════════════════════════════
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab5, tab3, tab4 = st.tabs([
     "📋  Leads & Sessions",
     "💼  Sales CRM",
+    "🎨  Canva License Sales CRM",
     "🤖  Insights",
     "📄  PDF & Email",
 ])
@@ -1284,6 +1285,89 @@ with tab2:
                          width="stretch", hide_index=True)
         else:
             st.info("No deals match the selected filter.")
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TAB 5 — CANVA LICENSE SALES CRM
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+with tab5:
+    st.markdown('<p class="sec-head">Canva License Sales CRM</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="sec-sub">Canva licence resales — invoiced value, what we owe Canva, and the margin between</p>',
+        unsafe_allow_html=True
+    )
+    st.markdown('<span class="src-badge">📂 Notion — Canva Sales CRM</span>', unsafe_allow_html=True)
+
+    canva_deals = data.get("canva_deals", [])
+
+    if not canva_deals:
+        st.info("No Canva licence data yet — send the Canva Sales CRM export to import it.")
+    else:
+        paid_canva = [d for d in canva_deals if d.get("status","").lower() == "paid"]
+
+        cv1, cv2, cv3, cv4 = st.columns(4)
+        for col, val, lbl, sub, clr in [
+            (cv1, f"RM {sum(d['invoiced'] for d in paid_canva):,.0f}",
+                  "Invoiced (Paid)", f"{len(paid_canva)} paid deal(s)", "teal"),
+            (cv2, f"RM {sum(d['gross_profit'] for d in paid_canva):,.0f}",
+                  "Gross Profit (Paid)", "our margin after Canva", "green"),
+            (cv3, f"RM {sum(d['to_pay_canva'] for d in paid_canva):,.0f}",
+                  "To Pay Canva (Paid)", "cost of licences", "yellow"),
+            (cv4, f"{sum(d['licenses'] for d in paid_canva):,}",
+                  "Licences Sold (Paid)", "seats across paid deals", "teal"),
+        ]:
+            with col:
+                st.markdown(f"""
+                <div class="kpi-card kpi-{clr}">
+                  <p class="kpi-val">{val}</p>
+                  <p class="kpi-lbl">{lbl}</p>
+                  <p class="kpi-src">{sub}</p>
+                </div>""", unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        all_statuses = sorted({d.get("status","—") for d in canva_deals})
+        picked = st.multiselect("Filter by status:", options=all_statuses,
+                                default=all_statuses, key="canva_status_filter")
+        shown = [d for d in canva_deals if d.get("status","—") in picked]
+
+        if not shown:
+            st.info("No deals match the selected filter.")
+        else:
+            crows = [{
+                "Company Name":      _expand_org(d["company"]),
+                "Status":            d.get("status","—"),
+                "Invoice Amount":    d["invoiced"],
+                "Gross Profit":      d["gross_profit"],
+                "To Pay Canva":      d["to_pay_canva"],
+                "No. of Licenses":   d["licenses"],
+                "No. of Years":      d["years"],
+            } for d in sorted(shown, key=lambda x: -x["invoiced"])]
+
+            dfc = pd.DataFrame(crows)
+            totals = {c: dfc[c].sum() for c in
+                      ("Invoice Amount", "Gross Profit", "To Pay Canva", "No. of Licenses")}
+            for c in ("Invoice Amount", "Gross Profit", "To Pay Canva"):
+                dfc[c] = dfc[c].apply(lambda x: f"RM {x:,.2f}" if x else "—")
+            for c in ("No. of Licenses", "No. of Years"):
+                dfc[c] = dfc[c].apply(lambda x: f"{x:,}" if x else "—")
+
+            total_row = pd.DataFrame([{
+                "Company Name":    f"TOTAL ({len(crows)} deals)",
+                "Status":          "",
+                "Invoice Amount":  f"RM {totals['Invoice Amount']:,.2f}",
+                "Gross Profit":    f"RM {totals['Gross Profit']:,.2f}",
+                "To Pay Canva":    f"RM {totals['To Pay Canva']:,.2f}",
+                "No. of Licenses": f"{totals['No. of Licenses']:,}",
+                "No. of Years":    "",
+            }])
+            st.dataframe(pd.concat([dfc, total_row], ignore_index=True),
+                         width="stretch", hide_index=True)
+
+            st.caption(
+                "New Lead and Proposal/Quotation deals show RM 0 where the figures "
+                "have not been filled in on Notion yet. Totals cover the rows currently shown."
+            )
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -4685,5 +4685,227 @@
       "week_label": "Aug 2026",
       "total_revenue": 0
     }
+  ],
+  "canva_deals": [
+    {
+      "company": "Kinabalu Era Takzim for PSUB Sabah",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 34800.0,
+      "gross_profit": 5220.0,
+      "to_pay_canva": 29580.0,
+      "licenses": 25,
+      "years": 1
+    },
+    {
+      "company": "KWAP",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 70992.0,
+      "gross_profit": 14198.4,
+      "to_pay_canva": 56793.6,
+      "licenses": 34,
+      "years": 3
+    },
+    {
+      "company": "Media Prima",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 18792.0,
+      "gross_profit": 2818.8,
+      "to_pay_canva": 15973.2,
+      "licenses": 25,
+      "years": 1
+    },
+    {
+      "company": "JANM",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 43152.0,
+      "gross_profit": 8630.4,
+      "to_pay_canva": 34521.6,
+      "licenses": 62,
+      "years": 1
+    },
+    {
+      "company": "OSK Group",
+      "status": "Proposal / Quotation",
+      "license_type": "Canva Business",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 25,
+      "years": 1
+    },
+    {
+      "company": "Bumi Optimus (M) Sdn Bhd",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "PNSB",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Winpower Corporation (M) Sdn Bhd",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Lembaga Zakat Selangor",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 10800.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 10800.0,
+      "licenses": 25,
+      "years": 1
+    },
+    {
+      "company": "Smog House",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Suruhanjaya Koperasi Malaysia (SKM)",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 17400.0,
+      "gross_profit": 2366.4,
+      "to_pay_canva": 15033.6,
+      "licenses": 25,
+      "years": 1
+    },
+    {
+      "company": "Silver Tech Synergy Sdn Bhd",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Professional Computer Systems Sdn Bhd",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Simply Data Sdn. Bhd.",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Advance Team Solution Sdn Bhd",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "ISOLECTRA (M) SDN BHD",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "DIC RESOURCES SDN BHD",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "KKM - BTM",
+      "status": "Proposal / Quotation",
+      "license_type": "Canva Enterprise",
+      "invoiced": 37584.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 37584.0,
+      "licenses": 50,
+      "years": 1
+    },
+    {
+      "company": "JTM Tender",
+      "status": "Proposal / Quotation",
+      "license_type": "Canva Enterprise",
+      "invoiced": 263250.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 263250.0,
+      "licenses": 125,
+      "years": 3
+    },
+    {
+      "company": "Mitracorp Resources Sdn Bhd",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Perbadanan Kemajuan Pertanian Negeri Pahang",
+      "status": "New Lead",
+      "license_type": "",
+      "invoiced": 0.0,
+      "gross_profit": 0.0,
+      "to_pay_canva": 0.0,
+      "licenses": 0,
+      "years": 0
+    },
+    {
+      "company": "Perodua Sales Sdn Bhd",
+      "status": "Paid",
+      "license_type": "Canva Enterprise",
+      "invoiced": 18792.0,
+      "gross_profit": 3758.4,
+      "to_pay_canva": 15033.6,
+      "licenses": 27,
+      "years": 1
+    }
   ]
 }
