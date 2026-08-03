@@ -77,6 +77,11 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 28 July – 3 August 2026 ──
+    "MSU 3.0 | Lecturers":    "Management and Science University (MSU) 3.0 — Lecturers Cohort",
+    "KLN | Sesi 1":           "Kementerian Luar Negeri Malaysia (Ministry of Foreign Affairs) — Sesi 1",
+    "ICU JPM":                "Unit Penyelarasan Pelaksanaan, Jabatan Perdana Menteri (ICU JPM)",
+    "JANM":                   "Jabatan Akauntan Negara Malaysia (Accountant General's Department)",
     # ── Week of 21–27 July 2026 ──
     # Exact entry needed so prefix-matching on "Kementerian Dalam Negeri"
     # doesn't mangle the division suffix.
