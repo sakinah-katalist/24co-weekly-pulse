@@ -385,5 +385,22 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
         mpatches.Patch(color="#DEDEDE",        label="No Paid deals"),
     ]
     ax.legend(handles=patches, fontsize=7.5, framealpha=0, loc="upper right")
+
+    # Year total below the axis — matches the YTD Revenue card exactly,
+    # since both count Paid deals created in `year`.
+    year_total = sum(monthly)
+    n_months   = sum(1 for v in monthly if v > 0)
+    ax.annotate(
+        f"Total {year}:  RM {year_total:,.0f}"
+        f"   ·   across {n_months} month{'s' if n_months != 1 else ''}",
+        xy=(0.0, -0.30), xycoords="axes fraction",
+        ha="left", va="top",
+        fontsize=9, color=BRAND["teal"], fontweight="bold",
+        bbox=dict(boxstyle="round,pad=0.45", facecolor="#E6F4F3",
+                  edgecolor=BRAND["teal"], linewidth=0.8),
+    )
+
     fig.tight_layout(pad=0.6)
+    # Leave room for the total box so tight_layout doesn't clip it
+    fig.subplots_adjust(bottom=0.30)
     return _save(fig)
