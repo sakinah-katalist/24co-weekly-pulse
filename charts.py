@@ -388,19 +388,20 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
 
     # Year total below the axis — matches the YTD Revenue card exactly,
     # since both count Paid deals created in `year`.
+    # NOTE: use the x-axis LABEL, not an annotate() placed outside the axes.
+    # An out-of-axes annotation is dropped by bbox_inches="tight" on some
+    # matplotlib versions; xlabel is a first-class axis artist that every
+    # version lays out below the tick labels and always includes.
     year_total = sum(monthly)
     n_months   = sum(1 for v in monthly if v > 0)
-    ax.annotate(
+    ax.set_xlabel(
         f"Total {year}:  RM {year_total:,.0f}"
         f"   ·   across {n_months} month{'s' if n_months != 1 else ''}",
-        xy=(0.0, -0.30), xycoords="axes fraction",
-        ha="left", va="top",
-        fontsize=9, color=BRAND["teal"], fontweight="bold",
-        bbox=dict(boxstyle="round,pad=0.45", facecolor="#E6F4F3",
-                  edgecolor=BRAND["teal"], linewidth=0.8),
+        fontsize=10, color=BRAND["teal"], fontweight="bold", labelpad=12,
     )
+    ax.xaxis.label.set_bbox(dict(boxstyle="round,pad=0.45",
+                                 facecolor="#E6F4F3",
+                                 edgecolor=BRAND["teal"], linewidth=0.9))
 
     fig.tight_layout(pad=0.6)
-    # Leave room for the total box so tight_layout doesn't clip it
-    fig.subplots_adjust(bottom=0.30)
     return _save(fig)
