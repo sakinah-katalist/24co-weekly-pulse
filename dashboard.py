@@ -1334,16 +1334,19 @@ with tab5:
         if not shown:
             st.info("No deals match the selected filter.")
         else:
+            # Newest first; rows with no creation date sort to the bottom.
             crows = [{
                 "Company Name":      _expand_org(d["company"]),
                 "Date Created":      d.get("created_date") or "—",
                 "Status":            d.get("status","—"),
                 "Invoice Amount":    d["invoiced"],
-                "Gross Profit":      d["gross_profit"],
                 "To Pay Canva":      d["to_pay_canva"],
+                "Gross Profit":      d["gross_profit"],
                 "No. of Licenses":   d["licenses"],
                 "No. of Years":      d["years"],
-            } for d in sorted(shown, key=lambda x: -x["invoiced"])]
+            } for d in sorted(shown,
+                              key=lambda x: x.get("created_date") or "",
+                              reverse=True)]
 
             dfc = pd.DataFrame(crows)
             totals = {c: dfc[c].sum() for c in
@@ -1358,8 +1361,8 @@ with tab5:
                 "Date Created":    "",
                 "Status":          "",
                 "Invoice Amount":  f"RM {totals['Invoice Amount']:,.2f}",
-                "Gross Profit":    f"RM {totals['Gross Profit']:,.2f}",
                 "To Pay Canva":    f"RM {totals['To Pay Canva']:,.2f}",
+                "Gross Profit":    f"RM {totals['Gross Profit']:,.2f}",
                 "No. of Licenses": f"{totals['No. of Licenses']:,}",
                 "No. of Years":    "",
             }])

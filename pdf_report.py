@@ -306,19 +306,20 @@ def _pending_table(deals, report_date, styles):
 # ── Canva licence table (Paid deals only) ─────────────────────────────────────
 def _canva_table(deals, styles):
     hdr = [Paragraph(h, styles["TableHead"]) for h in
-           ["Company", "Date Created", "Invoice Amount", "Gross Profit",
-            "To Pay Canva", "Licenses", "Years"]]
-    cw = [(W - 2*MARGIN) * f for f in [0.30, 0.11, 0.15, 0.14, 0.15, 0.08, 0.07]]
+           ["Company", "Date Created", "Invoice Amount", "To Pay Canva",
+            "Gross Profit", "Licenses", "Years"]]
+    cw = [(W - 2*MARGIN) * f for f in [0.30, 0.11, 0.15, 0.15, 0.14, 0.08, 0.07]]
 
     rows = []
-    for d in sorted(deals, key=lambda x: -(x.get("invoiced") or 0)):
+    # Newest first; rows with no creation date sort to the bottom.
+    for d in sorted(deals, key=lambda x: x.get("created_date") or "", reverse=True):
         rows.append([
             Paragraph(_expand_org(d.get("company", "")),      styles["TableCell"]),
             Paragraph(d.get("created_date") or "—",           styles["TableCell"]),
             Paragraph(f"RM {d.get('invoiced', 0):,.2f}",      styles["TableCellR"]),
+            Paragraph(f"RM {d.get('to_pay_canva', 0):,.2f}",  styles["TableCellR"]),
             Paragraph(f"RM {d.get('gross_profit', 0):,.2f}"
                       if d.get("gross_profit") else "—",      styles["TableCellR"]),
-            Paragraph(f"RM {d.get('to_pay_canva', 0):,.2f}",  styles["TableCellR"]),
             Paragraph(f"{d.get('licenses', 0):,}"
                       if d.get("licenses") else "—",          styles["TableCellR"]),
             Paragraph(str(d.get("years") or "—"),             styles["TableCellR"]),
@@ -332,8 +333,8 @@ def _canva_table(deals, styles):
         Paragraph(f"<b>TOTAL ({len(deals)} deals)</b>", styles["TableCell"]),
         Paragraph("", styles["TableCell"]),
         Paragraph(f"<b>RM {t_inv:,.2f}</b>", styles["TableCellR"]),
-        Paragraph(f"<b>RM {t_gp:,.2f}</b>",  styles["TableCellR"]),
         Paragraph(f"<b>RM {t_pay:,.2f}</b>", styles["TableCellR"]),
+        Paragraph(f"<b>RM {t_gp:,.2f}</b>",  styles["TableCellR"]),
         Paragraph(f"<b>{t_lic:,}</b>",       styles["TableCellR"]),
         Paragraph("", styles["TableCellR"]),
     ])
