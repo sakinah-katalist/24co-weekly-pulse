@@ -79,6 +79,10 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 ORG_FULL_NAMES = {
     # ── Week of 4–10 August 2026 ──
     "UCSI":                   "UCSI University",
+    "Hornbill Skyways":       "Hornbill Skyways Sdn Bhd (Sarawak state-owned aviation)",
+    "MAIWP International University": "Universiti Antarabangsa MAIWP (UniMAIWP)",
+    "Permodalan Nasional Berhad": "Permodalan Nasional Berhad (PNB)",
+    "Brunei Gas Carriers Sdn Bhd": "Brunei Gas Carriers Sdn Bhd (BGC — Brunei government-owned)",
     # ── Week of 28 July – 3 August 2026 ──
     "Ministry of Digital":    "Kementerian Digital (Ministry of Digital)",
     "Kelab Pegawai Wanita TUDM": "Kelab Pegawai Wanita TUDM (Royal Malaysian Air Force — Women Officers' Club)",
