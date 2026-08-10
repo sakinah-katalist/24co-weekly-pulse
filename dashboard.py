@@ -1425,31 +1425,40 @@ with tab6:
             return None
         return (new - base) / base * 100
 
+    # Short headers keep all nine columns on screen without sideways scrolling;
+    # the full meaning is restored as tooltips via column_config below.
+    p2, c2 = prev_year % 100, YEAR % 100
+    C_REMARK = "Remark"
+    C_PREV   = f"'{p2} Actual (RM)"
+    C_EXP    = f"'{c2} Expected (RM)"
+    C_GEXP   = f"Growth → Exp '{c2} (%)"
+    C_TGT    = "Target Attain. (%)"
+    C_ACT    = f"'{c2} Actual (RM)"
+    C_GACT   = f"Growth → Act '{c2} (%)"
+    C_COLL   = "Collection (%)"
+
     rows = []
     for m in range(1, 13):
         future  = m > this_month
         current = m == this_month
         rows.append({
-            "Period":                        MONTHS_FULL[m - 1],
-            f"'{prev_year % 100} Actual Revenue (RM)": a_prev[m],
-            f"'{YEAR % 100} Expected Revenue (RM)":    None if future else e_curr[m],
-            f"Actual '{prev_year % 100} → Expected '{YEAR % 100} Growth (%)":
-                None if future else _growth(a_prev[m], e_curr[m]),
-            "Target Attainment (%)":         None if future else (e_curr[m] / monthly_target * 100
-                                                                  if monthly_target else None),
-            f"'{YEAR % 100} Actual Revenue (RM)":      None if future else a_curr[m],
-            f"Actual '{prev_year % 100} → Actual '{YEAR % 100} Growth (%)":
-                None if future else _growth(a_prev[m], a_curr[m]),
-            "Collection Rate (%)":           None if future else (a_curr[m] / e_curr[m] * 100
-                                                                  if e_curr[m] else None),
-            "Remark":                        ("⏳ Month still in progress — data incomplete"
-                                              if current else ""),
+            "Period":  MONTHS_FULL[m - 1],
+            C_REMARK:  "⏳ In progress — incomplete" if current else "",
+            C_PREV:    a_prev[m],
+            C_EXP:     None if future else e_curr[m],
+            C_GEXP:    None if future else _growth(a_prev[m], e_curr[m]),
+            C_TGT:     None if future else (e_curr[m] / monthly_target * 100
+                                            if monthly_target else None),
+            C_ACT:     None if future else a_curr[m],
+            C_GACT:    None if future else _growth(a_prev[m], a_curr[m]),
+            C_COLL:    None if future else (a_curr[m] / e_curr[m] * 100
+                                            if e_curr[m] else None),
         })
 
     dfr = pd.DataFrame(rows)
-    growth_cols = [c for c in dfr.columns if "Growth" in c]
-    money_cols  = [c for c in dfr.columns if "(RM)" in c]
-    pct_cols    = growth_cols + ["Target Attainment (%)", "Collection Rate (%)"]
+    growth_cols = [C_GEXP, C_GACT]
+    money_cols  = [C_PREV, C_EXP, C_ACT]
+    pct_cols    = growth_cols + [C_TGT, C_COLL]
 
     # Streamlit renders the underlying values and ignores a Styler's .format(),
     # so format to strings here and drive the colours from the numeric frame.
@@ -1474,7 +1483,31 @@ with tab6:
         out.loc[cur, :] = ORANGE
         return out
 
-    st.dataframe(disp.style.apply(_styles, axis=None), width="stretch", hide_index=True)
+    st.dataframe(
+        disp.style.apply(_styles, axis=None),
+        width="stretch", hide_index=True,
+        column_config={
+            "Period":  st.column_config.TextColumn("Period", width="small"),
+            C_REMARK:  st.column_config.TextColumn(
+                "Remark", width="medium",
+                help="Notes on data completeness for that month."),
+            C_PREV:    st.column_config.TextColumn(
+                C_PREV, help=f"Paid deals created in {prev_year} (invoiced amount)."),
+            C_EXP:     st.column_config.TextColumn(
+                C_EXP, help=f"Paid + Closed deals created in {YEAR} — everything invoiced, "
+                            f"whether collected yet or not."),
+            C_GEXP:    st.column_config.TextColumn(
+                C_GEXP, help=f"Growth from {prev_year} actual to {YEAR} expected."),
+            C_TGT:     st.column_config.TextColumn(
+                C_TGT, help=f"Expected revenue ÷ RM {monthly_target:,.0f} monthly target."),
+            C_ACT:     st.column_config.TextColumn(
+                C_ACT, help=f"Paid deals created in {YEAR} — money actually received."),
+            C_GACT:    st.column_config.TextColumn(
+                C_GACT, help=f"Growth from {prev_year} actual to {YEAR} actual."),
+            C_COLL:    st.column_config.TextColumn(
+                C_COLL, help="Actual ÷ Expected — how much of the invoiced work is collected."),
+        },
+    )
 
     # ── Year-to-date summary ──────────────────────────────────────
     ytd_prev = sum(a_prev[m] for m in range(1, this_month + 1))
