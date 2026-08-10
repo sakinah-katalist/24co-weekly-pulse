@@ -2,7 +2,48 @@
   "report_date": "2026-08-10",
   "period_label": "Week of 4–10 August 2026",
   "leads": [],
-  "sessions": [],
+  "sessions": [
+    {
+      "org_name": "JANM",
+      "class_name": "Gemini & NotebookLM: Program Latih Jurulatih",
+      "date": "2026-08-03 → 2026-08-04",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1NTEAYFdftb1nSNOa4YDcI6J-SxEOFUcZvCeUeD-7RZ0/edit",
+      "description": "Jabatan Akauntan Negara Malaysia (Accountant General's Department) — established 1946 under the Ministry of Finance, responsible for federal government financial statements, cash flow and the Unclaimed Money Act. A train-the-trainer ('Latih Jurulatih') programme, so JANM staff cascade the training internally — high multiplier. This two-day session started 3 August and runs into this week."
+    },
+    {
+      "org_name": "EPF",
+      "class_name": "Fear Not! AI is Your Friend",
+      "date": "2026-08-05",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "",
+      "description": "Kumpulan Wang Simpanan Pekerja (Employees Provident Fund) — federal statutory body under the Ministry of Finance, est. 1951, managing retirement savings for 16+ million members with assets over RM1.2 trillion. NOTE: EPF first appeared as a hot lead on 23 June (Yoshita Sevaganam, inviting Ali Reza to speak at KFAIR26 for ~200 attendees). This session is that lead converting into delivery — worth confirming whether this was the KFAIR slot and what follow-on work it opens."
+    },
+    {
+      "org_name": "Ekonomi",
+      "class_name": "Enhancing Your Productivity with Google Workspace & Gemini",
+      "date": "2026-08-05 → 2026-08-06",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1FG3gtNr9c5jRnh8vmuWHYtNa9FnLvAlApy5bGthbbs8/edit",
+      "description": "Kementerian Ekonomi Malaysia (Ministry of Economy) — the federal ministry for economic planning, statistics and socioeconomic policy, working alongside MOF and the Economic Planning Unit on national development plans. This is their third multi-day programme with us since mid-July, now moving beyond Gen AI into Google Workspace — a deepening, repeat relationship rather than one-off training."
+    },
+    {
+      "org_name": "UCSI",
+      "class_name": "Canva Skills for Career Growth Workshop",
+      "date": "2026-08-06",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1H10rTmHpBMPLiBdd49nN2bdfvvMQsG7zDDYkYbh3XfU/edit",
+      "description": "UCSI University — Malaysia's second private university (founded 1986 as Sedaya College, full university status 2008), with campuses in Cheras KL, Kuching and Springhill. Ranked #269 globally in the QS World University Rankings 2026 and among the highest-ranked private universities in Malaysia, with students from 120 countries. A career-growth workshop points at their students rather than staff — a different audience from our usual government cohorts, and a possible route into recurring student-facing programmes."
+    }
+  ],
   "crm_deals": [
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",
