@@ -1427,7 +1427,8 @@ with tab6:
 
     rows = []
     for m in range(1, 13):
-        future = m > this_month
+        future  = m > this_month
+        current = m == this_month
         rows.append({
             "Period":                        MONTHS_FULL[m - 1],
             f"'{prev_year % 100} Actual Revenue (RM)": a_prev[m],
@@ -1441,6 +1442,8 @@ with tab6:
                 None if future else _growth(a_prev[m], a_curr[m]),
             "Collection Rate (%)":           None if future else (a_curr[m] / e_curr[m] * 100
                                                                   if e_curr[m] else None),
+            "Remark":                        ("⏳ Month still in progress — data incomplete"
+                                              if current else ""),
         })
 
     dfr = pd.DataFrame(rows)
@@ -1448,17 +1451,30 @@ with tab6:
     money_cols  = [c for c in dfr.columns if "(RM)" in c]
     pct_cols    = growth_cols + ["Target Attainment (%)", "Collection Rate (%)"]
 
-    def _shade_growth(v):
-        if v is None or pd.isna(v):
-            return ""
-        return ("background-color:#C6EFCE;color:#0B6B2E" if v >= 0
-                else "background-color:#FFC7CE;color:#9C0006")
+    # Streamlit renders the underlying values and ignores a Styler's .format(),
+    # so format to strings here and drive the colours from the numeric frame.
+    disp = dfr.copy()
+    for c in money_cols:
+        disp[c] = dfr[c].map(lambda x: "—" if pd.isna(x) else f"{x:,.2f}")
+    for c in pct_cols:
+        disp[c] = dfr[c].map(lambda x: "—" if pd.isna(x) else f"{x:,.2f}%")
 
-    styled = (dfr.style
-              .map(_shade_growth, subset=growth_cols)
-              .format({c: lambda x: "—" if pd.isna(x) else f"{x:,.2f}" for c in money_cols})
-              .format({c: lambda x: "—" if pd.isna(x) else f"{x:,.2f}%" for c in pct_cols}))
-    st.dataframe(styled, width="stretch", hide_index=True)
+    ORANGE = "background-color:#FFE0B2;color:#8A4B00;font-weight:600"
+    GREEN  = "background-color:#C6EFCE;color:#0B6B2E"
+    RED    = "background-color:#FFC7CE;color:#9C0006"
+
+    def _styles(_):
+        out = pd.DataFrame("", index=dfr.index, columns=dfr.columns)
+        for c in growth_cols:
+            out[c] = dfr[c].map(
+                lambda v: "" if pd.isna(v) else (GREEN if v >= 0 else RED))
+        # Current month last so it wins: a part-month comparison would
+        # otherwise show a misleading red -100%.
+        cur = dfr.index[dfr["Period"] == MONTHS_FULL[this_month - 1]]
+        out.loc[cur, :] = ORANGE
+        return out
+
+    st.dataframe(disp.style.apply(_styles, axis=None), width="stretch", hide_index=True)
 
     # ── Year-to-date summary ──────────────────────────────────────
     ytd_prev = sum(a_prev[m] for m in range(1, this_month + 1))
