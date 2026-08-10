@@ -426,10 +426,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ═══════════════════════════════════════════════════════════════════
 # TABS
 # ═══════════════════════════════════════════════════════════════════
-tab1, tab2, tab5, tab3, tab4 = st.tabs([
+tab1, tab2, tab5, tab6, tab3, tab4 = st.tabs([
     "📋  Leads & Sessions",
     "💼  Sales CRM",
     "🎨  Canva License Sales CRM",
+    "📈  Revenue",
     "🤖  Insights",
     "📄  PDF & Email",
 ])
@@ -1373,6 +1374,125 @@ with tab5:
                 "New Lead and Proposal/Quotation deals show RM 0 where the figures "
                 "have not been filled in on Notion yet. Totals cover the rows currently shown."
             )
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TAB 6 — REVENUE (year-on-year vs target)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+with tab6:
+    st.markdown('<p class="sec-head">Revenue — Year on Year vs Target</p>', unsafe_allow_html=True)
+    st.markdown(
+        '<p class="sec-sub">Deals grouped by the month they were <b>created</b>. '
+        '<b>Expected</b> = Paid + Closed (invoiced, collection pending). '
+        '<b>Actual</b> = Paid only (money in).</p>',
+        unsafe_allow_html=True
+    )
+    st.markdown('<span class="src-badge">📂 Notion — Sales CRM</span>', unsafe_allow_html=True)
+
+    monthly_target = st.number_input(
+        "Monthly target (RM)", min_value=0, value=200_000, step=10_000,
+        help="Target Attainment % = Expected Revenue ÷ this target.",
+    )
+
+    # Defined locally rather than relying on the Sales CRM tab having run first.
+    MONTHS_FULL = ["January","February","March","April","May","June",
+                   "July","August","September","October","November","December"]
+    this_month  = report_date.month
+
+    def _by_month(pred, year):
+        """Sum invoiced amount by CREATION month for deals matching pred."""
+        out = {m: 0.0 for m in range(1, 13)}
+        for d in crm_deals:
+            ad = (d.get("added_date") or "")
+            if ad[:4] == str(year) and pred(d):
+                try:
+                    out[int(ad[5:7])] += d.get("deal_value", 0) or 0
+                except (ValueError, KeyError):
+                    pass
+        return out
+
+    _paid   = lambda d: _is_paid_only(d.get("stage", ""))
+    _closed = lambda d: ("closed" in (d.get("stage") or "").lower()
+                         and "before adam" not in (d.get("stage") or "").lower())
+
+    prev_year = YEAR - 1
+    a_prev = _by_month(_paid, prev_year)                       # '25 actual
+    a_curr = _by_month(_paid, YEAR)                            # '26 actual
+    e_curr = _by_month(lambda d: _paid(d) or _closed(d), YEAR) # '26 expected
+
+    def _growth(base, new):
+        if base == 0:
+            return None
+        return (new - base) / base * 100
+
+    rows = []
+    for m in range(1, 13):
+        future = m > this_month
+        rows.append({
+            "Period":                        MONTHS_FULL[m - 1],
+            f"'{prev_year % 100} Actual Revenue (RM)": a_prev[m],
+            f"'{YEAR % 100} Expected Revenue (RM)":    None if future else e_curr[m],
+            f"Actual '{prev_year % 100} → Expected '{YEAR % 100} Growth (%)":
+                None if future else _growth(a_prev[m], e_curr[m]),
+            "Target Attainment (%)":         None if future else (e_curr[m] / monthly_target * 100
+                                                                  if monthly_target else None),
+            f"'{YEAR % 100} Actual Revenue (RM)":      None if future else a_curr[m],
+            f"Actual '{prev_year % 100} → Actual '{YEAR % 100} Growth (%)":
+                None if future else _growth(a_prev[m], a_curr[m]),
+            "Collection Rate (%)":           None if future else (a_curr[m] / e_curr[m] * 100
+                                                                  if e_curr[m] else None),
+        })
+
+    dfr = pd.DataFrame(rows)
+    growth_cols = [c for c in dfr.columns if "Growth" in c]
+    money_cols  = [c for c in dfr.columns if "(RM)" in c]
+    pct_cols    = growth_cols + ["Target Attainment (%)", "Collection Rate (%)"]
+
+    def _shade_growth(v):
+        if v is None or pd.isna(v):
+            return ""
+        return ("background-color:#C6EFCE;color:#0B6B2E" if v >= 0
+                else "background-color:#FFC7CE;color:#9C0006")
+
+    styled = (dfr.style
+              .map(_shade_growth, subset=growth_cols)
+              .format({c: lambda x: "—" if pd.isna(x) else f"{x:,.2f}" for c in money_cols})
+              .format({c: lambda x: "—" if pd.isna(x) else f"{x:,.2f}%" for c in pct_cols}))
+    st.dataframe(styled, width="stretch", hide_index=True)
+
+    # ── Year-to-date summary ──────────────────────────────────────
+    ytd_prev = sum(a_prev[m] for m in range(1, this_month + 1))
+    ytd_exp  = sum(e_curr[m] for m in range(1, this_month + 1))
+    ytd_act  = sum(a_curr[m] for m in range(1, this_month + 1))
+    yoy      = _growth(ytd_prev, ytd_act)
+    coll     = (ytd_act / ytd_exp * 100) if ytd_exp else 0
+    attain   = (ytd_exp / (monthly_target * this_month) * 100) if monthly_target else 0
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    r1, r2, r3, r4 = st.columns(4)
+    for col, val, lbl, sub, clr in [
+        (r1, f"RM {ytd_act:,.0f}", f"YTD Actual {YEAR}",
+             f"vs RM {ytd_prev:,.0f} in {prev_year}", "green"),
+        (r2, f"RM {ytd_exp:,.0f}", f"YTD Expected {YEAR}",
+             "Paid + Closed (invoiced)", "yellow"),
+        (r3, f"{yoy:+.1f}%" if yoy is not None else "—", "YoY Growth (Actual)",
+             f"Jan–{MONTHS_FULL[this_month-1]} vs {prev_year}", "teal"),
+        (r4, f"{coll:.1f}%", "Collection Rate",
+             f"{attain:.0f}% of RM {monthly_target*this_month:,.0f} target", "teal"),
+    ]:
+        with col:
+            st.markdown(f"""
+            <div class="kpi-card kpi-{clr}">
+              <p class="kpi-val">{val}</p>
+              <p class="kpi-lbl">{lbl}</p>
+              <p class="kpi-src">{sub}</p>
+            </div>""", unsafe_allow_html=True)
+
+    st.caption(
+        f"Future months are blank. Growth is blank where {prev_year} had no revenue that month. "
+        f"'{YEAR % 100} Actual matches the YTD Revenue card and the monthly chart; the gap to "
+        f"Expected is invoiced work still sitting in Awaiting Payment."
+    )
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
