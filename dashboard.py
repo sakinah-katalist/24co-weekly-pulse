@@ -1543,6 +1543,85 @@ with tab6:
         f"Expected is invoiced work still sitting in Awaiting Payment."
     )
 
+    # ── Current month, week by week ───────────────────────────────
+    # Expected/Actual read zero early in a month because deals take time to
+    # convert (Aug 2025 median: 60 days creation → payment). "In Proposal"
+    # shows the work raised in-month so the row is not just three zeros.
+    import calendar as _cal
+    month_name = MONTHS_FULL[this_month - 1]
+    days_in_m  = _cal.monthrange(YEAR, this_month)[1]
+    n_weeks    = min((days_in_m - 1) // 7 + 1, 5)
+    today_day  = report_date.day
+
+    def _wom(day):
+        return min((day - 1) // 7 + 1, 5)
+
+    def _week_bucket(year, pred):
+        out = {w: 0.0 for w in range(1, 6)}
+        for d in crm_deals:
+            ad = d.get("added_date") or ""
+            if len(ad) >= 10 and ad[:4] == str(year) and int(ad[5:7]) == this_month and pred(d):
+                out[_wom(int(ad[8:10]))] += d.get("deal_value", 0) or 0
+        return out
+
+    _proposal = lambda d: ("proposal" in (d.get("stage") or "").lower()
+                           or "quotation" in (d.get("stage") or "").lower())
+
+    w_prev = _week_bucket(prev_year, _paid)
+    w_exp  = _week_bucket(YEAR, lambda d: _paid(d) or _closed(d))
+    w_act  = _week_bucket(YEAR, _paid)
+    w_prop = _week_bucket(YEAR, _proposal)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(f'<p class="sec-head">{month_name} — Week on Week</p>', unsafe_allow_html=True)
+    st.markdown(
+        f'<p class="sec-sub">{month_name} {prev_year} against {month_name} {YEAR} so far. '
+        f'<b>In Proposal</b> = Proposal / Quotation raised that week — work in flight that '
+        f'has not converted yet.</p>',
+        unsafe_allow_html=True
+    )
+
+    wk_rows = []
+    for w in range(1, n_weeks + 1):
+        start = (w - 1) * 7 + 1
+        end   = min(w * 7, days_in_m)
+        reached = start <= today_day
+        wk_rows.append({
+            "Week":                    f"Week {w} ({start}–{end})",
+            f"{prev_year} Actual (RM)": f"{w_prev[w]:,.2f}",
+            f"{YEAR} Expected (RM)":    f"{w_exp[w]:,.2f}"  if reached else "—",
+            f"{YEAR} Actual (RM)":      f"{w_act[w]:,.2f}"  if reached else "—",
+            f"{YEAR} In Proposal (RM)": f"{w_prop[w]:,.2f}" if reached else "—",
+            "":                         "" if reached else "not reached",
+        })
+    wk_rows.append({
+        "Week":                    "TOTAL",
+        f"{prev_year} Actual (RM)": f"{sum(w_prev.values()):,.2f}",
+        f"{YEAR} Expected (RM)":    f"{sum(w_exp.values()):,.2f}",
+        f"{YEAR} Actual (RM)":      f"{sum(w_act.values()):,.2f}",
+        f"{YEAR} In Proposal (RM)": f"{sum(w_prop.values()):,.2f}",
+        "":                         "",
+    })
+
+    dfw = pd.DataFrame(wk_rows)
+
+    def _wk_styles(_):
+        out = pd.DataFrame("", index=dfw.index, columns=dfw.columns)
+        # Explicit text colour: without it the light background inherits the
+        # app's white dark-mode text and the row is unreadable.
+        out.iloc[-1, :] = "background-color:#EEF1F6;color:#0D3349;font-weight:700"
+        not_reached = dfw.index[dfw[""] == "not reached"]
+        out.loc[not_reached, :] = "color:#9AA3B2"
+        return out
+
+    st.dataframe(dfw.style.apply(_wk_styles, axis=None), width="stretch", hide_index=True)
+    st.caption(
+        f"Weeks are day-of-month buckets so the two years line up. Expected and Actual stay at "
+        f"zero early in a month because deals take time to convert — {month_name} {prev_year} "
+        f"deals took a median of 60 days from creation to payment, and none of that month's "
+        f"revenue had been banked by day {today_day}."
+    )
+
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # TAB 3 — INSIGHTS
