@@ -1510,22 +1510,39 @@ with tab6:
     )
 
     # ── Year-to-date summary ──────────────────────────────────────
-    ytd_prev = sum(a_prev[m] for m in range(1, this_month + 1))
+    # The prior year is capped at the same day of the same month, otherwise a
+    # full August 2025 is compared against a 10-day August 2026 and the growth
+    # figure is misleading (that framing showed -31.6% instead of -24.6%).
+    _day_cap = report_date.day
+
+    def _ytd_to_date(year, pred):
+        s = 0.0
+        for d in crm_deals:
+            ad = d.get("added_date") or ""
+            if len(ad) < 10 or ad[:4] != str(year) or not pred(d):
+                continue
+            mm, dd = int(ad[5:7]), int(ad[8:10])
+            if mm < this_month or (mm == this_month and dd <= _day_cap):
+                s += d.get("deal_value", 0) or 0
+        return s
+
+    ytd_prev = _ytd_to_date(prev_year, _paid)
     ytd_exp  = sum(e_curr[m] for m in range(1, this_month + 1))
     ytd_act  = sum(a_curr[m] for m in range(1, this_month + 1))
     yoy      = _growth(ytd_prev, ytd_act)
     coll     = (ytd_act / ytd_exp * 100) if ytd_exp else 0
     attain   = (ytd_exp / (monthly_target * this_month) * 100) if monthly_target else 0
+    _period  = f"1 Jan – {_day_cap} {MONTHS_FULL[this_month-1][:3]}"
 
     st.markdown("<br>", unsafe_allow_html=True)
     r1, r2, r3, r4 = st.columns(4)
     for col, val, lbl, sub, clr in [
         (r1, f"RM {ytd_act:,.0f}", f"YTD Actual {YEAR}",
-             f"vs RM {ytd_prev:,.0f} in {prev_year}", "green"),
+             f"vs RM {ytd_prev:,.0f} in {prev_year} (same period)", "green"),
         (r2, f"RM {ytd_exp:,.0f}", f"YTD Expected {YEAR}",
              "Paid + Closed (invoiced)", "yellow"),
         (r3, f"{yoy:+.1f}%" if yoy is not None else "—", "YoY Growth (Actual)",
-             f"Jan–{MONTHS_FULL[this_month-1]} vs {prev_year}", "teal"),
+             f"{_period} — both years", "teal"),
         (r4, f"{coll:.1f}%", "Collection Rate",
              f"{attain:.0f}% of RM {monthly_target*this_month:,.0f} target", "teal"),
     ]:
@@ -1540,7 +1557,9 @@ with tab6:
     st.caption(
         f"Future months are blank. Growth is blank where {prev_year} had no revenue that month. "
         f"'{YEAR % 100} Actual matches the YTD Revenue card and the monthly chart; the gap to "
-        f"Expected is invoiced work still sitting in Awaiting Payment."
+        f"Expected is invoiced work still sitting in Awaiting Payment. "
+        f"YoY compares {_period} in both years — {prev_year} is cut off at the same day of "
+        f"{MONTHS_FULL[this_month-1]} so a part-month is not measured against a full one."
     )
 
     # ── Current month, week by week ───────────────────────────────
