@@ -408,3 +408,131 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
 
     fig.tight_layout(pad=0.6)
     return _save(fig)
+
+
+# ── Revenue dashboard: YoY vs target, growth, collection ──────────────────────
+def revenue_dashboard(deals: list[dict], year: int = 2026,
+                      monthly_target: float = 200_000,
+                      current_month: int | None = None) -> bytes:
+    """
+    Three-panel revenue view, matching the Revenue tab's definitions:
+      top    — grouped columns: prev-year actual vs expected vs actual + target
+      bottom — YoY growth lines (expected & actual), and collection-rate bars
+
+    Deals are bucketed by CREATION month.
+      Expected = Paid + Closed (everything invoiced)
+      Actual   = Paid only (money received)
+    Collection rate is left BLANK, not 0%, where expected is zero — the
+    ratio is undefined there and a 0% bar would read as a real shortfall.
+    """
+    from collections import defaultdict
+    import matplotlib.gridspec as gridspec
+
+    MONTHS = ["Jan","Feb","Mar","Apr","May","Jun",
+              "Jul","Aug","Sep","Oct","Nov","Dec"]
+    prev = year - 1
+
+    def _low(d):  return (d.get("stage") or "").lower()
+    def _paid(d): return "paid" in _low(d) and "before adam" not in _low(d)
+    def _clsd(d): return "closed" in _low(d) and "before adam" not in _low(d)
+
+    def _bucket(yr, pred):
+        out = defaultdict(float)
+        for d in deals:
+            ad = d.get("added_date") or ""
+            if len(ad) >= 7 and ad[:4] == str(yr) and pred(d):
+                out[int(ad[5:7])] += d.get("deal_value", 0) or 0
+        return [out[m] for m in range(1, 13)]
+
+    a_prev = _bucket(prev, _paid)
+    e_curr = _bucket(year, lambda d: _paid(d) or _clsd(d))
+    a_curr = _bucket(year, _paid)
+
+    cm = current_month or 12
+    # Current-year series stop at the current month; later months have no data
+    e_plot = [v if i < cm else np.nan for i, v in enumerate(e_curr)]
+    a_plot = [v if i < cm else np.nan for i, v in enumerate(a_curr)]
+
+    fig = plt.figure(figsize=(13.5, 7.2))
+    fig.patch.set_facecolor(BRAND["bg"])
+    gs = gridspec.GridSpec(2, 2, height_ratios=[1.45, 1.0],
+                           hspace=0.42, wspace=0.20)
+
+    C_PREV = "#7F8FA6"          # neutral: last year is the baseline
+    C_EXP  = BRAND["yellow"]    # invoiced but not necessarily collected
+    C_ACT  = BRAND["teal"]      # money in
+
+    def _style(ax):
+        ax.set_facecolor(BRAND["bg"])
+        for s in ax.spines.values():
+            s.set_visible(False)
+        ax.tick_params(colors=BRAND["text"], labelsize=8)
+        ax.set_axisbelow(True)
+        ax.yaxis.grid(True, color=BRAND["grid"], linestyle="--", linewidth=0.6)
+        ax.xaxis.grid(False)
+
+    # ── Panel 1: grouped columns ─────────────────────────────────
+    ax1 = fig.add_subplot(gs[0, :]); _style(ax1)
+    x = np.arange(12); w = 0.27
+    ax1.bar(x - w, a_prev, w, label=f"FY{prev} actual", color=C_PREV,
+            edgecolor="white", linewidth=0.6, zorder=2)
+    ax1.bar(x,     e_plot, w, label=f"FY{year} expected", color=C_EXP,
+            edgecolor="white", linewidth=0.6, zorder=2)
+    ax1.bar(x + w, a_plot, w, label=f"FY{year} actual", color=C_ACT,
+            edgecolor="white", linewidth=0.6, zorder=2)
+    ax1.axhline(monthly_target, color="#8A8A8A", linestyle="--", linewidth=1.3, zorder=3)
+    ax1.annotate(f"RM {monthly_target:,.0f} target",
+                 xy=(0.995, monthly_target), xycoords=("axes fraction", "data"),
+                 xytext=(0, 4), textcoords="offset points", ha="right", va="bottom",
+                 fontsize=8, color="#6A6A6A", fontweight="bold")
+    ax1.set_xticks(x); ax1.set_xticklabels(MONTHS, fontsize=8.5)
+    ax1.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"RM {v:,.0f}"))
+    ax1.set_title(f"Monthly Revenue — FY{prev} vs FY{year}  ·  deals by creation month",
+                  fontsize=10, color=BRAND["text"], pad=10, fontweight="bold")
+    ax1.legend(fontsize=8, framealpha=0, ncol=3, loc="upper right")
+
+    # ── Panel 2: YoY growth lines ────────────────────────────────
+    ax2 = fig.add_subplot(gs[1, 0]); _style(ax2)
+    last_complete = cm - 1          # current month is only part-elapsed
+    g_exp = [((e_curr[i] - a_prev[i]) / a_prev[i] * 100)
+             if (a_prev[i] and i < last_complete) else np.nan for i in range(12)]
+    g_act = [((a_curr[i] - a_prev[i]) / a_prev[i] * 100)
+             if (a_prev[i] and i < last_complete) else np.nan for i in range(12)]
+    ax2.axhline(0, color="#B0B0B0", linewidth=1)
+    ax2.plot(x, g_exp, marker="o", markersize=4.5, linewidth=1.8,
+             color=C_EXP, label="Expected")
+    ax2.plot(x, g_act, marker="o", markersize=4.5, linewidth=1.8,
+             color=C_ACT, label="Actual")
+    ax2.set_xticks(x); ax2.set_xticklabels(MONTHS, fontsize=7.5)
+    ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:,.0f}%"))
+    ax2.set_title(f"Year-on-year growth vs FY{prev}",
+                  fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
+    ax2.legend(fontsize=7.5, framealpha=0, ncol=2)
+    if 1 <= cm <= 12:
+        ax2.annotate(f"excludes {MONTHS[cm-1]} — month still in progress",
+                     xy=(0.99, 0.03), xycoords="axes fraction",
+                     ha="right", va="bottom", fontsize=6.5, color="#8A8A8A")
+
+    # ── Panel 3: collection rate ─────────────────────────────────
+    ax3 = fig.add_subplot(gs[1, 1]); _style(ax3)
+    # Undefined where nothing was invoiced — omitted, not drawn as 0%.
+    coll = [(a_curr[i] / e_curr[i] * 100) if (i < cm and e_curr[i] > 0) else np.nan
+            for i in range(12)]
+    cols = [BRAND["red"] if (v == v and v < 50)
+            else (BRAND["yellow"] if (v == v and v < 80) else BRAND["teal"])
+            for v in coll]
+    ax3.bar(x, coll, 0.6, color=cols, edgecolor="white", linewidth=0.6, zorder=2)
+    for i, v in enumerate(coll):
+        if v == v:
+            ax3.text(i, v + 2.5, f"{v:.0f}%", ha="center", va="bottom",
+                     fontsize=7, color=BRAND["text"], fontweight="bold")
+    ax3.set_ylim(0, 112)
+    ax3.set_xticks(x); ax3.set_xticklabels(MONTHS, fontsize=7.5)
+    ax3.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:,.0f}%"))
+    ax3.set_title("Collection rate  ·  actual ÷ expected",
+                  fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
+    ax3.annotate("blank = nothing invoiced yet", xy=(0.99, 0.03),
+                 xycoords="axes fraction", ha="right", va="bottom",
+                 fontsize=6.5, color=BRAND["muted"] if "muted" in BRAND else "#888888")
+
+    return _save(fig)

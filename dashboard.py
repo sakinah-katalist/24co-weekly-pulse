@@ -13,7 +13,7 @@ MYT = timezone(timedelta(hours=8))
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent))
-from charts import crm_pipeline_bar, monthly_revenue_bar
+from charts import crm_pipeline_bar, monthly_revenue_bar, revenue_dashboard
 from pdf_report import build_pdf, _session_type, _pending_collection, _revenue_last_7_days, _expand_org
 from emailer import build_email_html, send_report
 from config import EMAIL_TO, EMAIL_FROM
@@ -1721,6 +1721,9 @@ with tab4:
                 "pipeline_bar":    crm_pipeline_bar(crm_deals),
                 "monthly_revenue": monthly_revenue_bar(crm_deals, year=YEAR,
                                                         current_month=report_date.month),
+                "revenue_dashboard": revenue_dashboard(
+                    crm_deals, year=YEAR, monthly_target=200_000,
+                    current_month=report_date.month),
             }
             kw = dict(leads=leads, sessions=sessions, crm_deals=crm_deals,
                       revenue_history=revenue, report_date=report_date,

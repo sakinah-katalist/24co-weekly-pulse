@@ -566,7 +566,22 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         add(_sp(2))
         add(_img_from_bytes(monthly_chart, full_w))
 
-    # ── 6. CANVA LICENCE SALES (PAID ONLY) ───────────────────────────────────
+    # ── 6. REVENUE DASHBOARD (YoY vs target) ─────────────────────────────────
+    rev_dash = chart_bytes.get("revenue_dashboard")
+    if rev_dash:
+        add(PageBreak())
+        add(_hr(C["teal"]))
+        add(Paragraph(f"Revenue — FY{year - 1} vs FY{year}", styles["SectionHead"]))
+        add(Paragraph(
+            "Deals grouped by the month they were created. Expected = Paid + Closed "
+            "(everything invoiced); Actual = Paid only (money received). Growth excludes "
+            "the current month while it is still in progress, and collection rate is left "
+            "blank where nothing has been invoiced yet.",
+            styles["SectionSub"]))
+        add(_sp(2))
+        add(_img_from_bytes(rev_dash, full_w, max_h_mm=118))
+
+    # ── 7. CANVA LICENCE SALES (PAID ONLY) ───────────────────────────────────
     canva_paid = [d for d in (canva_deals or [])
                   if (d.get("status") or "").lower() == "paid"]
     if canva_paid:
