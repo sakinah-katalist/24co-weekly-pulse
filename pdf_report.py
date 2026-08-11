@@ -573,10 +573,12 @@ def build_pdf(leads, sessions, crm_deals, revenue_history,
         add(_hr(C["teal"]))
         add(Paragraph(f"Revenue — FY{year - 1} vs FY{year}", styles["SectionHead"]))
         add(Paragraph(
-            "Deals grouped by the month they were created. Expected = Paid + Closed "
-            "(everything invoiced); Actual = Paid only (money received). Growth excludes "
-            "the current month while it is still in progress, and collection rate is left "
-            "blank where nothing has been invoiced yet.",
+            f"Deals grouped by the month they were created. <b>Expected</b> = Paid + Closed "
+            f"(everything invoiced); <b>Actual</b> = Paid only (money received). Top: FY{year-1} "
+            f"against FY{year}, versus the monthly target. Bottom left: FY{year} expected "
+            f"against actual — the shaded band is invoiced work still awaiting collection. "
+            f"Bottom right: collection rate, left blank where nothing has been invoiced yet. "
+            f"The current month is excluded from the lower charts while it is still in progress.",
             styles["SectionSub"]))
         add(_sp(2))
         add(_img_from_bytes(rev_dash, full_w, max_h_mm=118))

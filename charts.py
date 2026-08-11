@@ -491,27 +491,39 @@ def revenue_dashboard(deals: list[dict], year: int = 2026,
                   fontsize=10, color=BRAND["text"], pad=10, fontweight="bold")
     ax1.legend(fontsize=8, framealpha=0, ncol=3, loc="upper right")
 
-    # ── Panel 2: YoY growth lines ────────────────────────────────
+    # ── Panel 2: FY expected vs actual, in ringgit ────────────────
+    # Plotted as money rather than growth %, with the gap shaded: the gap IS
+    # the uncollected invoiced work, which a percentage view hides.
     ax2 = fig.add_subplot(gs[1, 0]); _style(ax2)
     last_complete = cm - 1          # current month is only part-elapsed
-    g_exp = [((e_curr[i] - a_prev[i]) / a_prev[i] * 100)
-             if (a_prev[i] and i < last_complete) else np.nan for i in range(12)]
-    g_act = [((a_curr[i] - a_prev[i]) / a_prev[i] * 100)
-             if (a_prev[i] and i < last_complete) else np.nan for i in range(12)]
-    ax2.axhline(0, color="#B0B0B0", linewidth=1)
-    ax2.plot(x, g_exp, marker="o", markersize=4.5, linewidth=1.8,
-             color=C_EXP, label="Expected")
-    ax2.plot(x, g_act, marker="o", markersize=4.5, linewidth=1.8,
-             color=C_ACT, label="Actual")
+    e_line = [e_curr[i] if i < last_complete else np.nan for i in range(12)]
+    a_line = [a_curr[i] if i < last_complete else np.nan for i in range(12)]
+
+    ax2.fill_between(x, a_line, e_line, color=C_EXP, alpha=0.22,
+                     zorder=1, label="Not yet collected")
+    ax2.plot(x, e_line, marker="o", markersize=4.5, linewidth=1.8,
+             color=C_EXP, zorder=3, label=f"FY{year} expected")
+    ax2.plot(x, a_line, marker="o", markersize=4.5, linewidth=1.8,
+             color=C_ACT, zorder=3, label=f"FY{year} actual")
+    # Headroom so the legend does not sit on top of the peak month
+    _peak = max([v for v in e_line if v == v] or [0])
+    ax2.set_ylim(0, _peak * 1.38 if _peak else 1)
     ax2.set_xticks(x); ax2.set_xticklabels(MONTHS, fontsize=7.5)
-    ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:,.0f}%"))
-    ax2.set_title(f"Year-on-year growth vs FY{prev}",
+    ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"RM {v:,.0f}"))
+    ax2.set_title(f"FY{year} expected vs actual  ·  shaded = awaiting collection",
                   fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
-    ax2.legend(fontsize=7.5, framealpha=0, ncol=2)
+    ax2.legend(fontsize=7, framealpha=0, ncol=3, loc="upper center")
+
+    gap = sum((e_curr[i] - a_curr[i]) for i in range(last_complete))
+    if gap > 0:
+        ax2.annotate(f"RM {gap:,.0f} invoiced, not yet collected",
+                     xy=(0.99, 0.04), xycoords="axes fraction",
+                     ha="right", va="bottom", fontsize=7,
+                     color="#8A6B00", fontweight="bold")
     if 1 <= cm <= 12:
         ax2.annotate(f"excludes {MONTHS[cm-1]} — month still in progress",
-                     xy=(0.99, 0.03), xycoords="axes fraction",
-                     ha="right", va="bottom", fontsize=6.5, color="#8A8A8A")
+                     xy=(0.01, 0.04), xycoords="axes fraction",
+                     ha="left", va="bottom", fontsize=6.5, color="#8A8A8A")
 
     # ── Panel 3: collection rate ─────────────────────────────────
     ax3 = fig.add_subplot(gs[1, 1]); _style(ax3)
