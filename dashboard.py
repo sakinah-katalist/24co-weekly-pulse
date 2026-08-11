@@ -1562,6 +1562,23 @@ with tab6:
         f"{MONTHS_FULL[this_month-1]} so a part-month is not measured against a full one."
     )
 
+    # ── Charts (same figure as PDF page 4) ────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(f'<p class="sec-head">Revenue Charts — FY{prev_year} vs FY{YEAR}</p>',
+                unsafe_allow_html=True)
+    st.markdown(
+        f'<p class="sec-sub">Top: {prev_year} against {YEAR} versus the monthly target. '
+        f'Bottom left: {YEAR} expected against actual — the shaded band is invoiced work '
+        f'awaiting collection. Bottom right: collection rate, blank where nothing has been '
+        f'invoiced yet. The current month is excluded from the lower charts while in progress.</p>',
+        unsafe_allow_html=True
+    )
+    # Target line follows the input above, so the chart matches the table.
+    st.image(revenue_dashboard(crm_deals, year=YEAR,
+                               monthly_target=monthly_target or 200_000,
+                               current_month=this_month),
+             width="stretch")
+
     # ── Current month, week by week ───────────────────────────────
     # Expected/Actual read zero early in a month because deals take time to
     # convert (Aug 2025 median: 60 days creation → payment). "In Proposal"
