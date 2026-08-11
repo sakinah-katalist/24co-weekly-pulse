@@ -510,7 +510,7 @@ def revenue_dashboard(deals: list[dict], year: int = 2026,
     ax2.set_ylim(0, _peak * 1.38 if _peak else 1)
     ax2.set_xticks(x); ax2.set_xticklabels(MONTHS, fontsize=7.5)
     ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"RM {v:,.0f}"))
-    ax2.set_title(f"FY{year} expected vs actual  ·  shaded = awaiting collection",
+    ax2.set_title(f"Year {year} Comparison — Actual vs Expected Revenue",
                   fontsize=9, color=BRAND["text"], pad=8, fontweight="bold")
     ax2.legend(fontsize=7, framealpha=0, ncol=3, loc="upper center")
 
