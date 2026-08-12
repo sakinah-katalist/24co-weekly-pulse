@@ -13,7 +13,8 @@ MYT = timezone(timedelta(hours=8))
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent))
-from charts import crm_pipeline_bar, monthly_revenue_bar, revenue_dashboard
+from charts import (crm_pipeline_bar, monthly_revenue_bar, revenue_dashboard,
+                    revenue_series)
 from pdf_report import build_pdf, _session_type, _pending_collection, _revenue_last_7_days, _expand_org
 from emailer import build_email_html, send_report
 from config import EMAIL_TO, EMAIL_FROM
@@ -1573,11 +1574,107 @@ with tab6:
         f'invoiced yet. The current month is excluded from the lower charts while in progress.</p>',
         unsafe_allow_html=True
     )
-    # Target line follows the input above, so the chart matches the table.
-    st.image(revenue_dashboard(crm_deals, year=YEAR,
-                               monthly_target=monthly_target or 200_000,
-                               current_month=this_month),
-             width="stretch")
+    # Interactive (Altair) rather than the static PNG so values can be hovered.
+    # Both surfaces read the same revenue_series(), so the dashboard charts and
+    # the PDF figure cannot drift apart.
+    import altair as alt
+
+    S   = revenue_series(crm_deals, year=YEAR, current_month=this_month)
+    MO  = S["months"]
+    tgt = monthly_target or 200_000
+    lc  = S["last_complete"]
+
+    C_PREV, C_EXP, C_ACT = "#7F8FA6", "#F5C800", "#1A7F7A"
+    _money = alt.Tooltip("value:Q", title="RM", format=",.2f")
+
+    # 1 — grouped columns vs target
+    rows = []
+    for i, m in enumerate(MO):
+        rows.append({"Month": m, "Series": f"FY{S['prev_year']} actual",
+                     "value": S["prev_actual"][i]})
+        if i < S["current_month"]:
+            rows.append({"Month": m, "Series": f"FY{YEAR} expected", "value": S["expected"][i]})
+            rows.append({"Month": m, "Series": f"FY{YEAR} actual",   "value": S["actual"][i]})
+    df_bar = pd.DataFrame(rows)
+    order  = [f"FY{S['prev_year']} actual", f"FY{YEAR} expected", f"FY{YEAR} actual"]
+
+    bars = alt.Chart(df_bar).mark_bar().encode(
+        x=alt.X("Month:N", sort=MO, title=None),
+        xOffset=alt.XOffset("Series:N", sort=order),
+        y=alt.Y("value:Q", title="RM", axis=alt.Axis(format=",.0f")),
+        color=alt.Color("Series:N", sort=order, title=None,
+                        scale=alt.Scale(domain=order, range=[C_PREV, C_EXP, C_ACT]),
+                        legend=alt.Legend(orient="top")),
+        tooltip=[alt.Tooltip("Month:N"), alt.Tooltip("Series:N"), _money],
+    )
+    rule = alt.Chart(pd.DataFrame({"y": [tgt]})).mark_rule(
+        strokeDash=[6, 4], color="#8A8A8A").encode(
+        y="y:Q", tooltip=[alt.Tooltip("y:Q", title="Monthly target", format=",.0f")])
+    st.altair_chart((bars + rule).properties(height=300), use_container_width=True)
+
+    cL, cR = st.columns(2)
+
+    # 2 — expected vs actual, with the collection gap shaded
+    with cL:
+        gap_rows, line_rows = [], []
+        for i in range(lc):
+            gap_rows.append({"Month": MO[i], "actual": S["actual"][i],
+                             "expected": S["expected"][i],
+                             "gap": S["expected"][i] - S["actual"][i]})
+            line_rows.append({"Month": MO[i], "Series": f"FY{YEAR} expected",
+                              "value": S["expected"][i]})
+            line_rows.append({"Month": MO[i], "Series": f"FY{YEAR} actual",
+                              "value": S["actual"][i]})
+        df_gap, df_line = pd.DataFrame(gap_rows), pd.DataFrame(line_rows)
+
+        band = alt.Chart(df_gap).mark_area(opacity=0.25, color=C_EXP).encode(
+            x=alt.X("Month:N", sort=MO, title=None),
+            y=alt.Y("actual:Q", title="RM", axis=alt.Axis(format=",.0f")),
+            y2="expected:Q",
+            tooltip=[alt.Tooltip("Month:N"),
+                     alt.Tooltip("expected:Q", title="Expected RM", format=",.2f"),
+                     alt.Tooltip("actual:Q",   title="Actual RM",   format=",.2f"),
+                     alt.Tooltip("gap:Q",      title="Awaiting collection RM", format=",.2f")],
+        )
+        lines = alt.Chart(df_line).mark_line(point=True, strokeWidth=2.5).encode(
+            x=alt.X("Month:N", sort=MO, title=None),
+            y=alt.Y("value:Q", title="RM"),
+            color=alt.Color("Series:N", title=None,
+                            scale=alt.Scale(domain=[f"FY{YEAR} expected", f"FY{YEAR} actual"],
+                                            range=[C_EXP, C_ACT]),
+                            legend=alt.Legend(orient="top")),
+            tooltip=[alt.Tooltip("Month:N"), alt.Tooltip("Series:N"), _money],
+        )
+        st.markdown(f"**Year {YEAR} Comparison — Actual vs Expected Revenue**")
+        st.altair_chart((band + lines).properties(height=260), use_container_width=True)
+        _gap_total = sum(S["expected"][i] - S["actual"][i] for i in range(lc))
+        st.caption(f"Shaded band = RM {_gap_total:,.0f} invoiced, not yet collected. "
+                   f"Excludes {MONTHS_FULL[this_month-1]} — month still in progress.")
+
+    # 3 — collection rate
+    with cR:
+        # Banded in the data rather than with nested alt.condition — Altair 6
+        # rejects nesting, and a categorical scale is clearer regardless.
+        def _band(v):
+            return "Below 50%" if v < 50 else ("50–79%" if v < 80 else "80%+")
+
+        df_coll = pd.DataFrame([{"Month": MO[i], "rate": S["collection"][i],
+                                 "Band": _band(S["collection"][i])}
+                                for i in range(12) if S["collection"][i] is not None])
+        _bands = ["Below 50%", "50–79%", "80%+"]
+        coll_chart = alt.Chart(df_coll).mark_bar().encode(
+            x=alt.X("Month:N", sort=MO, title=None),
+            y=alt.Y("rate:Q", title="%", scale=alt.Scale(domain=[0, 100])),
+            color=alt.Color("Band:N", sort=_bands, title=None,
+                            scale=alt.Scale(domain=_bands,
+                                            range=["#C0392B", C_EXP, C_ACT]),
+                            legend=alt.Legend(orient="top")),
+            tooltip=[alt.Tooltip("Month:N"),
+                     alt.Tooltip("rate:Q", title="Collected %", format=".1f")],
+        )
+        st.markdown("**Collection rate — actual ÷ expected**")
+        st.altair_chart(coll_chart.properties(height=260), use_container_width=True)
+        st.caption("Months with nothing invoiced are omitted — the ratio is undefined there.")
 
     # ── Current month, week by week ───────────────────────────────
     # Expected/Actual read zero early in a month because deals take time to

@@ -410,6 +410,51 @@ def monthly_revenue_bar(deals: list[dict], year: int = 2026,
     return _save(fig)
 
 
+# ── Shared revenue series (used by the PDF chart and the dashboard) ──────────
+MONTHS_ABBR = ["Jan","Feb","Mar","Apr","May","Jun",
+               "Jul","Aug","Sep","Oct","Nov","Dec"]
+
+
+def revenue_series(deals: list[dict], year: int = 2026,
+                   current_month: int | None = None) -> dict:
+    """
+    Monthly revenue series, bucketed by deal CREATION month.
+      prev_actual = Paid deals created in `year - 1`
+      expected    = Paid + Closed created in `year` (everything invoiced)
+      actual      = Paid only created in `year` (money received)
+
+    `collection` is None where nothing was invoiced — the ratio is undefined
+    and a 0% would read as a real shortfall. Current-year values past the
+    current month are None; the current month itself is part-elapsed, so
+    `last_complete` marks where derived views should stop.
+    """
+    from collections import defaultdict
+
+    def _low(d):  return (d.get("stage") or "").lower()
+    def _paid(d): return "paid" in _low(d) and "before adam" not in _low(d)
+    def _clsd(d): return "closed" in _low(d) and "before adam" not in _low(d)
+
+    def _bucket(yr, pred):
+        out = defaultdict(float)
+        for d in deals:
+            ad = d.get("added_date") or ""
+            if len(ad) >= 7 and ad[:4] == str(yr) and pred(d):
+                out[int(ad[5:7])] += d.get("deal_value", 0) or 0
+        return [out[m] for m in range(1, 13)]
+
+    cm = current_month or 12
+    prev_actual = _bucket(year - 1, _paid)
+    expected    = _bucket(year, lambda d: _paid(d) or _clsd(d))
+    actual      = _bucket(year, _paid)
+    collection  = [(actual[i] / expected[i] * 100) if (i < cm and expected[i] > 0) else None
+                   for i in range(12)]
+    return {
+        "months": MONTHS_ABBR, "year": year, "prev_year": year - 1,
+        "prev_actual": prev_actual, "expected": expected, "actual": actual,
+        "collection": collection, "current_month": cm, "last_complete": cm - 1,
+    }
+
+
 # ── Revenue dashboard: YoY vs target, growth, collection ──────────────────────
 def revenue_dashboard(deals: list[dict], year: int = 2026,
                       monthly_target: float = 200_000,
@@ -425,30 +470,15 @@ def revenue_dashboard(deals: list[dict], year: int = 2026,
     Collection rate is left BLANK, not 0%, where expected is zero — the
     ratio is undefined there and a 0% bar would read as a real shortfall.
     """
-    from collections import defaultdict
     import matplotlib.gridspec as gridspec
 
-    MONTHS = ["Jan","Feb","Mar","Apr","May","Jun",
-              "Jul","Aug","Sep","Oct","Nov","Dec"]
-    prev = year - 1
-
-    def _low(d):  return (d.get("stage") or "").lower()
-    def _paid(d): return "paid" in _low(d) and "before adam" not in _low(d)
-    def _clsd(d): return "closed" in _low(d) and "before adam" not in _low(d)
-
-    def _bucket(yr, pred):
-        out = defaultdict(float)
-        for d in deals:
-            ad = d.get("added_date") or ""
-            if len(ad) >= 7 and ad[:4] == str(yr) and pred(d):
-                out[int(ad[5:7])] += d.get("deal_value", 0) or 0
-        return [out[m] for m in range(1, 13)]
-
-    a_prev = _bucket(prev, _paid)
-    e_curr = _bucket(year, lambda d: _paid(d) or _clsd(d))
-    a_curr = _bucket(year, _paid)
-
-    cm = current_month or 12
+    S = revenue_series(deals, year, current_month)
+    MONTHS = S["months"]
+    prev   = S["prev_year"]
+    a_prev = S["prev_actual"]
+    e_curr = S["expected"]
+    a_curr = S["actual"]
+    cm     = S["current_month"]
     # Current-year series stop at the current month; later months have no data
     e_plot = [v if i < cm else np.nan for i, v in enumerate(e_curr)]
     a_plot = [v if i < cm else np.nan for i, v in enumerate(a_curr)]
