@@ -77,6 +77,9 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 11–17 August 2026 ──
+    "Achieve Tech Sdn Bhd (for KKDW tender)":
+        "Achieve Tech Sdn Bhd — for Kementerian Kemajuan Desa dan Wilayah (KKDW)",
     # ── Week of 4–10 August 2026 ──
     "UCSI":                   "UCSI University",
     "Hornbill Skyways":       "Hornbill Skyways Sdn Bhd (Sarawak state-owned aviation)",

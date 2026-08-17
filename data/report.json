@@ -1,7 +1,59 @@
 {
   "report_date": "2026-08-17",
   "period_label": "Week of 11–17 August 2026",
-  "leads": [],
+  "leads": [
+    {
+      "org_name": "Kementerian Dalam Negeri",
+      "contact_name": "Siti (Pegawai IT)",
+      "contact_email": "sitimariamarif@gmail.com",
+      "contact_phone": "0149070424",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-08-16",
+      "enquiry": "Trainings/Courses Request",
+      "area": "Google Apps Script Mastery",
+      "notes": "IT officer requesting Google Apps Script Mastery training. NOTE: this is KDN's THIRD approach in a month — 17 July (procurement eligibility: MOF registration, government purchase orders), 23 July (AI in Public Relations speaker for Bahagian Kawalan dan Penguatkuasaan), and now this. Three separate officers, three different needs, none converted yet. Worth one coordinated ministry-level conversation rather than three separate replies.",
+      "is_hot": false,
+      "tier1": "KDN",
+      "color": "gold",
+      "description": "Kementerian Dalam Negeri (Ministry of Home Affairs, KDN) — Tier 1 federal ministry for public security and order, overseeing PDRM, the Immigration Department, National Registration Department, RELA and AADK. One of the largest ministries by workforce. Repeated inbound interest across different divisions suggests genuine appetite; the blocker is likely the unanswered procurement question from July rather than lack of demand."
+    },
+    {
+      "org_name": "UiTM",
+      "contact_name": "Zaidie (Literacy Librarian, PhD candidate)",
+      "contact_email": "mzaidie2746@uitm.edu.my",
+      "contact_phone": "01111374601",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-08-13",
+      "enquiry": "Enquiries/Questions",
+      "area": null,
+      "notes": "PhD research building an AI literacy instruction framework, based on observing how students actually use AI. Has a draft framework and is asking to discuss it with practitioners to shape the teaching content. Not a sale — a request for expert input. Low cost, and it puts us inside the design of an academic AI-literacy framework at Malaysia's largest university.",
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal",
+      "description": "Universiti Teknologi MARA — Malaysia's largest university, founded 1956 as the RIDA Training Centre, now 34 campuses, 24 faculties and over 180,000 students nationwide. A public university under MARA. Contact is a literacy librarian doing PhD work on AI literacy instruction; influence over such a framework at UiTM's scale reaches far more people than a single training booking."
+    },
+    {
+      "org_name": "Achieve Tech Sdn Bhd (for KKDW tender)",
+      "contact_name": "Aina (Tender Executive)",
+      "contact_email": "aina@achievetech.com.my",
+      "contact_phone": "012-3109036",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "Unqualified",
+      "date": "2026-08-13",
+      "enquiry": "Enquiries/Questions",
+      "area": "Canva Related Services",
+      "notes": "Requesting a quotation to support a GOVERNMENT TENDER: 'Perkhidmatan Langganan Lesen Perisian di Kementerian Kemajuan Desa dan Wilayah (KKDW)' — Canva Team for 5 users x 2 units, 3-year subscription. Team has marked this Unqualified. Flagging because it is a live ministry tender for exactly the Canva licence business that has had no movement since 3 July.",
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal",
+      "description": "Enquiry from a private tender specialist acting for a government end-client: Kementerian Kemajuan Desa dan Wilayah (Ministry of Rural and Regional Development), formed December 2022, headquartered in Putrajaya with ~29,600 staff and a 2026 budget of RM12.4 billion. Covers rural and regional development, Orang Asli affairs and land rehabilitation. Listed here because the licences would be supplied to a federal ministry, routed through a vendor."
+    }
+  ],
   "sessions": [],
   "crm_deals": [
     {
