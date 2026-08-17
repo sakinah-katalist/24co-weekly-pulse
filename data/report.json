@@ -54,7 +54,68 @@
       "description": "Enquiry from a private tender specialist acting for a government end-client: Kementerian Kemajuan Desa dan Wilayah (Ministry of Rural and Regional Development), formed December 2022, headquartered in Putrajaya with ~29,600 staff and a 2026 budget of RM12.4 billion. Covers rural and regional development, Orang Asli affairs and land rehabilitation. Listed here because the licences would be supplied to a federal ministry, routed through a vendor."
     }
   ],
-  "sessions": [],
+  "sessions": [
+    {
+      "org_name": "CCB",
+      "class_name": "Canva Intermediate: Design for the Modern Workplace",
+      "date": "2026-08-11",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1x_4SjXttkD0kUalpqMRRd7JgdYqB7eEJHc1DOtwTCsI/edit",
+      "description": "Cycle & Carriage Bintang — automotive retail group, a private company rather than a government body. Included here because they are an existing CRM client: a RM 3,780 deal from mid-June still sits in Awaiting Payment. This is their follow-on Canva session, so worth pairing delivery with a collection nudge."
+    },
+    {
+      "org_name": "MSU 4.0 | Management",
+      "class_name": "Canva Essentials: A Beginner's Guide to Design",
+      "date": "2026-08-12",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1Zpx9o2XPx4HswpWbdrkU0H_vS_-2H6jac3Noi1Xd-NU/edit",
+      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff). This is the MSU 4.0 management cohort, following the 13th and 14th series in July and the 3.0 lecturers cohort on 28 July. Four MSU cohorts in a month makes them comfortably our most active repeat account."
+    },
+    {
+      "org_name": "Zakat Selangor",
+      "class_name": "Canva Essentials: A Beginner's Guide to Design",
+      "date": "2026-08-13",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1tVImhazsteBGFngmakMMd_qRWgc5Sfbx3a_mf9W2rIM/edit",
+      "description": "Lembaga Zakat Selangor — the zakat authority for Selangor, operating under the Selangor Islamic Religious Council (MAIS) and incorporated under the Trustees (Incorporation) Act 1952. Manages over RM1 billion in zakat annually across collection, distribution and asnaf development. NOTE: they also have a RM 10,800 Canva licence deal marked Paid, so this is a training-plus-licences account — one of the few spanning both revenue lines."
+    },
+    {
+      "org_name": "E-Idaman",
+      "class_name": "Gen AI Essentials: From Skills to Solutions",
+      "date": "2026-08-12 → 2026-08-13",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1QCO2dy7L9VOxLPZcpDw7T-5V5o1TVBfmnduwsBdKVbc/edit",
+      "description": "E-Idaman Sdn Bhd — holds the Federal Government concession for solid waste management and public cleansing across northern Peninsular Malaysia, delivered through Environment Idaman. Covers 13 local authorities and 350,000+ premises in Kedah and Perlis with a workforce of roughly 6,000. Government-linked through the federal concession rather than ownership, and a large operational headcount makes it a candidate for repeat cohorts."
+    },
+    {
+      "org_name": "Cybernetics",
+      "class_name": "Canva for Business: Mastering Visual Design for the Workplace",
+      "date": "2026-08-17 → 2026-08-18",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1GJyBRwo-oMy3Mk3FYIGvl-0VhSpF9NsOkxRUGg-Sdtc/edit",
+      "description": "Cybernetics International College of Technology — a private college in Malaysia. NOTE: they came in as a hot lead on 28 July (Ts. Norsairah, Generative AI & Automation) and were left off the leads list as a private institution rather than a government body. They converted to a booking within three weeks, which is worth remembering when judging the gov-only filter."
+    },
+    {
+      "org_name": "KKM BPM",
+      "class_name": "Gen AI Essentials: Daripada Kemahiran kepada Penyelesaian Praktikal",
+      "date": "2026-08-17 → 2026-08-18",
+      "tier1": "MOH",
+      "color": "gold",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1LARbZ757ZgAssuZto0ugkrgleoa0uKzjYfmb0wzDPYs/edit",
+      "description": "Kementerian Kesihatan Malaysia — Bahagian Pengurusan Maklumat (Information Management Division). Tier 1 MOH: the ministry runs the national public healthcare system with one of the largest workforces in government. KKM divisions are long-standing clients (BTM, BKKM HQ and Bahagian Kompetensi all appear in the CRM), and a Malay-language Gen AI programme for the information management team continues that run."
+    }
+  ],
   "crm_deals": [
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",

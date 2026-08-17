@@ -78,6 +78,12 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
     # ── Week of 11–17 August 2026 ──
+    "CCB":                    "Cycle & Carriage Bintang (CCB)",
+    "MSU 4.0 | Management":   "Management and Science University (MSU) 4.0 — Management Cohort",
+    "Zakat Selangor":         "Lembaga Zakat Selangor (MAIS)",
+    "E-Idaman":               "E-Idaman Sdn Bhd (federal solid waste concession — Kedah & Perlis)",
+    "Cybernetics":            "Cybernetics International College of Technology (CICT)",
+    "KKM BPM":                "Kementerian Kesihatan Malaysia — Bahagian Pengurusan Maklumat",
     "Achieve Tech Sdn Bhd (for KKDW tender)":
         "Achieve Tech Sdn Bhd — for Kementerian Kemajuan Desa dan Wilayah (KKDW)",
     # ── Week of 4–10 August 2026 ──
