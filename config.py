@@ -77,6 +77,10 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 18–24 August 2026 ──
+    "CGSI":                   "CGS International Securities Malaysia (CGSI)",
+    "Quality Reputation":     "Quality Reputation Sdn Bhd",
+    "MSU | 15th Series":      "Management and Science University (MSU) — 15th Series",
     # ── Week of 11–17 August 2026 ──
     "CCB":                    "Cycle & Carriage Bintang (CCB)",
     "MSU 4.0 | Management":   "Management and Science University (MSU) 4.0 — Management Cohort",

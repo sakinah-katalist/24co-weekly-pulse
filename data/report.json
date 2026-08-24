@@ -1,100 +1,8 @@
 {
-  "report_date": "2026-08-17",
-  "period_label": "Week of 11–17 August 2026",
-  "leads": [
-    {
-      "org_name": "Kementerian Dalam Negeri",
-      "contact_name": "Siti (Pegawai IT)",
-      "contact_email": "sitimariamarif@gmail.com",
-      "contact_phone": "0149070424",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-08-16",
-      "enquiry": "Trainings/Courses Request",
-      "area": "Google Apps Script Mastery",
-      "notes": "IT officer requesting Google Apps Script Mastery training. NOTE: this is KDN's THIRD approach in a month — 17 July (procurement eligibility: MOF registration, government purchase orders), 23 July (AI in Public Relations speaker for Bahagian Kawalan dan Penguatkuasaan), and now this. Three separate officers, three different needs, none converted yet. Worth one coordinated ministry-level conversation rather than three separate replies.",
-      "is_hot": false,
-      "tier1": "KDN",
-      "color": "gold",
-      "description": "Kementerian Dalam Negeri (Ministry of Home Affairs, KDN) — Tier 1 federal ministry for public security and order, overseeing PDRM, the Immigration Department, National Registration Department, RELA and AADK. One of the largest ministries by workforce. Repeated inbound interest across different divisions suggests genuine appetite; the blocker is likely the unanswered procurement question from July rather than lack of demand."
-    },
-    {
-      "org_name": "UiTM",
-      "contact_name": "Zaidie (Literacy Librarian, PhD candidate)",
-      "contact_email": "mzaidie2746@uitm.edu.my",
-      "contact_phone": "01111374601",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-08-13",
-      "enquiry": "Enquiries/Questions",
-      "area": null,
-      "notes": "PhD research building an AI literacy instruction framework, based on observing how students actually use AI. Has a draft framework and is asking to discuss it with practitioners to shape the teaching content. Not a sale — a request for expert input. Low cost, and it puts us inside the design of an academic AI-literacy framework at Malaysia's largest university.",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "Universiti Teknologi MARA — Malaysia's largest university, founded 1956 as the RIDA Training Centre, now 34 campuses, 24 faculties and over 180,000 students nationwide. A public university under MARA. Contact is a literacy librarian doing PhD work on AI literacy instruction; influence over such a framework at UiTM's scale reaches far more people than a single training booking."
-    },
-    {
-      "org_name": "Achieve Tech Sdn Bhd (for KKDW tender)",
-      "contact_name": "Aina (Tender Executive)",
-      "contact_email": "aina@achievetech.com.my",
-      "contact_phone": "012-3109036",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "Unqualified",
-      "date": "2026-08-13",
-      "enquiry": "Enquiries/Questions",
-      "area": "Canva Related Services",
-      "notes": "Requesting a quotation to support a GOVERNMENT TENDER: 'Perkhidmatan Langganan Lesen Perisian di Kementerian Kemajuan Desa dan Wilayah (KKDW)' — Canva Team for 5 users x 2 units, 3-year subscription. Team has marked this Unqualified. Flagging because it is a live ministry tender for exactly the Canva licence business that has had no movement since 3 July.",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "Enquiry from a private tender specialist acting for a government end-client: Kementerian Kemajuan Desa dan Wilayah (Ministry of Rural and Regional Development), formed December 2022, headquartered in Putrajaya with ~29,600 staff and a 2026 budget of RM12.4 billion. Covers rural and regional development, Orang Asli affairs and land rehabilitation. Listed here because the licences would be supplied to a federal ministry, routed through a vendor."
-    }
-  ],
+  "report_date": "2026-08-24",
+  "period_label": "Week of 18–24 August 2026",
+  "leads": [],
   "sessions": [
-    {
-      "org_name": "CCB",
-      "class_name": "Canva Intermediate: Design for the Modern Workplace",
-      "date": "2026-08-11",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1x_4SjXttkD0kUalpqMRRd7JgdYqB7eEJHc1DOtwTCsI/edit",
-      "description": "Cycle & Carriage Bintang — automotive retail group, a private company rather than a government body. Included here because they are an existing CRM client: a RM 3,780 deal from mid-June still sits in Awaiting Payment. This is their follow-on Canva session, so worth pairing delivery with a collection nudge."
-    },
-    {
-      "org_name": "MSU 4.0 | Management",
-      "class_name": "Canva Essentials: A Beginner's Guide to Design",
-      "date": "2026-08-12",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1Zpx9o2XPx4HswpWbdrkU0H_vS_-2H6jac3Noi1Xd-NU/edit",
-      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff). This is the MSU 4.0 management cohort, following the 13th and 14th series in July and the 3.0 lecturers cohort on 28 July. Four MSU cohorts in a month makes them comfortably our most active repeat account."
-    },
-    {
-      "org_name": "Zakat Selangor",
-      "class_name": "Canva Essentials: A Beginner's Guide to Design",
-      "date": "2026-08-13",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1tVImhazsteBGFngmakMMd_qRWgc5Sfbx3a_mf9W2rIM/edit",
-      "description": "Lembaga Zakat Selangor — the zakat authority for Selangor, operating under the Selangor Islamic Religious Council (MAIS) and incorporated under the Trustees (Incorporation) Act 1952. Manages over RM1 billion in zakat annually across collection, distribution and asnaf development. NOTE: they also have a RM 10,800 Canva licence deal marked Paid, so this is a training-plus-licences account — one of the few spanning both revenue lines."
-    },
-    {
-      "org_name": "E-Idaman",
-      "class_name": "Gen AI Essentials: From Skills to Solutions",
-      "date": "2026-08-12 → 2026-08-13",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1QCO2dy7L9VOxLPZcpDw7T-5V5o1TVBfmnduwsBdKVbc/edit",
-      "description": "E-Idaman Sdn Bhd — holds the Federal Government concession for solid waste management and public cleansing across northern Peninsular Malaysia, delivered through Environment Idaman. Covers 13 local authorities and 350,000+ premises in Kedah and Perlis with a workforce of roughly 6,000. Government-linked through the federal concession rather than ownership, and a large operational headcount makes it a candidate for repeat cohorts."
-    },
     {
       "org_name": "Cybernetics",
       "class_name": "Canva for Business: Mastering Visual Design for the Workplace",
@@ -103,7 +11,7 @@
       "color": "teal",
       "signup": "",
       "feedback": "https://docs.google.com/spreadsheets/d/1GJyBRwo-oMy3Mk3FYIGvl-0VhSpF9NsOkxRUGg-Sdtc/edit",
-      "description": "Cybernetics International College of Technology — a private college in Malaysia. NOTE: they came in as a hot lead on 28 July (Ts. Norsairah, Generative AI & Automation) and were left off the leads list as a private institution rather than a government body. They converted to a booking within three weeks, which is worth remembering when judging the gov-only filter."
+      "description": "Cybernetics International College of Technology — a private college in Malaysia. Came in as a hot lead on 28 July and converted to a booking within three weeks. This two-day session started 17 August and runs into this week."
     },
     {
       "org_name": "KKM BPM",
@@ -113,7 +21,37 @@
       "color": "gold",
       "signup": "",
       "feedback": "https://docs.google.com/spreadsheets/d/1LARbZ757ZgAssuZto0ugkrgleoa0uKzjYfmb0wzDPYs/edit",
-      "description": "Kementerian Kesihatan Malaysia — Bahagian Pengurusan Maklumat (Information Management Division). Tier 1 MOH: the ministry runs the national public healthcare system with one of the largest workforces in government. KKM divisions are long-standing clients (BTM, BKKM HQ and Bahagian Kompetensi all appear in the CRM), and a Malay-language Gen AI programme for the information management team continues that run."
+      "description": "Kementerian Kesihatan Malaysia — Bahagian Pengurusan Maklumat (Information Management Division). Tier 1 MOH: the ministry runs the national public healthcare system with one of the largest workforces in government. KKM divisions are long-standing clients (BTM, BKKM HQ and Bahagian Kompetensi all appear in the CRM). Two-day session straddling the week boundary."
+    },
+    {
+      "org_name": "MSU | 15th Series",
+      "class_name": "Boosting Workplace Efficiency with Copilot",
+      "date": "2026-08-19",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1Ag-d9MFR538PY4oRmM0X181almbpXX2V5rspyGTNuS8/edit",
+      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff). This is the 15th series, following the 13th, 14th, 3.0 Lecturers and 4.0 Management cohorts since 20 July. Five MSU cohorts in five weeks — our most reliable repeat account by a wide margin."
+    },
+    {
+      "org_name": "CGSI",
+      "class_name": "Boosting Workplace Efficiency with Copilot",
+      "date": "2026-08-19",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1W8W-aV0eM-i11tYY0jMchuABHjiRlPXINrnnnVVdJ2c/edit",
+      "description": "CGS International Securities Malaysia — integrated financial services provider and one of the top securities houses in Asia, offering equities, derivatives and Islamic stockbroking from Menara IQ at TRX. Owned by CGS International Holdings with parent China Galaxy Securities; formerly CGS-CIMB. Private sector rather than government. Repeat client: a RM 9,720 deal from early July is still in Awaiting Payment."
+    },
+    {
+      "org_name": "Quality Reputation",
+      "class_name": "Gen AI Essentials: From Skills to Solutions",
+      "date": "2026-08-21 → 2026-08-22",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1ikpItG6o79sRcb2avaSJAD5gYDDJPDeeTZrZuIQ3lXc/edit",
+      "description": "Quality Reputation Sdn Bhd — Petaling Jaya company acting as a supply channel between medical and health suppliers and public hospitals and institutions. Private sector, but its business runs into the public healthcare system, so it sits adjacent to our MOH work. Repeat client: a RM 21,600 deal is still in Awaiting Payment, the third-largest outstanding invoice."
     }
   ],
   "crm_deals": [
