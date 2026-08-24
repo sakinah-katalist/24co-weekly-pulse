@@ -78,6 +78,10 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
     # ── Week of 18–24 August 2026 ──
+    "Securities Commission Malaysia": "Securities Commission Malaysia (Suruhanjaya Sekuriti)",
+    "PIJ Holdings Sdn Bhd":   "PIJ Holdings Sdn Bhd (Perbadanan Islam Johor — Johor state GLC)",
+    "IIUM.FM":                "IIUM.FM — International Islamic University Malaysia campus radio",
+    "27Advisory Sdn Bhd":     "27Advisory Sdn Bhd — partner for national-level training RFQ",
     "CGSI":                   "CGS International Securities Malaysia (CGSI)",
     "Quality Reputation":     "Quality Reputation Sdn Bhd",
     "MSU | 15th Series":      "Management and Science University (MSU) — 15th Series",
