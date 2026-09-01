@@ -77,6 +77,10 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 25–31 August 2026 ──
+    "MSU | 16th Series":      "Management and Science University (MSU) — 16th Series",
+    "MSU | 17th Series":      "Management and Science University (MSU) — 17th Series",
+    "MSU | 18th Series":      "Management and Science University (MSU) — 18th Series",
     # ── Week of 18–24 August 2026 ──
     "Securities Commission Malaysia": "Securities Commission Malaysia (Suruhanjaya Sekuriti)",
     "PIJ Holdings Sdn Bhd":   "PIJ Holdings Sdn Bhd (Perbadanan Islam Johor — Johor state GLC)",

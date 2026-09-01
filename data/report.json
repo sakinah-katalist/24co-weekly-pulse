@@ -20,7 +20,38 @@
       "description": "Lembaga Hasil Dalam Negeri (Inland Revenue Board of Malaysia) — statutory body under the Ministry of Finance and one of the country's main revenue-collecting agencies. Established 1948 as the Income Tax Office and given statutory status in 1996 under the Inland Revenue Board Act 1995. Administers income and corporate tax nationwide through divisions covering Policy, Tax Operations, Compliance and Management. A division-level relationship here is a strong reference across the whole tax administration."
     }
   ],
-  "sessions": [],
+  "sessions": [
+    {
+      "org_name": "MSU | 16th Series",
+      "class_name": "Boosting Workplace Efficiency with Copilot",
+      "date": "2026-08-26",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/15y0vp_PE8rQ08uCYv25H2GVyXtxv5yuKxrGd_AFuIcw/edit",
+      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). 16th series. All three of this week's sessions were MSU — the first week this year with a single client accounting for every delivery."
+    },
+    {
+      "org_name": "MSU | 17th Series",
+      "class_name": "The AI-Resilient Educator",
+      "date": "2026-08-26",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1XrqYPVlE59XbnHGhYITPtHn-lZemKQLvcJyBlmVrPWw/edit",
+      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). 17th series, run the same day as the 16th — two parallel cohorts, which points at a scheduled roll-out across departments rather than ad-hoc bookings."
+    },
+    {
+      "org_name": "MSU | 18th Series",
+      "class_name": "The AI-Resilient Educator",
+      "date": "2026-08-27",
+      "tier1": null,
+      "color": "teal",
+      "signup": "",
+      "feedback": "https://docs.google.com/spreadsheets/d/1SOjXkEzh2_Rkd5hW7YNDOxcK59GDTM6f_8FrGWtq3tA/edit",
+      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). 18th series. Eight MSU cohorts have now run in six weeks (13th, 14th, 3.0 Lecturers, 4.0 Management, 15th, 16th, 17th, 18th) — by far our largest and most consistent account."
+    }
+  ],
   "crm_deals": [
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",
