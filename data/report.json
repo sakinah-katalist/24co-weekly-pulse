@@ -1,7 +1,25 @@
 {
   "report_date": "2026-08-31",
   "period_label": "Week of 25–31 August 2026",
-  "leads": [],
+  "leads": [
+    {
+      "org_name": "LHDN",
+      "contact_name": "Ashiqin (Division Director)",
+      "contact_email": "eqin1411@yahoo.com",
+      "contact_phone": "0197309433",
+      "org_type": "Company",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-08-27",
+      "enquiry": "Speaker/Talk Services",
+      "area": null,
+      "notes": "Speaker/talk enquiry from a DIVISION DIRECTOR — the most senior contact to come through the form in months, and senior enough to authorise budget. NOTE: LHDN's third touchpoint. A hot lead for training came in on 11 July, and '(LHDN) Jabatan Pungutan Hasil' sits in the CRM as a RM 19,440 Proposal created 3 August. Worth handling as one account rather than three separate threads. Contact used a personal Yahoo address, so confirm the official hasil.gov.my address before sending anything formal.",
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal",
+      "description": "Lembaga Hasil Dalam Negeri (Inland Revenue Board of Malaysia) — statutory body under the Ministry of Finance and one of the country's main revenue-collecting agencies. Established 1948 as the Income Tax Office and given statutory status in 1996 under the Inland Revenue Board Act 1995. Administers income and corporate tax nationwide through divisions covering Policy, Tax Operations, Compliance and Management. A division-level relationship here is a strong reference across the whole tax administration."
+    }
+  ],
   "sessions": [],
   "crm_deals": [
     {
