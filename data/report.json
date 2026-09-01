@@ -1,128 +1,8 @@
 {
-  "report_date": "2026-08-24",
-  "period_label": "Week of 18–24 August 2026",
-  "leads": [
-    {
-      "org_name": "Securities Commission Malaysia",
-      "contact_name": "Leah R (Senior Manager, Corporate Surveillance Department)",
-      "contact_email": "LeahR@seccom.com.my",
-      "contact_phone": "+603 6204 8301",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-08-18",
-      "enquiry": "Trainings/Courses Request",
-      "area": "Other/Customised Course",
-      "notes": "FULL RFP, not a general enquiry. In-house AI programme for the Corporate Surveillance Department: 25-30 officers, one full day, in person at SC Kuala Lumpur, hands-on and use-case driven. Wants AI applied to regulatory work specifically — analysing financial statements and disclosures, spotting anomalies and red flags, extracting across documents, building timelines and fund-flow analysis, Copilot in analytical workflows, plus responsible use (hallucinations, confidentiality, source verification). Explicitly NOT an introductory course. Asked for 8 things: programme outline and objectives, trainer profiles, methodology and exercises, prerequisites, quotation for 25-30 pax, taxes, available dates and lead time, and evidence of similar work for regulators or financial institutions. Open to our recommendation if one day is too short. For budget planning — so a proposal now shapes their budget.",
-      "is_hot": true,
-      "tier1": null,
-      "color": "red",
-      "description": "Securities Commission Malaysia — self-funded statutory body established under the Securities Commission Act 1993, regulating and developing the Malaysian capital market from Bukit Kiara. Reports to the Minister of Finance with accounts tabled in Parliament. Regulates exchanges, clearing houses, licensed intermediaries, prospectuses, corporate bonds, take-overs and unit trusts. NOTE: SC first appeared on 22 July (Syahrizatul Iza, speaker enquiry) and was closed as Unqualified; they have returned with a far more serious, fully-specified request from a different department."
-    },
-    {
-      "org_name": "27Advisory Sdn Bhd",
-      "contact_name": "Ivan (Associate Director)",
-      "contact_email": "ivan@27advisory.com.my",
-      "contact_phone": "0166633886",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-08-21",
-      "enquiry": "Collaboration Opportunity",
-      "area": null,
-      "notes": "TIME-SENSITIVE. Looking for a training partner for a NATIONAL-LEVEL training programme RFQ, and flagged a short submission window — sent 21 August, so the deadline may already be close or past. Asked to be contacted as soon as possible. Worth checking whether this is still live before anything else on this list.",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "27Advisory Sdn Bhd — a private advisory firm approaching us as a delivery partner on a national-level training programme RFQ. Listed here because the end client is a national government programme routed through a consultancy, the same pattern as the KKDW and Pasukan Polis Udara enquiries. Partnering on an RFQ is a route into work that would not otherwise reach us directly."
-    },
-    {
-      "org_name": "PIJ Holdings Sdn Bhd",
-      "contact_name": "Amirul Hakim (Junior Executive, Admin)",
-      "contact_email": "amirulhakim@pijholdings.com",
-      "contact_phone": "072666366",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-08-18",
-      "enquiry": "Trainings/Courses Request",
-      "area": "AI Automation & Critical Thinking Programme [3 Days 2 Nights]",
-      "notes": "Interested in the 3-day / 2-night AI Automation & Critical Thinking Programme — our longest and highest-value format. Enquiry is from a junior admin executive, so expect to be routed to a decision-maker; worth asking who owns the training budget.",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "PIJ Holdings Sdn Bhd — a government-linked company wholly owned by Perbadanan Islam Johor, the Johor state Islamic economic development corporation (established 1976). Acts as the investment and holding arm across real estate, plantations, manufacturing, utilities, the Pengerang oil and gas city development, and waqf/baitulmal activities, with subsidiaries in plantation, property and manufacturing. A Johor state GLC — our second Johor-linked opportunity after Hornbill Skyways in Sarawak."
-    },
-    {
-      "org_name": "IIUM.FM",
-      "contact_name": "Aina (Programme Manager)",
-      "contact_email": "aafiqahh11@gmail.com",
-      "contact_phone": "+601162886150",
-      "org_type": "Company",
-      "lead_source": "Contact Form",
-      "status": "New",
-      "date": "2026-08-20",
-      "enquiry": "Speaker/Talk Services",
-      "area": null,
-      "notes": "Student club organising a Canva workshop, asking about training or collaboration. States they are non-profit and can offer only 'a token of appreciation' — so effectively no budget. Submitted twice within six minutes (duplicate entry). Treat as brand/community exposure rather than revenue: a good-will session reaches students at a 30,000-strong university.",
-      "is_hot": false,
-      "tier1": null,
-      "color": "teal",
-      "description": "IIUM.FM — the campus radio station and student club of the International Islamic University Malaysia, a public university established 1983 with 30,000+ students across seven campuses and students from over 120 countries. The enquiry carries no real budget, but IIUM is a substantial public university and student-facing goodwill work there has reach; the same pattern as the UCSI career-growth workshop in August."
-    }
-  ],
-  "sessions": [
-    {
-      "org_name": "Cybernetics",
-      "class_name": "Canva for Business: Mastering Visual Design for the Workplace",
-      "date": "2026-08-17 → 2026-08-18",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1GJyBRwo-oMy3Mk3FYIGvl-0VhSpF9NsOkxRUGg-Sdtc/edit",
-      "description": "Cybernetics International College of Technology — a private college in Malaysia. Came in as a hot lead on 28 July and converted to a booking within three weeks. This two-day session started 17 August and runs into this week."
-    },
-    {
-      "org_name": "KKM BPM",
-      "class_name": "Gen AI Essentials: Daripada Kemahiran kepada Penyelesaian Praktikal",
-      "date": "2026-08-17 → 2026-08-18",
-      "tier1": "MOH",
-      "color": "gold",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1LARbZ757ZgAssuZto0ugkrgleoa0uKzjYfmb0wzDPYs/edit",
-      "description": "Kementerian Kesihatan Malaysia — Bahagian Pengurusan Maklumat (Information Management Division). Tier 1 MOH: the ministry runs the national public healthcare system with one of the largest workforces in government. KKM divisions are long-standing clients (BTM, BKKM HQ and Bahagian Kompetensi all appear in the CRM). Two-day session straddling the week boundary."
-    },
-    {
-      "org_name": "MSU | 15th Series",
-      "class_name": "Boosting Workplace Efficiency with Copilot",
-      "date": "2026-08-19",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1Ag-d9MFR538PY4oRmM0X181almbpXX2V5rspyGTNuS8/edit",
-      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff). This is the 15th series, following the 13th, 14th, 3.0 Lecturers and 4.0 Management cohorts since 20 July. Five MSU cohorts in five weeks — our most reliable repeat account by a wide margin."
-    },
-    {
-      "org_name": "CGSI",
-      "class_name": "Boosting Workplace Efficiency with Copilot",
-      "date": "2026-08-19",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1W8W-aV0eM-i11tYY0jMchuABHjiRlPXINrnnnVVdJ2c/edit",
-      "description": "CGS International Securities Malaysia — integrated financial services provider and one of the top securities houses in Asia, offering equities, derivatives and Islamic stockbroking from Menara IQ at TRX. Owned by CGS International Holdings with parent China Galaxy Securities; formerly CGS-CIMB. Private sector rather than government. Repeat client: a RM 9,720 deal from early July is still in Awaiting Payment."
-    },
-    {
-      "org_name": "Quality Reputation",
-      "class_name": "Gen AI Essentials: From Skills to Solutions",
-      "date": "2026-08-21 → 2026-08-22",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1ikpItG6o79sRcb2avaSJAD5gYDDJPDeeTZrZuIQ3lXc/edit",
-      "description": "Quality Reputation Sdn Bhd — Petaling Jaya company acting as a supply channel between medical and health suppliers and public hospitals and institutions. Private sector, but its business runs into the public healthcare system, so it sits adjacent to our MOH work. Repeat client: a RM 21,600 deal is still in Awaiting Payment, the third-largest outstanding invoice."
-    }
-  ],
+  "report_date": "2026-08-31",
+  "period_label": "Week of 25–31 August 2026",
+  "leads": [],
+  "sessions": [],
   "crm_deals": [
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM)",
@@ -2910,13 +2790,13 @@
     },
     {
       "org_name": "Jabatan Akauntan Negara Malaysia (JANM) @ Hub",
-      "stage": "Closed",
-      "deal_value": 16200.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "stage": "Paid",
+      "deal_value": 16070.4,
+      "close_date": "2026-08-24",
+      "payment_received_date": "2026-08-24",
       "course": "Gen AI",
       "contact": "Fadzilah binti Ismail",
-      "pax": 0,
+      "pax": 36,
       "train_date": "2026-08-03",
       "added_date": "2026-02-16"
     },
@@ -3485,14 +3365,14 @@
       "added_date": "2026-04-09"
     },
     {
-      "org_name": "KKM - BTM",
-      "stage": "Closed",
-      "deal_value": 24084.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "org_name": "KKM - BTM @ Hub",
+      "stage": "Paid",
+      "deal_value": 23891.33,
+      "close_date": "2026-08-24",
+      "payment_received_date": "2026-08-24",
       "course": "Gen AI sesi 2",
       "contact": "Amir",
-      "pax": 25,
+      "pax": 30,
       "train_date": "2026-08-17",
       "added_date": "2026-04-09"
     },
@@ -4272,7 +4152,7 @@
       "payment_received_date": "2026-08-03",
       "course": "AI, Automation & Critical Thinking Programme",
       "contact": "",
-      "pax": 30,
+      "pax": 35,
       "train_date": "2026-07-15",
       "added_date": "2026-07-08"
     },
@@ -4284,7 +4164,7 @@
       "payment_received_date": "2026-08-03",
       "course": "Gen AI Essentials",
       "contact": "",
-      "pax": 30,
+      "pax": 35,
       "train_date": "2026-07-13",
       "added_date": "2026-07-08"
     },
@@ -4398,13 +4278,13 @@
     },
     {
       "org_name": "Kementerian Ekonomi -  Fahim Siri 3 @ Hub",
-      "stage": "Closed",
-      "deal_value": 15000.0,
-      "close_date": "",
-      "payment_received_date": "",
+      "stage": "Paid",
+      "deal_value": 16070.4,
+      "close_date": "2026-08-24",
+      "payment_received_date": "2026-08-24",
       "course": "GWS & Gemini",
       "contact": "",
-      "pax": 30,
+      "pax": 36,
       "train_date": "2026-08-05",
       "added_date": "2026-07-17"
     },
@@ -4920,7 +4800,11 @@
     },
     {
       "week_label": "Aug 2026",
-      "total_revenue": 157408
+      "total_revenue": 213440
+    },
+    {
+      "week_label": "Sep 2026",
+      "total_revenue": 0
     }
   ],
   "canva_deals": [
