@@ -77,6 +77,15 @@ WEEKS_TO_COMPARE  = 4                       # How many prior weeks shown in reve
 # Add to this list whenever a new org appears.
 # ─────────────────────────────────────────────
 ORG_FULL_NAMES = {
+    # ── Week of 1–7 September 2026 ──
+    "Kementerian Kewangan Malaysia": "Kementerian Kewangan Malaysia (Ministry of Finance / MOF)",
+    "Tenaga Nasional Berhad":  "Tenaga Nasional Berhad (TNB) — Procurement & Supply Chain",
+    "TNB Research Sdn Bhd":    "TNB Research Sdn Bhd (TNBR) — R&D arm of Tenaga Nasional",
+    "Petronas":                "Petroliam Nasional Berhad (PETRONAS)",
+    "SACOFA SDN BHD":          "SACOFA Sdn Bhd — Sarawak telecommunications infrastructure",
+    "Dimension Tree Resources": "Dimension Tree Resources — reseller acting for a government client",
+    "MCCC":                    "Malaysia-China Chamber of Commerce (MCCC)",
+    "UniKL RCMP | Siri 3":     "UniKL Royal College of Medicine Perak (RCMP), Ipoh — Siri 3",
     # ── Week of 25–31 August 2026 ──
     "MSU | 16th Series":      "Management and Science University (MSU) — 16th Series",
     "MSU | 17th Series":      "Management and Science University (MSU) — 17th Series",

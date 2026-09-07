@@ -1,55 +1,130 @@
 {
-  "report_date": "2026-08-31",
-  "period_label": "Week of 25–31 August 2026",
+  "report_date": "2026-09-07",
+  "period_label": "Week of 1–7 September 2026",
   "leads": [
     {
-      "org_name": "LHDN",
-      "contact_name": "Ashiqin (Division Director)",
-      "contact_email": "eqin1411@yahoo.com",
-      "contact_phone": "0197309433",
-      "org_type": "Company",
+      "org_name": "Kementerian Kewangan Malaysia",
+      "contact_name": "Diyana (PTM)",
+      "contact_email": "mizzdhiyana@gmail.com",
+      "contact_phone": "0196339102",
+      "org_type": "Ministry",
       "lead_source": "Contact Form",
       "status": "New",
-      "date": "2026-08-27",
+      "date": "2026-09-03",
+      "enquiry": "Enquiries/Questions",
+      "area": null,
+      "notes": "MOF wants Ali Reza as a speaker for their ICT Seminar and is asking for the fee. A direct invitation, not a general enquiry. NOTE: this is the third live thread inside the MOF family — LHDN (a statutory body under MOF) sent a Division Director enquiry on 27 Aug and has a RM 19,440 proposal open, and KWAP is already a paid Canva customer. Enquiry came from a personal Gmail address, so confirm the official treasury.gov.my contact before quoting.",
+      "is_hot": true,
+      "tier1": "MOF",
+      "color": "teal",
+      "description": "Malaysia's Ministry of Finance — the central ministry responsible for the national budget, fiscal policy, tax policy, government procurement and the oversight of statutory bodies including LHDN and KWAP. A speaking slot at an MOF ICT seminar puts Ali Reza in front of federal ICT decision-makers and is a strong reference for the whole public sector."
+    },
+    {
+      "org_name": "Tenaga Nasional Berhad",
+      "contact_name": "Laila (Manager)",
+      "contact_email": "lailatul.aziz@tnb.com.my",
+      "contact_phone": "0126953222",
+      "org_type": "GLC",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-09-03",
       "enquiry": "Speaker/Talk Services",
       "area": null,
-      "notes": "Speaker/talk enquiry from a DIVISION DIRECTOR — the most senior contact to come through the form in months, and senior enough to authorise budget. NOTE: LHDN's third touchpoint. A hot lead for training came in on 11 July, and '(LHDN) Jabatan Pungutan Hasil' sits in the CRM as a RM 19,440 Proposal created 3 August. Worth handling as one account rather than three separate threads. Contact used a personal Yahoo address, so confirm the official hasil.gov.my address before sending anything formal.",
+      "notes": "The most concrete inbound request of the week — not an enquiry but a booking: a one-hour AI Governance session for the Procurement & Supply Chain management team on 5 October 2026 at Angsana Hotel, Penang, with Ali Reza named. Date, venue, audience and topic are all fixed, so this needs a fee quote and a diary hold rather than qualification. Paired with the TNB Research enquiry the day before, two separate TNB units approached us within 24 hours.",
+      "is_hot": true,
+      "tier1": null,
+      "color": "teal",
+      "description": "Malaysia's national electricity utility and largest power company — a government-linked company majority-held through Khazanah and the EPF, serving over 10 million customers in Peninsular Malaysia. Its Procurement & Supply Chain division governs one of the largest procurement budgets in the country, so an AI-governance session there reaches a high-leverage audience."
+    },
+    {
+      "org_name": "TNB Research Sdn Bhd",
+      "contact_name": "Hanisah (Legal Manager)",
+      "contact_email": "hanisah.hanaffi@tnb.com.my",
+      "contact_phone": "0162063692",
+      "org_type": "GLC",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-09-02",
+      "enquiry": "Speaker/Talk Services",
+      "area": null,
+      "notes": "Speaker enquiry from TNB's R&D arm, submitted a day before the separate TNB Procurement request. Worth checking whether the two are connected before responding — a coordinated internal push would justify a group proposal rather than two one-off quotes. Enquiry came from a Legal Manager, which suggests governance or compliance framing rather than technical training.",
       "is_hot": false,
       "tier1": null,
       "color": "teal",
-      "description": "Lembaga Hasil Dalam Negeri (Inland Revenue Board of Malaysia) — statutory body under the Ministry of Finance and one of the country's main revenue-collecting agencies. Established 1948 as the Income Tax Office and given statutory status in 1996 under the Inland Revenue Board Act 1995. Administers income and corporate tax nationwide through divisions covering Policy, Tax Operations, Compliance and Management. A division-level relationship here is a strong reference across the whole tax administration."
+      "description": "TNB Research (TNBR) has been Tenaga Nasional's in-house research and solutions arm since 1993, based at the R&D centre in Kajang, Selangor. It works on renewable energy, smart grids, energy efficiency and environmental research, and runs its own subsidiary TNB Labs for industry testing services. A legal-side enquiry here points at AI governance and compliance rather than tooling."
+    },
+    {
+      "org_name": "Petronas",
+      "contact_name": "Tya",
+      "contact_email": "athidyahomar@petronas.com.my",
+      "contact_phone": "01157671861",
+      "org_type": "GLC",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-09-02",
+      "enquiry": "Trainings/Courses Request",
+      "area": "Other/Customised Course",
+      "notes": "Customised course request. The brief is a single word — 'Demurrage' — which is the shipping charge incurred when a vessel is held beyond agreed laytime, a real cost centre in oil and gas logistics. Needs a scoping call to establish whether they want AI applied to demurrage claims analysis or something broader; do not quote off the one-word brief.",
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal",
+      "description": "Malaysia's national oil and gas company, wholly owned by the government and the country's single largest corporate taxpayer and revenue contributor. It operates across the full energy value chain in over 30 countries and is consistently the highest-profile GLC in Malaysia. Any training relationship here carries significant reference value."
+    },
+    {
+      "org_name": "SACOFA SDN BHD",
+      "contact_name": "Wan Nur Azlan (Manager, IT Product Development)",
+      "contact_email": "wnazlan@sacofa.com.my",
+      "contact_phone": "0138335143",
+      "org_type": "GLC",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-09-02",
+      "enquiry": "Trainings/Courses Request",
+      "area": "Other/Customised Course",
+      "notes": "Asking for training on data lakes, data warehousing and data analytics for 5 software engineers with 3 years of SQL and PHP experience. This is a well-specified brief — known audience size and skill baseline — but it sits outside our published Canva/GenAI/Google Workspace catalogue. Decide whether to build a customised data-engineering track or refer it on; a vague reply to this level of detail would be a wasted opportunity.",
+      "is_hot": false,
+      "tier1": null,
+      "color": "teal",
+      "description": "SACOFA Sdn Bhd is Sarawak's telecommunications infrastructure provider, incorporated in 2001 and majority-owned by the state government through State Financial Secretary Incorporated, with Cahya Mata Sarawak as a further shareholder. It operates more than 1,688 towers and over 12,000 km of optical fibre, forming the backbone of Sarawak's communications network. First inbound lead from a Sarawak state GLC in this dataset."
+    },
+    {
+      "org_name": "Dimension Tree Resources",
+      "contact_name": "Ms Azlin (Manager)",
+      "contact_email": "azlinoor@dimensiontree.com",
+      "contact_phone": "0173034534",
+      "org_type": "Reseller",
+      "lead_source": "Contact Form",
+      "status": "New",
+      "date": "2026-09-04",
+      "enquiry": "Canva Related Services",
+      "area": null,
+      "notes": "Explicitly states a GOVERNMENT client wants 3-year Canva Pro licences for 30 users, to be purchased through Dimension Tree on the client's behalf. A concrete, sized, multi-year public-sector Canva order arriving through a reseller. This is the sixth reseller-routed Canva enquiry in four weeks (Achieve Tech/KKDW, ConnectB, Drawbridge, Focus Instruments, Total Integrated System) while the Canva CRM has had no new record since 3 July. Ask which agency the end client is — it determines whether this can be booked directly.",
+      "is_hot": true,
+      "tier1": null,
+      "color": "amber",
+      "description": "A Malaysian IT reseller acting as purchasing agent for a government end client on a 3-year, 30-user Canva Pro licence requirement. Included here despite being a private company because the ultimate customer is a public-sector agency, matching how the Achieve Tech / KKDW enquiry was treated in August."
     }
   ],
   "sessions": [
     {
-      "org_name": "MSU | 16th Series",
-      "class_name": "Boosting Workplace Efficiency with Copilot",
-      "date": "2026-08-26",
+      "org_name": "MCCC",
+      "class_name": "Gen AI Essentials: From Skills to Solutions",
+      "date": "2026-09-03",
       "tier1": null,
       "color": "teal",
       "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/15y0vp_PE8rQ08uCYv25H2GVyXtxv5yuKxrGd_AFuIcw/edit",
-      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). 16th series. All three of this week's sessions were MSU — the first week this year with a single client accounting for every delivery."
+      "feedback": "",
+      "description": "The Malaysia-China Chamber of Commerce, founded in 1990, is a non-governmental, non-profit and multi-ethnic business association promoting trade and investment between Malaysia and China. It has over 2,000 corporate members across nine state branches and has been authorised by MITI to issue Certificates of Origin since 2008. Delivering here reaches a membership spanning manufacturing, finance, property and services. The corresponding RM 21,000 deal moved to Closed this week."
     },
     {
-      "org_name": "MSU | 17th Series",
-      "class_name": "The AI-Resilient Educator",
-      "date": "2026-08-26",
+      "org_name": "UniKL RCMP | Siri 3",
+      "class_name": "Gen AI Essentials: From Skills to Solutions",
+      "date": "2026-09-07",
       "tier1": null,
       "color": "teal",
       "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1XrqYPVlE59XbnHGhYITPtHn-lZemKQLvcJyBlmVrPWw/edit",
-      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). 17th series, run the same day as the 16th — two parallel cohorts, which points at a scheduled roll-out across departments rather than ad-hoc bookings."
-    },
-    {
-      "org_name": "MSU | 18th Series",
-      "class_name": "The AI-Resilient Educator",
-      "date": "2026-08-27",
-      "tier1": null,
-      "color": "teal",
-      "signup": "",
-      "feedback": "https://docs.google.com/spreadsheets/d/1SOjXkEzh2_Rkd5hW7YNDOxcK59GDTM6f_8FrGWtq3tA/edit",
-      "description": "Management and Science University — one of Malaysia's largest private universities (Shah Alam, ~15,000 students, ~700 academic staff, QS ~#608). 18th series. Eight MSU cohorts have now run in six weeks (13th, 14th, 3.0 Lecturers, 4.0 Management, 15th, 16th, 17th, 18th) — by far our largest and most consistent account."
+      "feedback": "",
+      "description": "Universiti Kuala Lumpur Royal College of Medicine Perak, in Greentown, Ipoh, offers medicine, pharmacy and health sciences programmes and is registered with the Malaysian Medical Council. Third session in a six-part series worth RM 110,208 in total — two delivered and paid or closed, two more closed for 21-22 September, and two still at Almost Confirmed for October. After MSU, this is our most committed repeat account."
     }
   ],
   "crm_deals": [
@@ -122,7 +197,7 @@
       "course": "Generative AI Fundamentals & Prompting Skills",
       "contact": "Ms Lai / Mr Kee",
       "pax": 0,
-      "train_date": "",
+      "train_date": "2025-05-15",
       "added_date": "2025-01-07"
     },
     {
@@ -3578,7 +3653,7 @@
       "course": "Copilot 3rd sesh",
       "contact": "Nor Amalina",
       "pax": 30,
-      "train_date": "2026-10-15",
+      "train_date": "2026-10-06",
       "added_date": "2026-04-21"
     },
     {
@@ -4218,18 +4293,6 @@
       "added_date": "2026-07-08"
     },
     {
-      "org_name": "UMMC",
-      "stage": "Almost Confirmed",
-      "deal_value": 10800.0,
-      "close_date": "",
-      "payment_received_date": "",
-      "course": "Designing with Canva",
-      "contact": "Shariffudin",
-      "pax": 0,
-      "train_date": "2026-09-08",
-      "added_date": "2026-07-13"
-    },
-    {
       "org_name": "Weststar Engineering Sdn Bhd",
       "stage": "Proposal / Quotation",
       "deal_value": 19440.0,
@@ -4411,7 +4474,7 @@
     },
     {
       "org_name": "UniKL RCMP",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 20952.0,
       "close_date": "",
       "payment_received_date": "",
@@ -4423,7 +4486,7 @@
     },
     {
       "org_name": "UniKL RCMP",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 20952.0,
       "close_date": "",
       "payment_received_date": "",
@@ -4735,7 +4798,7 @@
     },
     {
       "org_name": "Malaysia-Chine Chamber of Commerce (MCCC)",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 21000.0,
       "close_date": "",
       "payment_received_date": "",
@@ -4747,7 +4810,7 @@
     },
     {
       "org_name": "Kementerian Luar Negeri (KLN) Siri 2 - Zenith",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 46915.2,
       "close_date": "",
       "payment_received_date": "",
@@ -4759,7 +4822,7 @@
     },
     {
       "org_name": "Kementerian Luar Negeri (KLN) Siri 3 - Zenith",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 46915.2,
       "close_date": "",
       "payment_received_date": "",
@@ -4771,7 +4834,7 @@
     },
     {
       "org_name": "Perbadanan Stadium Malaysia",
-      "stage": "Almost Confirmed",
+      "stage": "Closed",
       "deal_value": 6000.0,
       "close_date": "",
       "payment_received_date": "",
@@ -4816,43 +4879,143 @@
       "pax": 25,
       "train_date": "",
       "added_date": "2026-08-21"
+    },
+    {
+      "org_name": "27Advisory Sdn Bhd",
+      "stage": "In progress",
+      "deal_value": 0.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "",
+      "contact": "mailto:ivan@27advisory.com.my",
+      "pax": 0,
+      "train_date": "",
+      "added_date": "2026-08-21"
+    },
+    {
+      "org_name": "LKPP Property Sdn Bhd",
+      "stage": "Almost Confirmed",
+      "deal_value": 7020.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Canva",
+      "contact": "Safura Ainy",
+      "pax": 35,
+      "train_date": "2026-09-24",
+      "added_date": "2026-08-24"
+    },
+    {
+      "org_name": "PIJ Holdings Sdn Bhd",
+      "stage": "Proposal / Quotation",
+      "deal_value": 22680.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen Ai",
+      "contact": "Amirul Hakim",
+      "pax": 0,
+      "train_date": "",
+      "added_date": "2026-08-26"
+    },
+    {
+      "org_name": "CGSI",
+      "stage": "Almost Confirmed",
+      "deal_value": 9720.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Copilot 4th sesh",
+      "contact": "Nor Amalina",
+      "pax": 30,
+      "train_date": "2026-10-15",
+      "added_date": "2026-09-02"
+    },
+    {
+      "org_name": "CGSI",
+      "stage": "Almost Confirmed",
+      "deal_value": 9720.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Copilot 5th sesh",
+      "contact": "Nor Amalina",
+      "pax": 30,
+      "train_date": "2026-10-29",
+      "added_date": "2026-09-02"
+    },
+    {
+      "org_name": "Kementerian Luar Negeri (KLN) Siri 4 - Zenith",
+      "stage": "Almost Confirmed",
+      "deal_value": 46915.2,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen AI",
+      "contact": "Shahrul",
+      "pax": 40,
+      "train_date": "2026-10-07",
+      "added_date": "2026-09-04"
+    },
+    {
+      "org_name": "Kementerian Luar Negeri (KLN) Siri 5 - Zenith",
+      "stage": "Almost Confirmed",
+      "deal_value": 26338.93,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Gen AI",
+      "contact": "Shahrul",
+      "pax": 50,
+      "train_date": "2026-10-09",
+      "added_date": "2026-09-04"
+    },
+    {
+      "org_name": "Cyberview",
+      "stage": "Almost Confirmed",
+      "deal_value": 9504.0,
+      "close_date": "",
+      "payment_received_date": "",
+      "course": "Executive talk",
+      "contact": "Juriana",
+      "pax": 40,
+      "train_date": "2026-09-18",
+      "added_date": "2026-09-04"
     }
   ],
   "revenue_history": [
     {
-      "week_label": "Jan 2026",
-      "total_revenue": 88055
+      "week_label": "Wk 14 Jul",
+      "monday_date": "2026-07-14",
+      "total_revenue": 6480
     },
     {
-      "week_label": "Feb 2026",
-      "total_revenue": 61599
+      "week_label": "Wk 21 Jul",
+      "monday_date": "2026-07-21",
+      "total_revenue": 8420
     },
     {
-      "week_label": "Mar 2026",
-      "total_revenue": 20196
+      "week_label": "Wk 28 Jul",
+      "monday_date": "2026-07-28",
+      "total_revenue": 79991
     },
     {
-      "week_label": "Apr 2026",
-      "total_revenue": 128153
+      "week_label": "Wk 4 Aug",
+      "monday_date": "2026-08-04",
+      "total_revenue": 25920
     },
     {
-      "week_label": "May 2026",
-      "total_revenue": 97080
+      "week_label": "Wk 11 Aug",
+      "monday_date": "2026-08-11",
+      "total_revenue": 31952
     },
     {
-      "week_label": "Jun 2026",
-      "total_revenue": 245017
+      "week_label": "Wk 18 Aug",
+      "monday_date": "2026-08-18",
+      "total_revenue": 106286
     },
     {
-      "week_label": "Jul 2026",
-      "total_revenue": 100170
+      "week_label": "Wk 25 Aug",
+      "monday_date": "2026-08-25",
+      "total_revenue": 0
     },
     {
-      "week_label": "Aug 2026",
-      "total_revenue": 213440
-    },
-    {
-      "week_label": "Sep 2026",
+      "week_label": "This week",
+      "monday_date": "2026-09-01",
       "total_revenue": 0
     }
   ],
